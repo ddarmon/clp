@@ -2,7 +2,7 @@
 title: Confidence Curves for Linear Combinations via Feasible Direction Optimization
 author: David Darmon
 date: 230520
-output: html_notebook
+output: html_document
 ---
 
 ```{r}
