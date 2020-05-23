@@ -3,7 +3,7 @@ Type: Package
 Title: R Package to Accompany *Confidence, Likelihood, and Probability*.
 Version: 0.1.0
 Author: David Darmon (for now)
-Maintainer: ddarmon@monmouth.edu
+Maintainer: David Darmon <ddarmon@monmouth.edu>
 Description: Currently in **very** alpha.
     Will implement the confidence distribution machinery for several models.
 License: What license is it under?
