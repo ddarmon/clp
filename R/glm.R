@@ -139,9 +139,9 @@ confcurve.lincom <- function(mod, x){
 
   par(mfrow = c(1, 2))
   curve(profile.lik.fun, from = min(resp.vals), to = max(resp.vals),
-       xlab = 'Expected Response', ylab = 'Profile Likelihood')
+        xlab = 'Expected Response', ylab = 'Profile Likelihood')
   curve(dev.fun,  from = min(resp.vals), to = max(resp.vals),
-       xlab = 'Expected Response', ylab = 'Deviance')
+        xlab = 'Expected Response', ylab = 'Deviance')
   abline(h = qchisq(c(0.5, 0.9, 0.95, 0.99), 1), lty = 3)
 
   signed.sqrt.dev.fun <- function(m) sign(m - mod$family$linkinv(m.mle))*sqrt(dev.fun(m))
@@ -150,11 +150,11 @@ confcurve.lincom <- function(mod, x){
   cd <- function(m) pnorm(signed.sqrt.dev.fun(m))
 
   curve(cc(x), from = min(resp.vals), to = max(resp.vals),
-       xlab = 'Expected Response', ylab = 'cc', n = 2001)
+        xlab = 'Expected Response', ylab = 'cc', n = 2001)
   abline(h = 0.95, lty = 3)
 
   curve(cd(x), from = min(resp.vals), to = max(resp.vals),
-       xlab = 'Expected Response', ylab = 'cd', n = 2001)
+        xlab = 'Expected Response', ylab = 'cd', n = 2001)
 
   return(list(cc = cc, cd = cd, profile.lik = profile.lik.fun, deviance = dev.fun))
 }
