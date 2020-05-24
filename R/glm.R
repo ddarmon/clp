@@ -11,6 +11,7 @@ confcurve.lincom <- function(mod, x){
   }
 
   beta.mle <- coef(mod)
+  ell.mle <- ell.beta(beta.mle)
 
   m.mle <- sum(x*beta.mle)
 
@@ -51,23 +52,82 @@ confcurve.lincom <- function(mod, x){
     return(list(value = value, beta.con = beta.con))
   }
 
-  ms <- seq(m.mle - 2, m.mle + 2, length.out = 21)
+  #Use procedure as described on page 23 of
+  #
+  # *Fitting Linear Mixed-Effects Models Using lme4*
+  # (Bates, Machler, Bolker, and Walker)
+  #
+  # to perform the profiling.
 
-  pll <- rep(0, length(ms))
+  ms <- c(m.mle)
+  zs <- c(0)
 
+  z.max <- qnorm(0.999)
+  D.z <- z.max / 16
+
+  # Probably should take advantage of asymptotic results here
+  # rather than use a fudge factor.
+
+  new.m <- if (ms == 0) 0.001 else 1.01*ms
+
+  ms <- c(ms, new.m)
+
+  # Get value at initial new point:
+
+  xhat <- qr.out$Q[, 1]*(ms[2]/qr.out$R[1])
   beta0 <- beta.mle[2:length(beta.mle)]
+  prof.out <- profile.lik(ms[2], beta0)
 
-  for(m.ind in 1:length(ms)){
-    m <- ms[m.ind]
+  pll <- prof.out$value
+  beta0 <- prof.out$beta.con
 
-    xhat <- qr.out$Q[, 1]*(m/qr.out$R[1])
+  zs <- c(zs, sqrt(2*(ell.mle - pll)))
 
-    prof.out <- profile.lik(m, beta0)
+  # Profile in positive direction.
 
-    pll[m.ind] <- prof.out$value
+  i <- 2
+  while (tail(zs, 1) < z.max){
+    DzDpsi <- (zs[i] - zs[i - 1])/(ms[i] - ms[i-1])
 
-    beta0 <- prof.out$beta.con
+    dpsi <- D.z / DzDpsi
+
+    ms <- c(ms, tail(ms, 1) + dpsi)
+
+    xhat <- qr.out$Q[, 1]*(ms[length(ms)]/qr.out$R[1])
+
+    prof.out <- profile.lik(ms[length(ms)], beta0)
+
+    pll <- prof.out$value
+    theta0 <- prof.out$beta.con
+
+    zs <- c(zs, sqrt(2*(ell.mle - pll)))
+
+    i <- i + 1
   }
+
+  # Profile in negative direction.
+
+  i <- 2
+  while (zs[1] > -z.max){
+    DzDpsi <- (zs[i-1] - zs[i])/(ms[i-1] - ms[i])
+
+    dpsi <- D.z / DzDpsi
+
+    ms <- c(ms[1] - dpsi, ms)
+
+    xhat <- qr.out$Q[, 1]*(ms[1]/qr.out$R[1])
+
+    prof.out <- profile.lik(ms[1], beta0)
+
+    pll <- prof.out$value
+    theta0 <- prof.out$beta.con
+
+    zs <- c(-sqrt(2*(ell.mle - pll)), zs)
+
+    i <- i + 1
+  }
+
+  pll <- ell.mle - (zs^2)/2
 
   profile.lik.fun <- splinefun(mod$family$linkinv(ms), pll)
 
@@ -90,11 +150,11 @@ confcurve.lincom <- function(mod, x){
   cd <- function(m) pnorm(signed.sqrt.dev.fun(m))
 
   curve(cc(x), from = min(resp.vals), to = max(resp.vals),
-       xlab = 'Expected Response', ylab = 'cc')
+       xlab = 'Expected Response', ylab = 'cc', n = 2001)
   abline(h = 0.95, lty = 3)
 
   curve(cd(x), from = min(resp.vals), to = max(resp.vals),
-       xlab = 'Expected Response', ylab = 'cd')
+       xlab = 'Expected Response', ylab = 'cd', n = 2001)
 
   return(list(cc = cc, cd = cd, profile.lik = profile.lik.fun, deviance = dev.fun))
 }
@@ -168,13 +228,27 @@ confcurve.lincom.disp <- function(mod, x){
     return(list(value = value, theta.con = theta.con))
   }
 
+  #Use procedure as described on page 23 of
+  #
+  # *Fitting Linear Mixed-Effects Models Using lme4*
+  # (Bates, Machler, Bolker, and Walker)
+  #
+  # to perform the profiling.
+
   ms <- c(m.mle)
   zs <- c(0)
 
-  z.max <- qnorm(0.999)
+  z.max <- qt(0.999, n - p)
   D.z <- z.max / 16
 
-  ms <- c(ms, 1.01*ms)
+  # Probably should take advantage of asymptotic results here
+  # rather than use a fudge factor.
+
+  new.m <- if (ms == 0) 0.001 else 1.01*ms
+
+  ms <- c(ms, new.m)
+
+  # Get value at initial new point:
 
   xhat <- qr.out$Q[, 1]*(ms[2]/qr.out$R[1])
   theta0 <- theta.mle[2:length(theta.mle)]
@@ -184,6 +258,8 @@ confcurve.lincom.disp <- function(mod, x){
   theta0 <- prof.out$theta.con
 
   zs <- c(zs, sqrt(2*(ell.mle - pll)))
+
+  # Profile in the positive direction.
 
   i <- 2
   while (tail(zs, 1) < z.max){
@@ -205,6 +281,8 @@ confcurve.lincom.disp <- function(mod, x){
     i <- i + 1
   }
 
+  # Profile in the negative direction.
+
   i <- 2
   while (zs[1] > -z.max){
     DzDpsi <- (zs[i-1] - zs[i])/(ms[i-1] - ms[i])
@@ -224,6 +302,8 @@ confcurve.lincom.disp <- function(mod, x){
 
     i <- i + 1
   }
+
+  # Recover profile log-likelihood from Z-values.
 
   pll <- ell.mle - (zs^2)/2
 
@@ -248,11 +328,11 @@ confcurve.lincom.disp <- function(mod, x){
   cd <- function(m) pt(signed.sqrt.dev.fun(m), df = n - p)
 
   curve(cc(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'cc')
+        xlab = 'Expected Response', ylab = 'cc', n = 2001)
   abline(h = 0.95, lty = 3)
 
   curve(cd(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'cd')
+        xlab = 'Expected Response', ylab = 'cd', n = 2001)
 
   return(list(cc = cc, cd = cd, profile.lik = profile.lik.fun, deviance = dev.fun))
 }
