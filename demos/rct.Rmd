@@ -1,0 +1,31 @@
+```{r}
+## Dobson (1990) Page 93: Randomized Controlled Trial :
+counts <- c(18,17,15,20,10,20,25,13,12)
+outcome <- gl(3,1,9)
+treatment <- gl(3,3)
+print(d.AD <- data.frame(treatment, outcome, counts))
+
+d.AD$outcome2 <- as.numeric(d.AD$outcome == '2')
+d.AD$outcome3 <- as.numeric(d.AD$outcome == '3')
+
+d.AD$treatment2 <- as.numeric(d.AD$treatment == '2')
+d.AD$treatment3 <- as.numeric(d.AD$treatment == '3')
+
+mod <- glm(counts ~ outcome2 + outcome3 + treatment2 + treatment3, family = poisson(), data = d.AD)
+
+summary(mod)
+```
+
+```{r}
+library(clp)
+
+x <- c(1, 0, 0, 0, 0)
+cc11 <- confcurve.lincom(mod, x)
+
+x <- c(1, 1, 0, 0, 0)
+cc21 <- confcurve.lincom(mod, x)
+
+x <- c(1, 0, 1, 0, 0)
+cc31 <- confcurve.lincom(mod, x)
+```
+

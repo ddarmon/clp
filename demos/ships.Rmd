@@ -1,0 +1,28 @@
+```{r}
+library(MASS)
+
+data(ships)
+
+ships$year <- as.factor(ships$year)
+ships$period <- as.factor(ships$period)
+
+ships <- subset(ships, service > 0)
+
+mm <- data.frame(model.matrix(incidents ~ service + year + type, ships))
+
+mm$incidents <- ships$incidents
+
+mod <- glm(incidents ~ log(service) + year65 + year70 + year75 + typeB + typeC + typeD + typeE, data = mm, family = poisson)
+```
+
+```{r}
+x <- c(1,
+       log(mean(mm$service)),
+       0, 0, 0,
+       0, 0, 0, 0)
+
+library(clp)
+
+cc <- confcurve.lincom(mod, x)
+```
+
