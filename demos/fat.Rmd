@@ -38,5 +38,7 @@ curve(cc.glm$cc(x), from = 9, to = 14, n = 2001, col = 'red', lty = 3, add = TRU
 resp <- seq(9, 14, length.out = 2000)
 
 plot(resp, cc.lm$cc(resp) - cc.glm$cc(resp))
+
+curve(0.01*(cc.lm$cc(x)-1), add = TRUE)
 ```
 
