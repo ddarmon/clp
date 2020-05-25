@@ -52,7 +52,7 @@ confcurve.lincom <- function(mod, x){
     return(list(value = value, beta.con = beta.con))
   }
 
-  #Use procedure as described on page 23 of
+  # Use procedure as described on page 23 of
   #
   # *Fitting Linear Mixed-Effects Models Using lme4*
   # (Bates, Machler, Bolker, and Walker)
@@ -62,7 +62,7 @@ confcurve.lincom <- function(mod, x){
   ms <- c(m.mle)
   zs <- c(0)
 
-  z.max <- qnorm(0.999)
+  z.max <- qnorm(0.9999)
   D.z <- z.max / 16
 
   # Probably should take advantage of asymptotic results here
@@ -75,7 +75,9 @@ confcurve.lincom <- function(mod, x){
   # Get value at initial new point:
 
   xhat <- qr.out$Q[, 1]*(ms[2]/qr.out$R[1])
-  beta0 <- beta.mle[2:length(beta.mle)]
+
+  beta0 <- t(Fcon)%*%(beta.mle - xhat)
+
   prof.out <- profile.lik(ms[2], beta0)
 
   pll <- prof.out$value
@@ -187,6 +189,8 @@ confcurve.lincom.disp <- function(mod, x){
 
   m.mle <- sum(x*theta.mle[1:length(x)])
 
+  dev.mle <- deviance(mod)
+
   # Get out feasible direction for the
   # constraint x*theta = m via QR decomp.
 
@@ -201,9 +205,10 @@ confcurve.lincom.disp <- function(mod, x){
 
   ell.con <- function(theta, xhat){
     theta <- matrix(theta, nrow = length(theta))
-    theta[length(theta)] <- theta[length(theta)]^2
 
     arg <- Fcon%*%theta + xhat
+    arg[length(arg)] <- arg[length(arg)]^2 # Square to enforce positivity
+
     return(ell.theta(arg))
   }
 
@@ -211,9 +216,9 @@ confcurve.lincom.disp <- function(mod, x){
 
   score.con <- function(theta, xhat){
     theta <- matrix(theta, nrow = length(theta))
-    theta[length(theta)] <- theta[length(theta)]^2
 
     arg <- Fcon%*%theta + xhat
+    arg[length(arg)] <- arg[length(arg)]^2 # Square to enforce positivity
 
     t(Fcon)%*%score(coefficients = arg[1:(length(arg)-1)], dispersion = arg[length(arg)])
   }
@@ -221,14 +226,15 @@ confcurve.lincom.disp <- function(mod, x){
   # The profile likelihood function.
 
   profile.lik <- function(m, theta0){
-    opt.out <- optim(theta0, ell.con, score.con, method = 'BFGS', xhat = xhat, control = list(fnscale = -1))
+    # Suppressing warning for NAs that can occur for gamma GLMs.
+    suppressWarnings(opt.out <- optim(theta0, ell.con, score.con, method = 'BFGS', xhat = xhat, control = list(fnscale = -1)))
     value <- opt.out$value
     theta.con <- opt.out$par
 
     return(list(value = value, theta.con = theta.con))
   }
 
-  #Use procedure as described on page 23 of
+  # Use procedure as described on page 23 of
   #
   # *Fitting Linear Mixed-Effects Models Using lme4*
   # (Bates, Machler, Bolker, and Walker)
@@ -238,7 +244,7 @@ confcurve.lincom.disp <- function(mod, x){
   ms <- c(m.mle)
   zs <- c(0)
 
-  z.max <- qt(0.999, n - p)
+  z.max <- qt(0.9999, n - p)
   D.z <- z.max / 16
 
   # Probably should take advantage of asymptotic results here
@@ -248,16 +254,31 @@ confcurve.lincom.disp <- function(mod, x){
 
   ms <- c(ms, new.m)
 
-  # Get value at initial new point:
+  # Get values at initial new point:
 
   xhat <- qr.out$Q[, 1]*(ms[2]/qr.out$R[1])
-  theta0 <- theta.mle[2:length(theta.mle)]
+
+  # Do these two lines in non-disp. code as well.
+
+  theta0 <- t(Fcon)%*%(theta.mle - xhat)
+
+  theta0[length(theta0)] <- sqrt(theta0[length(theta0)])
+
+  # theta0 <- theta.mle[2:length(theta.mle)]
+
   prof.out <- profile.lik(ms[2], theta0)
 
   pll <- prof.out$value
   theta0 <- prof.out$theta.con
 
-  zs <- c(zs, sqrt(2*(ell.mle - pll)))
+  beta0 <- as.numeric(Fcon%*%theta0 + xhat)[1:length(x)]
+
+  fit.con <- mod$family$linkinv(model.matrix(mod)%*%beta0)
+  dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = 1)) ## Not sure about wt = 1 here.
+
+  # Use deviance-based F-statistic:
+
+  zs <- c(zs, sqrt((dev.con - dev.mle)/(dev.mle/(n - p))))
 
   # Profile in the positive direction.
 
@@ -276,7 +297,12 @@ confcurve.lincom.disp <- function(mod, x){
     pll <- prof.out$value
     theta0 <- prof.out$theta.con
 
-    zs <- c(zs, sqrt(2*(ell.mle - pll)))
+    beta0 <- as.numeric(Fcon%*%theta0 + xhat)[1:length(x)]
+
+    fit.con <- mod$family$linkinv(model.matrix(mod)%*%beta0)
+    dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = 1)) ## Not sure about wt = 1 here.
+
+    zs <- c(zs, sqrt((dev.con - dev.mle)/(dev.mle/(n - p))))
 
     i <- i + 1
   }
@@ -298,34 +324,28 @@ confcurve.lincom.disp <- function(mod, x){
     pll <- prof.out$value
     theta0 <- prof.out$theta.con
 
-    zs <- c(-sqrt(2*(ell.mle - pll)), zs)
+    beta0 <- as.numeric(Fcon%*%theta0 + xhat)[1:length(x)]
+
+    fit.con <- mod$family$linkinv(model.matrix(mod)%*%beta0)
+    dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = 1)) ## Not sure about wt = 1 here.
+
+    zs <- c(-sqrt((dev.con - dev.mle)/(dev.mle/(n - p))), zs)
 
     i <- i + 1
   }
 
-  # Recover profile log-likelihood from Z-values.
-
-  pll <- ell.mle - (zs^2)/2
-
-  profile.lik.fun <- splinefun(mod$family$linkinv(ms), pll)
-
-  dev.fun <- function(m){
-    2*(ell.mle - profile.lik.fun(m))
-  }
-
   resp.vals <- mod$family$linkinv(ms)
 
-  par(mfrow = c(1, 2))
-  curve(profile.lik.fun, from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'Profile Likelihood')
-  curve(dev.fun,  from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'Deviance')
-  abline(h = qf(c(0.5, 0.9, 0.95, 0.99), df1 = 1, df2 = n - p), lty = 3)
+  profile <- approxfun(resp.vals, zs)
 
-  signed.sqrt.dev.fun <- function(m) sign(m - mod$family$linkinv(m.mle))*sqrt(dev.fun(m))
+  # Not sure why we have to do this? Why aren't the resp.values always increasing?
 
-  cc <- function(m) pf(dev.fun(m), df1 = 1, df2 = n - p)
-  cd <- function(m) pt(signed.sqrt.dev.fun(m), df = n - p)
+  cd <- if (resp.vals[2] - resp.vals[1] < 0) {
+    function(m) 1-pt(profile(m), df = n - p)
+  } else{
+    function(m) pt(profile(m), df = n - p)
+  }
+  cc <- function(m) pf(profile(m)^2, df1 = 1, df2 = n - p)
 
   curve(cc(x), from = min(resp.vals), to = max(resp.vals),
         xlab = 'Expected Response', ylab = 'cc', n = 2001)
@@ -334,5 +354,5 @@ confcurve.lincom.disp <- function(mod, x){
   curve(cd(x), from = min(resp.vals), to = max(resp.vals),
         xlab = 'Expected Response', ylab = 'cd', n = 2001)
 
-  return(list(cc = cc, cd = cd, profile.lik = profile.lik.fun, deviance = dev.fun))
+  return(list(cc = cc, cd = cd))
 }
