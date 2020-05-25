@@ -17,8 +17,6 @@ library(clp)
 # Reformat Data Set to Match Example 2.4 on Page 38 of CLP
 
 ```{r}
-data(lbw)
-
 lbw.clp <- data.frame(low = lbw$LOW)
 
 lbw.clp$age <- lbw$AGE
