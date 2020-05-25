@@ -274,7 +274,7 @@ confcurve.lincom.disp <- function(mod, x){
   beta0 <- as.numeric(Fcon%*%theta0 + xhat)[1:length(x)]
 
   fit.con <- mod$family$linkinv(model.matrix(mod)%*%beta0)
-  dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = 1)) ## Not sure about wt = 1 here.
+  dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = mod$prior.weights))
 
   # Use deviance-based F-statistic:
 
@@ -300,7 +300,7 @@ confcurve.lincom.disp <- function(mod, x){
     beta0 <- as.numeric(Fcon%*%theta0 + xhat)[1:length(x)]
 
     fit.con <- mod$family$linkinv(model.matrix(mod)%*%beta0)
-    dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = 1)) ## Not sure about wt = 1 here.
+    dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = mod$prior.weights)) ## Not sure about wt = 1 here.
 
     zs <- c(zs, sqrt((dev.con - dev.mle)/(dev.mle/(n - p))))
 
@@ -327,7 +327,7 @@ confcurve.lincom.disp <- function(mod, x){
     beta0 <- as.numeric(Fcon%*%theta0 + xhat)[1:length(x)]
 
     fit.con <- mod$family$linkinv(model.matrix(mod)%*%beta0)
-    dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = 1)) ## Not sure about wt = 1 here.
+    dev.con <- sum(mod$family$dev.resids(mod$y, fit.con, wt = mod$prior.weights))
 
     zs <- c(-sqrt((dev.con - dev.mle)/(dev.mle/(n - p))), zs)
 

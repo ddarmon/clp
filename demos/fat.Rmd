@@ -1,0 +1,42 @@
+# Data Set for Body Fat Prediction
+
+http://lib.stat.cmu.edu/datasets/bodyfat
+
+```{r}
+load('fat.rda')
+
+mod.lm <- lm(body.fat ~ age + weight + height, data = fat)
+mod.glm <- glm(body.fat ~ age + weight + height, data = fat, family = gaussian)
+
+par(mfrow = c(2, 2))
+plot(mod.lm)
+
+```
+
+# Confidence curve for the expected BFP of a 170lb, 6ft, 20-year old male
+
+```{r}
+x <- c(1,    # Intercept
+       20,   # 20 years old
+       170,  # 170 lbs
+       6*12) # 72 inches (6 feet)
+
+library(clp)
+
+cc.lm <- confcurve.lincom.lm(mod.lm, x)
+cc.glm <- confcurve.lincom.disp(mod.glm, x)
+```
+
+## Compare exact cc from Gaussian noise to GLM cc
+
+```{r}
+curve(cc.lm$cc(x), from = 9, to = 14, n = 2001, col = 'blue')
+curve(cc.glm$cc(x), from = 9, to = 14, n = 2001, col = 'red', lty = 3, add = TRUE)
+```
+
+```{r}
+resp <- seq(9, 14, length.out = 2000)
+
+plot(resp, cc.lm$cc(resp) - cc.glm$cc(resp))
+```
+
