@@ -49,7 +49,7 @@ alpha.lower <- 0.0001
 
 n.plot <- 401
 
-for (var.name in all.vars(mod$terms[[3]])){
+for (var.name in names(coef(mod))){
   par(mfrow = c(2, 2))
   
   Qn <- conf.out[[var.name]]$qconf

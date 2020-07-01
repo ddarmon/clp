@@ -392,7 +392,7 @@ glm.conf <- function(mod){
 
   return.list <- list()
 
-  for (var.name in all.vars(mod$terms[[3]])){
+  for (var.name in Pnames){
     return.list[[var.name]] <- list()
 
     z <- prof[[var.name]]$par.vals[, var.name]
