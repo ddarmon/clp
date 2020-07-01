@@ -5,11 +5,11 @@ date: 230520
 output: html_document
 ---
 
-```{r}
+```{r, message = FALSE}
 library(LogisticDx) # This has the data set on low birth weights in infants
 ```
 
-```{r}
+```{r, message = FALSE}
 library(clp)
 ```
 

@@ -9,7 +9,7 @@ output: html_document
 library(LogisticDx) # This has the data set on low birth weights in infants
 ```
 
-```{r}
+```{r, message = FALSE}
 library(clp)
 ```
 
