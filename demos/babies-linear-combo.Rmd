@@ -1,0 +1,69 @@
+---
+title: Confidence Curves for Linear Combinations via Feasible Direction Optimization
+author: David Darmon
+date: 230520
+output: html_document
+---
+
+```{r}
+library(LogisticDx) # This has the data set on low birth weights in infants
+```
+
+```{r}
+library(clp)
+```
+
+# Reformat Data Set to Match Example 2.4 on Page 38 of CLP
+
+```{r}
+data(lbw)
+
+lbw.clp <- data.frame(low = lbw$LOW)
+
+lbw.clp$age <- lbw$AGE
+lbw.clp$weight <- lbw$LWT/2.20462 # Convert to kilograms
+lbw.clp$black <- lbw$RACE == 'black'
+lbw.clp$other <- lbw$RACE == 'other'
+lbw.clp$smoker <- lbw$SMOKE == 'yes'
+
+# Convert race and smoke factors into dummy variables.
+lbw.clp[, 2:ncol(lbw.clp)] <- apply(lbw.clp[, 2:ncol(lbw.clp)], 2, as.numeric)
+```
+
+# Fit Model
+
+```{r}
+mod <- glm(low ~ weight + age + black + other + smoker, data = lbw.clp, family = binomial)
+```
+
+# Determine Confidence Curve for Expected Response at the Following Covariate Valuess
+
+```{r}
+# From CLP:
+x.black <- c(1, 50, 23.238, 1, 0, 1)
+
+# Not in CLP
+x.white <- c(1, 50, 23.238, 0, 0, 1)
+```
+
+# Construct Confidence Curves for Expected Response
+
+```{r}
+cc.black <- confcurve.lincom(mod, x.black)
+```
+
+```{r}
+cc.white <- confcurve.lincom(mod, x.white)
+```
+
+# Compare Blacks and Whites
+
+```{r}
+par(mfrow = c(1, 2))
+curve(cc.black$cc(x), from = 0, to = 1, n = 2001, lwd = 2)
+curve(cc.white$cc(x), from = 0, to = 1, n = 2001, add = TRUE, col = 'grey')
+abline(h = 0.95, lty = 3)
+
+curve(cc.black$cd(x), from = 0, to = 1, n = 2001, lwd = 2)
+curve(cc.white$cd(x), from = 0, to = 1, n = 2001, add = TRUE, col = 'grey')
+```

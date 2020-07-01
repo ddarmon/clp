@@ -9,4 +9,4 @@ Description: Currently in **very** alpha.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Depends: enrichwith (>= 0.3.1), pracma (>= 2.2.9)
+Depends: enrichwith (>= 0.3.1), pracma (>= 2.2.9), MASS (>= 7.3)

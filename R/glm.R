@@ -356,3 +356,86 @@ confcurve.lincom.disp <- function(mod, x){
 
   return(list(cc = cc, cd = cd))
 }
+
+glm.conf <- function(mod){
+  alpha = 1e-8
+  prof <- profile(mod, alpha = alpha, maxsteps = 100, del = qnorm(1-alpha)/80)
+
+  fam <- family(mod)
+
+  Pnames <- names(B0 <- coef(mod))
+
+  p <- length(Pnames)
+
+  mf <- model.frame(mod)
+  Y <- model.response(mf)
+  n <- NROW(Y)
+
+  switch(fam$family,
+         binomial = ,
+         poisson = ,
+         `Negative Binomial` = {
+           pivot.cdf <- function(x) pnorm(x)
+           profName <- "z"
+         }
+         ,
+         gaussian = ,
+         quasi = ,
+         inverse.gaussian = ,
+         quasibinomial = ,
+         quasipoisson = ,
+         {
+           pivot.cdf <- function(x) pt(x, n - p)
+           profName <- "tau"
+         }
+  )
+
+  return.list <- list()
+
+  for (var.name in all.vars(mod$terms[[3]])){
+    return.list[[var.name]] <- list()
+
+    z <- prof[[var.name]]$par.vals[, var.name]
+
+    Hn <- pivot.cdf(prof[[var.name]][[profName]])
+
+    # Confidence Distribution
+
+    Cn <- approxfun(z, Hn)
+
+    # Confidence Density
+
+    dz <- min(diff(z))
+
+    hn <- (Cn(z + dz) - Cn(z - dz))/(2*dz)
+
+    cn <- approxfun(z, hn)
+
+    # Confidence Quantile
+
+    Qn <- approxfun(Hn, z)
+
+    # Confidence Curve
+
+    ccn <- approxfun(z, abs(2*Hn - 1))
+
+    # P-curve
+
+    Ps <- 2*apply(cbind(Hn, 1 - Hn), 1, min)
+
+    Pn <- approxfun(z, Ps)
+
+    # S-curve
+
+    Sn <- approxfun(z, -log2(Ps))
+
+    return.list[[var.name]][['pconf']] <- Cn
+    return.list[[var.name]][['dconf']] <- cn
+    return.list[[var.name]][['qconf']] <- Qn
+    return.list[[var.name]][['cconf']] <- ccn
+    return.list[[var.name]][['Pcurve']] <- Pn
+    return.list[[var.name]][['Scurve']] <- Sn
+  }
+
+  return(return.list)
+}

@@ -1,0 +1,78 @@
+---
+title: Confidence Curves for Parameters of a GLM
+author: David Darmon
+date: 010720
+output: html_document
+---
+
+```{r, message = FALSE}
+library(LogisticDx) # This has the data set on low birth weights in infants
+```
+
+```{r}
+library(clp)
+```
+
+# Reformat Data Set to Match Example 2.4 on Page 38 of CLP
+
+```{r}
+data(lbw)
+
+lbw.clp <- data.frame(low = lbw$LOW)
+
+lbw.clp$age <- lbw$AGE
+lbw.clp$weight <- lbw$LWT/2.20462 # Convert to kilograms
+lbw.clp$black <- lbw$RACE == 'black'
+lbw.clp$other <- lbw$RACE == 'other'
+lbw.clp$smoker <- lbw$SMOKE == 'yes'
+
+# Convert race and smoke factors into dummy variables.
+lbw.clp[, 2:ncol(lbw.clp)] <- apply(lbw.clp[, 2:ncol(lbw.clp)], 2, as.numeric)
+```
+
+# Fit Model
+
+```{r}
+mod <- glm(low ~ weight + age + black + other + smoker, data = lbw.clp, family = binomial)
+```
+
+# Demo all of the curves
+
+```{r}
+conf.out <- glm.conf(mod)
+
+alpha = 0.5
+
+ci.out <- confint(mod, level = 1 - alpha)
+
+alpha.lower <- 0.0001
+
+n.plot <- 401
+
+for (var.name in all.vars(mod$terms[[3]])){
+  par(mfrow = c(2, 2))
+  
+  xlim <- c(conf.out[[var.name]]$qconf(alpha.lower/2), conf.out[[var.name]]$qconf(1-alpha.lower/2))
+  
+  curve(conf.out[[var.name]]$pconf(x), xlim = xlim,
+        main = var.name, n = n.plot)
+  
+  curve(conf.out[[var.name]]$cconf(x), xlim = xlim, n = n.plot)
+  abline(v = ci.out[var.name, ], h = 1-alpha, lty = 3)
+  abline(v = c(conf.out[[var.name]]$qconf(alpha/2), conf.out[[var.name]]$qconf(1-alpha/2)), lty = 4, col = 'red')
+  
+  #curve(conf.out[[var.name]]$Pcurve(x), xlim = xlim, n = n.plot)
+  curve(conf.out[[var.name]]$dconf(x), xlim = xlim, n = n.plot)
+  curve(conf.out[[var.name]]$Scurve(x), xlim = xlim, n = n.plot)
+}
+```
+
+
+```{r}
+# Need a way to handle "out of bound" queries that give NAs
+
+conf.out$weight$cconf(3)
+
+conf.out$weight$qconf(1e-9)
+```
+
