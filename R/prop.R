@@ -33,7 +33,7 @@ cubic.root <- function(x, n, Delta){
 
 cubic.root <- Vectorize(cubic.root, vectorize.args = c('Delta'))
 
-prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95){
+prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
 
@@ -57,7 +57,13 @@ prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95){
     D0 <- p0.Delta*(1-p0.Delta)/n0
     D1 <- p1.Delta*(1-p1.Delta)/n1
 
-    DENOM <- sqrt(D0 + D1)
+    if (mn.correct){
+      fac <- (n0 + n1)/(n0 + n1 - 1) # Miettinen and Nurminen correction.
+    }else{
+      fac <- 1
+    }
+
+    DENOM <- sqrt(fac*(D0 + D1))
 
     return(pnorm(NUM/DENOM))
   }

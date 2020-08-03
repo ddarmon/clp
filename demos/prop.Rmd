@@ -1,8 +1,21 @@
 ```{r}
 library(clp)
 
-conf.score <- prop.conf(c(94, 113), c(125, 175))
-conf.ac <- prop.conf.agresti.caffo(c(94, 113), c(125, 175))
+# From Physician's Health Study, on whether regular
+# intake of aspirin reduces the rate of heart disease.
+# 
+# Data:
+# 
+#         | Yes |   No  | Total
+# -----------------------------
+# Placebo | 189 | 10845 | 11034
+# Aspirin | 104 | 10933 | 11037
+
+x <- c(189, 104)
+n <- c(11034, 11037)
+
+conf.score <- prop.conf(x, n)
+conf.ac <- prop.conf.agresti.caffo(x, n)
 
 conf.score$qconf(c(0.025, 0.975))
 conf.ac$qconf(c(0.025, 0.975))
