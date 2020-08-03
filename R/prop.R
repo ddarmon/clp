@@ -147,7 +147,7 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
 
   pcurve.ac <- function(Delta) 1 - cconf.ac(Delta)
 
-  out <- list(pconf = pconf.ac, dconf = dconf.ac, qconf = qconf.ac, cconf = cconf.ac, pcurve.ac)
+  out <- list(pconf = pconf.ac, dconf = dconf.ac, qconf = qconf.ac, cconf = cconf.ac, pcurve = pcurve.ac)
 
   if (plot){
     plot.dconf(out, xlab = 'Difference (p[1] - p[2])')
@@ -216,7 +216,7 @@ risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
 
   pcurve.score <- function(rho) 1 - cconf.score(rho)
 
-  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve.score)
+  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve.score = pcurve.score)
 
   if (plot){
     plot.dconf(out, xlab = 'Relative Risk (p[2]/p[1])')
