@@ -96,7 +96,9 @@ prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
 
   qconf.score <- Vectorize(qconf.score)
 
-  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score)
+  pcurve.score <- function(Delta) 1 - cconf.score(Delta)
+
+  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve = pcurve.score)
 
   if (plot){
     plot.dconf(out, xlab = 'Difference (p[1] - p[2])')
@@ -143,7 +145,9 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
     return((p0 - p1) + qnorm(p)*DENOM)
   }
 
-  out <- list(pconf = pconf.ac, dconf = dconf.ac, qconf = qconf.ac, cconf = cconf.ac)
+  pcurve.ac <- function(Delta) 1 - cconf.ac(Delta)
+
+  out <- list(pconf = pconf.ac, dconf = dconf.ac, qconf = qconf.ac, cconf = cconf.ac, pcurve.ac)
 
   if (plot){
     plot.dconf(out, xlab = 'Difference (p[1] - p[2])')
@@ -190,10 +194,10 @@ risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
 
   pconf.score <- Vectorize(pconf.score)
 
-  cconf.score <- function(Delta) abs(2*pconf.score(Delta) - 1)
+  cconf.score <- function(rho) abs(2*pconf.score(rho) - 1)
 
-  dconf.score <- function(Delta, dx = 1e-10){
-    dd <- (pconf.score(Delta + dx) - pconf.score(Delta - dx))/(2*dx)
+  dconf.score <- function(rho, dx = 1e-10){
+    dd <- (pconf.score(rho + dx) - pconf.score(rho - dx))/(2*dx)
 
     return(dd)
   }
@@ -210,7 +214,9 @@ risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
 
   qconf.score <- Vectorize(qconf.score)
 
-  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score)
+  pcurve.score <- function(rho) 1 - cconf.score(rho)
+
+  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve.score)
 
   if (plot){
     plot.dconf(out, xlab = 'Relative Risk (p[2]/p[1])')
