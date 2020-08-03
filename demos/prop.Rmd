@@ -1,0 +1,8 @@
+```{r}
+library(clp)
+
+conf.out <- prop.conf(c(94, 113), c(125, 175))
+
+conf.out$qconf(c(0.025, 0.975))
+```
+
