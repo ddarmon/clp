@@ -95,7 +95,7 @@ prop.conf <- function(x, n, plot = TRUE){
     lims <- qconf.score(c(tail.prob/2, 1 - tail.prob/2))
 
     curve(dconf.score(x), xlim = lims, xlab = 'Difference (p[1] - p[2])', ylab = 'Confidence Density', n = 2001)
-    curve(cconf.score(x), xlim = lims, xlab = 'Difference (p[1] - p[2])', ylab = 'Confidence Density', n = 2001)
+    curve(cconf.score(x), xlim = lims, xlab = 'Difference (p[1] - p[2])', ylab = 'Confidence Curve', n = 2001)
     segments(x0 = qconf.score(0.025), x1 = qconf.score(0.975), y0 = 0.95, col = 'red')
   }
 
