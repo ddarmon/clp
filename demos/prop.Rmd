@@ -1,9 +1,6 @@
 ```{r}
 library(clp)
 
-source('../R/prop.R')
-source('../R/plot.R')
-
 conf.score <- prop.conf(c(94, 113), c(125, 175))
 conf.ac <- prop.conf.agresti.caffo(c(94, 113), c(125, 175))
 

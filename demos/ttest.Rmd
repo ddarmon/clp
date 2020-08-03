@@ -1,8 +1,6 @@
 ```{r}
 library(clp)
 
-source('../R/ttest.R')
-
 weight <- readRDS('dietstudy.rda')
 
 lc.conf <- t.conf(x = weight$weightchange[weight$diet == 'Low Carb'])
