@@ -152,3 +152,70 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
 
   return(out)
 }
+
+
+risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
+  x0 <- x[1]; x1 <- x[2]
+  n0 <- n[1]; n1 <- n[2]
+
+  pconf.score <- function(rho){
+    if (rho <= 0){
+      return(0)
+    }
+
+    p0 <- x0/n0
+    p1 <- x1/n1
+
+    x <- (x0 + x1)
+    n <- (n0 + n1)
+
+    NUM <- (p1 - p0*rho)^2
+
+    A <- n*rho
+    B <- -(n1*rho + x1 + n0 + x0*rho)
+    C <- x
+
+    p0.rho <- (-B - sqrt(B^2 - 4*A*C))/(2*A)
+    p1.rho <- p0.rho*rho
+
+    S0 <- rho^2*p0.rho*(1-p0.rho)/n0
+    S1 <- p1.rho*(1-p1.rho)/n1
+
+    fac <- n/(n-1)
+
+    DENOM <- (S0 + S1)*fac
+
+    return(pnorm(sign(p0*rho - p1)*sqrt(NUM/DENOM)))
+  }
+
+  pconf.score <- Vectorize(pconf.score)
+
+  cconf.score <- function(Delta) abs(2*pconf.score(Delta) - 1)
+
+  dconf.score <- function(Delta, dx = 1e-10){
+    dd <- (pconf.score(Delta + dx) - pconf.score(Delta - dx))/(2*dx)
+
+    return(dd)
+  }
+
+  qconf.score <- function(p){
+    fun.root <- function(z) {
+      rr <- pconf.score(z) - p
+
+      return(rr)
+    }
+
+    return(uniroot(fun.root, interval = c(0, 100))$root) # Might need better upperbound here!
+  }
+
+  qconf.score <- Vectorize(qconf.score)
+
+  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score)
+
+  if (plot){
+    plot.dconf(out, xlab = 'Relative Risk (p[2]/p[1])')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Relative Risk (p[2]/p[1])')
+  }
+
+  return(out)
+}

@@ -13,11 +13,22 @@ library(clp)
 
 x <- c(189, 104)
 n <- c(11034, 11037)
+```
 
+# Difference in Proportions
+
+```{r}
 conf.score <- prop.conf(x, n)
 conf.ac <- prop.conf.agresti.caffo(x, n)
 
 conf.score$qconf(c(0.025, 0.975))
 conf.ac$qconf(c(0.025, 0.975))
+```
+
+# Relative Risks
+
+```{r}
+conf.score <- risk.conf(x, n)
+conf.score$qconf(c(0.025, 0.975))
 ```
 
