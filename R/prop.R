@@ -33,7 +33,7 @@ cubic.root <- function(x, n, Delta){
 
 cubic.root <- Vectorize(cubic.root, vectorize.args = c('Delta'))
 
-prop.conf <- function(x, n, plot = TRUE){
+prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
 
@@ -90,21 +90,17 @@ prop.conf <- function(x, n, plot = TRUE){
 
   qconf.score <- Vectorize(qconf.score)
 
-  if (plot){
-    tail.prob <- 0.001
-    lims <- qconf.score(c(tail.prob/2, 1 - tail.prob/2))
-
-    curve(dconf.score(x), xlim = lims, xlab = 'Difference (p[1] - p[2])', ylab = 'Confidence Density', n = 2001)
-    curve(cconf.score(x), xlim = lims, xlab = 'Difference (p[1] - p[2])', ylab = 'Confidence Curve', n = 2001)
-    segments(x0 = qconf.score(0.025), x1 = qconf.score(0.975), y0 = 0.95, col = 'red')
-  }
-
   out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score)
+
+  if (plot){
+    plot.dconf(out, xlab = 'Difference (p[1] - p[2])')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Difference (p[1] - p[2])')
+  }
 
   return(out)
 }
 
-prop.conf.agresti.caffo <- function(x, n){
+prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
 
@@ -142,4 +138,11 @@ prop.conf.agresti.caffo <- function(x, n){
   }
 
   out <- list(pconf = pconf.ac, dconf = dconf.ac, qconf = qconf.ac, cconf = cconf.ac)
+
+  if (plot){
+    plot.dconf(out, xlab = 'Difference (p[1] - p[2])')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Difference (p[1] - p[2])')
+  }
+
+  return(out)
 }

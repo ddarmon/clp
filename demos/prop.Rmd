@@ -1,8 +1,13 @@
 ```{r}
 library(clp)
 
-conf.out <- prop.conf(c(94, 113), c(125, 175))
+source('../R/prop.R')
+source('../R/plot.R')
 
-conf.out$qconf(c(0.025, 0.975))
+conf.score <- prop.conf(c(94, 113), c(125, 175))
+conf.ac <- prop.conf.agresti.caffo(c(94, 113), c(125, 175))
+
+conf.score$qconf(c(0.025, 0.975))
+conf.ac$qconf(c(0.025, 0.975))
 ```
 
