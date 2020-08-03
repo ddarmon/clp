@@ -158,9 +158,16 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
 }
 
 
-risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
+risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
+
+
+
+  if ((x0 == 0) && (x1 == 0)){
+    warning("Confidence functions not defined when no successes in either group.")
+    return(FALSE)
+  }
 
   pconf.score <- function(rho){
     if (rho <= 0){
@@ -196,31 +203,66 @@ risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
 
   cconf.score <- function(rho) abs(2*pconf.score(rho) - 1)
 
-  dconf.score <- function(rho, dx = 1e-10){
+  dconf.score <- function(rho, dx = 1e-5){
     dd <- (pconf.score(rho + dx) - pconf.score(rho - dx))/(2*dx)
+
+    if ((x1 == 0) || (x0 == n0)){
+      dd[rho == 0] = 0
+    }
 
     return(dd)
   }
 
   qconf.score <- function(p){
+    # Need to deal with atoms:
+
+    # When x1 = 0, atom w/ prob 1/2 at rho = 0
+
+    # When x0 = 0, atom w/ prob 1/2 at rho = Infty
+
+    if (x1 == 0 && p <= 0.5){
+      return(0)
+    }else if (x0 == 0 && p >= 0.5){
+      return(Inf)
+    }
+
     fun.root <- function(z) {
       rr <- pconf.score(z) - p
 
       return(rr)
     }
 
-    return(uniroot(fun.root, interval = c(0, 100))$root) # Might need better upperbound here!
+    ub <- 100
+
+    while (pconf.score(ub) < p){
+      ub <- ub*10
+    }
+
+    return(uniroot(fun.root, interval = c(0, ub))$root) # Might need better upperbound here!
   }
 
   qconf.score <- Vectorize(qconf.score)
 
   pcurve.score <- function(rho) 1 - cconf.score(rho)
 
-  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve.score = pcurve.score)
+  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve = pcurve.score)
 
   if (plot){
-    plot.dconf(out, xlab = 'Relative Risk (p[2]/p[1])')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Relative Risk (p[2]/p[1])')
+    xlim <- qconf.score(c(0.001, 0.999))
+
+    # For Relative risk atoms:
+    if (xlim[2] == Inf){
+      xlim[2] <- qconf.score(0.4)
+    }
+
+    if (log == 'x'){
+      xlab.cconf = 'log Relative Risk (log p[2]/p[1])'
+    }else{
+      xlab.cconf = 'Relative Risk (p[2]/p[1])'
+    }
+
+    plot.dconf(out, xlab = 'Relative Risk (p[2]/p[1])', xlim = xlim)
+    plot.cconf(out, conf.level = conf.level, xlab = xlab.cconf, xlim = xlim, log = log)
   }
 
   return(out)

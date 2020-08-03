@@ -30,5 +30,7 @@ conf.ac$qconf(c(0.025, 0.975))
 ```{r}
 conf.score <- risk.conf(x, n)
 conf.score$qconf(c(0.025, 0.975))
+
+conf.score <- risk.conf(x, n, log = 'x')
 ```
 
