@@ -49,21 +49,21 @@ x.white <- c(1, 50, 23.238, 0, 0, 1)
 # Construct Confidence Curves for Expected Response
 
 ```{r}
-cc.black <- confcurve.lincom(mod, x.black)
+cc.black <- glm.lincom.conf(mod, x.black)
 ```
 
 ```{r}
-cc.white <- confcurve.lincom(mod, x.white)
+cc.white <- glm.lincom.conf(mod, x.white)
 ```
 
 # Compare Blacks and Whites
 
 ```{r}
 par(mfrow = c(1, 2))
-curve(cc.black$cc(x), from = 0, to = 1, n = 2001, lwd = 2)
-curve(cc.white$cc(x), from = 0, to = 1, n = 2001, add = TRUE, col = 'grey')
+curve(cc.black$cconf(x), from = 0, to = 1, n = 2001, lwd = 2)
+curve(cc.white$cconf(x), from = 0, to = 1, n = 2001, add = TRUE, col = 'grey')
 abline(h = 0.95, lty = 3)
 
-curve(cc.black$cd(x), from = 0, to = 1, n = 2001, lwd = 2)
-curve(cc.white$cd(x), from = 0, to = 1, n = 2001, add = TRUE, col = 'grey')
+curve(cc.black$pconf(x), from = 0, to = 1, n = 2001, lwd = 2)
+curve(cc.white$pconf(x), from = 0, to = 1, n = 2001, add = TRUE, col = 'grey')
 ```

@@ -20,12 +20,12 @@ summary(mod)
 library(clp)
 
 x <- c(1, 0, 0, 0, 0)
-cc11 <- confcurve.lincom(mod, x)
+cc11 <- glm.lincom.conf(mod, x)
 
 x <- c(1, 1, 0, 0, 0)
-cc21 <- confcurve.lincom(mod, x)
+cc21 <- glm.lincom.conf(mod, x)
 
 x <- c(1, 0, 1, 0, 0)
-cc31 <- confcurve.lincom(mod, x)
+cc31 <- glm.lincom.conf(mod, x)
 ```
 

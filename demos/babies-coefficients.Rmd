@@ -39,7 +39,7 @@ mod <- glm(low ~ weight + age + black + other + smoker, data = lbw.clp, family =
 # Demo all of the curves
 
 ```{r}
-conf.out <- glm.conf(mod)
+conf.out <- glm.beta.conf(mod)
 
 alpha = 0.05
 

@@ -1,5 +1,5 @@
 #' @export
-confcurve.lincom.lm <- function(mod, x){
+lm.lincom.conf <- function(mod, x){
   # Estimated expected response.
   mhat <- sum(x*coef(mod))
 

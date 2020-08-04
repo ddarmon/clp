@@ -23,8 +23,8 @@ x <- c(1,    # Intercept
 
 library(clp)
 
-cc.lm <- confcurve.lincom.lm(mod.lm, x)
-cc.glm <- confcurve.lincom.disp(mod.glm, x)
+cc.lm <- lm.lincom.conf(mod.lm, x)
+cc.glm <- glm.lincom.conf(mod.glm, x)
 ```
 
 ## Compare exact cc from Gaussian noise to GLM cc

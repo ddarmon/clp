@@ -1,5 +1,5 @@
 #' @export
-confcurve.lincom <- function(mod, x){
+glm.lincom.conf <- function(mod, x){
   # PDF / PMF from GLM
   dmod <- get_dmodel_function(mod)
 
@@ -149,20 +149,20 @@ confcurve.lincom <- function(mod, x){
 
   signed.sqrt.dev.fun <- function(m) sign(m - mod$family$linkinv(m.mle))*sqrt(dev.fun(m))
 
-  cc <- function(m) pchisq(dev.fun(m), 1)
-  cd <- function(m) pnorm(signed.sqrt.dev.fun(m))
+  cconf <- function(m) pchisq(dev.fun(m), 1)
+  pconf <- function(m) pnorm(signed.sqrt.dev.fun(m))
 
-  curve(cc(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'cc', n = 2001)
+  curve(cconf(x), from = min(resp.vals), to = max(resp.vals),
+        xlab = 'Expected Response', ylab = 'cconf', n = 2001)
   abline(h = 0.95, lty = 3)
 
-  curve(cd(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'cd', n = 2001)
+  curve(pconf(x), from = min(resp.vals), to = max(resp.vals),
+        xlab = 'Expected Response', ylab = 'pconf', n = 2001)
 
-  return(list(cc = cc, cd = cd, profile.lik = profile.lik.fun, deviance = dev.fun))
+  return(list(cconf = cconf, pconf = pconf, profile.lik = profile.lik.fun, deviance = dev.fun))
 }
 
-confcurve.lincom.disp <- function(mod, x){
+glm.lincom.conf.disp <- function(mod, x){
   n <- nrow(mod$model)
   p <- length(mod$coefficients)
 
@@ -341,25 +341,25 @@ confcurve.lincom.disp <- function(mod, x){
 
   # Not sure why we have to do this? Why aren't the resp.values always increasing?
 
-  cd <- if (resp.vals[2] - resp.vals[1] < 0) {
+  pconf <- if (resp.vals[2] - resp.vals[1] < 0) {
     function(m) 1-pt(profile(m), df = n - p)
   } else{
     function(m) pt(profile(m), df = n - p)
   }
-  cc <- function(m) pf(profile(m)^2, df1 = 1, df2 = n - p)
+  cconf <- function(m) pf(profile(m)^2, df1 = 1, df2 = n - p)
 
-  curve(cc(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'cc', n = 2001)
+  curve(cconf(x), from = min(resp.vals), to = max(resp.vals),
+        xlab = 'Expected Response', ylab = 'cconf', n = 2001)
   abline(h = 0.95, lty = 3)
 
-  curve(cd(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'cd', n = 2001)
+  curve(pconf(x), from = min(resp.vals), to = max(resp.vals),
+        xlab = 'Expected Response', ylab = 'pconf', n = 2001)
 
-  return(list(cc = cc, cd = cd))
+  return(list(cconf = cconf, pconf = pconf))
 }
 
 #' @export
-glm.conf <- function(mod){
+glm.beta.conf <- function(mod){
   alpha = 1e-8
   prof <- profile(mod, alpha = alpha, maxsteps = 100, del = qnorm(1-alpha)/80)
 
