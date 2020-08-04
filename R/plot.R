@@ -1,3 +1,4 @@
+#' @export
 plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = 'Parameter', log = ''){
   if (is.null(xlim)){
     xlim <- obj$qconf(c(0.001, 0.999))
@@ -12,6 +13,7 @@ plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = 'Parameter', 
   segments(x0 = ci[1], x1 = ci[2], y0 = -0.025, col = 'red', lwd = 4)
 }
 
+#' @export
 plot.dconf <- function(obj, xlim = NULL, xlab = 'Parameter'){
   if (is.null(xlim)){
     xlim <- obj$qconf(c(0.001, 0.999))

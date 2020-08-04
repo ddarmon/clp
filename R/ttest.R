@@ -1,3 +1,4 @@
+
 #' Confidence functions for t-Test
 #'
 #' Computes confidence functions for one and two sample t-tests on vectors of data.
@@ -9,8 +10,7 @@
 #' @return A list containing the confidence functions.
 #' @examples
 #' t.confdist(x = 1:10, y = 7:20)
-
-
+#' @export
 t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) {
 
   if(!is.null(y)){
@@ -58,8 +58,8 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
     out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve)
 
     if (plot){
-      plot.dconf(out, xlab = 'Mean')
-      plot.cconf(out, conf.level = conf.level, xlab = 'Mean')
+      plot.dconf(out, xlab = 'mean')
+      plot.cconf(out, conf.level = conf.level, xlab = 'mean')
     }
 
     return(out)
@@ -96,8 +96,8 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
     out <- list(pconf = pconf, dconf = dconf, cconf =  cconf, qconf = qconf, pcurve = pcurve)
 
     if (plot){
-      plot.dconf(out, xlab = 'Mean[1] - Mean[2]')
-      plot.cconf(out, conf.level = conf.level, xlab = 'Mean[1] - Mean[2]')
+      plot.dconf(out, xlab = 'mean[1] - mean[2]')
+      plot.cconf(out, conf.level = conf.level, xlab = 'mean[1] - mean[2]')
     }
 
     return(out)
@@ -116,7 +116,7 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
 #' @return A list containing the confidence functions.
 #' @examples
 #' t.confdist(c(3,5), c(1,.5), c(10, 12))
-
+#' @export
 t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
 
   stopifnot(length(mean)==length(sd) && length(mean)==length(n))
@@ -147,8 +147,8 @@ t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
     out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve)
 
     if (plot){
-      plot.dconf(out, xlab = 'Mean')
-      plot.cconf(out, conf.level = conf.level, xlab = 'Mean')
+      plot.dconf(out, xlab = 'mean')
+      plot.cconf(out, conf.level = conf.level, xlab = 'mean')
     }
 
     return(out)
@@ -188,8 +188,8 @@ t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
     out <- list(pconf = pconf, dconf = dconf, cconf =  cconf, qconf = qconf, pcurve = pcurve)
 
     if (plot){
-      plot.dconf(out, xlab = 'Mean[1] - Mean[2]')
-      plot.cconf(out, conf.level = conf.level, xlab = 'Mean[1] - Mean[2]')
+      plot.dconf(out, xlab = 'mean[1] - mean[2]')
+      plot.cconf(out, conf.level = conf.level, xlab = 'mean[1] - mean[2]')
     }
 
     return(out)

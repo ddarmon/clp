@@ -1,3 +1,4 @@
+#' @export
 confcurve.lincom <- function(mod, x){
   # PDF / PMF from GLM
   dmod <- get_dmodel_function(mod)
@@ -357,6 +358,7 @@ confcurve.lincom.disp <- function(mod, x){
   return(list(cc = cc, cd = cd))
 }
 
+#' @export
 glm.conf <- function(mod){
   alpha = 1e-8
   prof <- profile(mod, alpha = alpha, maxsteps = 100, del = qnorm(1-alpha)/80)

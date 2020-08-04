@@ -33,7 +33,74 @@ cubic.root <- function(x, n, Delta){
 
 cubic.root <- Vectorize(cubic.root, vectorize.args = c('Delta'))
 
-prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
+#' @export
+prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95){
+  if  (length(x) == 1 && length(n == 1)){
+    out <- prop.conf.1s(x, n, plot = plot, conf.level = conf.level)
+  } else if (length(x) == 2 && length(n) == 2){
+    out <- prop.conf.2s(x, n, plot = plot, conf.level = conf.level)
+  }
+
+  return(out)
+}
+
+prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
+  pconf <- function(p){
+    cd <- vector(length = length(p))
+
+    cd[p < 0] <- 0
+    cd[p > 1] <- 1
+
+    in.bounds <- (p >= 0) & (p <= 1)
+
+    cd[in.bounds] <- pbinom(x, n, p[in.bounds], lower.tail = FALSE) + 0.5*dbinom(x, n, p[in.bounds])
+
+    return(cd)
+  }
+
+  cconf <- function(p) abs(2*pconf(p) - 1)
+
+  dconf <- function(p){
+    if (x == 0){
+      0.5*dbeta(p, 1, n)
+    } else if (x == n){
+      0.5*dbeta(p, n, 1)
+    } else{
+      0.5*dbeta(p, x, n-x+1) + 0.5*dbeta(p, x+1, n-x)
+    }
+  }
+
+  qconf <- function(p){
+    if (x == 0 && p <= 0.5){
+      return(0)
+    } else if (x == n && p >= 0.5){
+      return(1)
+    }else{
+      fun.root <- function(z) {
+        diff <- pconf(z) - p
+
+        return(diff)
+      }
+
+      return(uniroot(fun.root, interval = c(0, 1))$root)
+    }
+  }
+
+  qconf <- Vectorize(qconf)
+
+  pcurve <- function(p) 1 - cconf(p)
+
+  out <- list(pconf = pconf, dconf = dconf, qconf = qconf, cconf = cconf, pcurve = pcurve)
+
+  if (plot){
+    plot.dconf(out, xlab = 'Proportion p')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Proportion p')
+  }
+
+  return(out)
+}
+
+prop.conf.2s <- function(x, n, plot = TRUE, conf.level = 0.95){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
 
@@ -57,11 +124,7 @@ prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95, mn.correct = TRUE){
     D0 <- p0.Delta*(1-p0.Delta)/n0
     D1 <- p1.Delta*(1-p1.Delta)/n1
 
-    if (mn.correct){
-      fac <- (n0 + n1)/(n0 + n1 - 1) # Miettinen and Nurminen correction.
-    }else{
-      fac <- 1
-    }
+    fac <- (n0 + n1)/(n0 + n1 - 1) # Miettinen and Nurminen correction.
 
     DENOM <- sqrt(fac*(D0 + D1))
 
@@ -157,7 +220,7 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
   return(out)
 }
 
-
+#' @export
 risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
