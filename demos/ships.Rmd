@@ -23,6 +23,6 @@ x <- c(1,
 
 library(clp)
 
-cc <- confcurve.lincom(mod, x)
+cc <- glm.lincom.conf(mod, x)
 ```
 
