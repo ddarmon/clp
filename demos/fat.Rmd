@@ -1,3 +1,8 @@
+```{r}
+library(clp)
+```
+
+
 # Data Set for Body Fat Prediction
 
 http://lib.stat.cmu.edu/datasets/bodyfat
@@ -13,6 +18,48 @@ plot(mod.lm)
 
 ```
 
+# Confidence Curve for Coefficients
+
+```{r}
+conf.out <- lm.beta.conf(mod.lm)
+```
+
+
+
+```{r}
+alpha = 0.05
+
+ci.out <- confint(mod.lm, level = 1 - alpha)
+
+alpha.lower <- 0.0001
+
+n.plot <- 401
+
+for (var.name in names(coef(mod.lm))){
+  par(mfrow = c(2, 2))
+  
+  Qn <- conf.out[[var.name]]$qconf
+  
+  xlim <- c(Qn(alpha.lower/2), Qn(1-alpha.lower/2))
+  
+  curve(conf.out[[var.name]]$pconf(x), xlim = xlim,
+        n = n.plot, xlab = var.name, ylab = 'Confidence Dist.')
+  
+  curve(conf.out[[var.name]]$cconf(x), xlim = xlim, n = n.plot, 
+        xlab = var.name, ylab = 'Confidence Curve')
+  abline(v = ci.out[var.name, ], h = 1-alpha, lty = 3)
+  abline(v = c(conf.out[[var.name]]$qconf(alpha/2), conf.out[[var.name]]$qconf(1-alpha/2)), lty = 4, col = 'red')
+  
+  #curve(conf.out[[var.name]]$pcurve(x), xlim = xlim, n = n.plot)
+  
+  curve(conf.out[[var.name]]$dconf(x), xlim = xlim, n = n.plot, 
+        xlab = var.name, ylab = 'Confidence Dens.')
+  curve(conf.out[[var.name]]$scurve(x), xlim = xlim, n = n.plot, 
+        xlab = var.name, ylab = 'S-curve')
+}
+```
+
+
 # Confidence curve for the expected BFP of a 170lb, 6ft, 20-year old male
 
 ```{r}
@@ -20,8 +67,6 @@ x <- c(1,    # Intercept
        20,   # 20 years old
        170,  # 170 lbs
        6*12) # 72 inches (6 feet)
-
-library(clp)
 
 conf.out.lm <- lm.lincom.conf(mod.lm, x)
 

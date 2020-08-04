@@ -64,11 +64,11 @@ for (var.name in names(coef(mod))){
   abline(v = ci.out[var.name, ], h = 1-alpha, lty = 3)
   abline(v = c(conf.out[[var.name]]$qconf(alpha/2), conf.out[[var.name]]$qconf(1-alpha/2)), lty = 4, col = 'red')
   
-  #curve(conf.out[[var.name]]$Pcurve(x), xlim = xlim, n = n.plot)
+  #curve(conf.out[[var.name]]$pcurve(x), xlim = xlim, n = n.plot)
   
   curve(conf.out[[var.name]]$dconf(x), xlim = xlim, n = n.plot, 
         xlab = var.name, ylab = 'Confidence Dens.')
-  curve(conf.out[[var.name]]$Scurve(x), xlim = xlim, n = n.plot, 
+  curve(conf.out[[var.name]]$scurve(x), xlim = xlim, n = n.plot, 
         xlab = var.name, ylab = 'S-curve')
 }
 ```

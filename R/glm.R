@@ -464,8 +464,8 @@ glm.beta.conf <- function(mod){
     return.list[[var.name]][['dconf']] <- cn
     return.list[[var.name]][['qconf']] <- Qn
     return.list[[var.name]][['cconf']] <- ccn
-    return.list[[var.name]][['Pcurve']] <- Pn
-    return.list[[var.name]][['Scurve']] <- Sn
+    return.list[[var.name]][['pcurve']] <- Pn
+    return.list[[var.name]][['scurve']] <- Sn
   }
 
   return(return.list)
