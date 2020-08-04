@@ -15,14 +15,25 @@ x <- c(189, 104)
 n <- c(11034, 11037)
 ```
 
+# One proportion
+
+```{r}
+conf.out <- prop.conf(x[1], n[1])
+
+conf.out$qconf(c(0.025, 0.975))
+
+conf.out <- prop.conf(x[2], n[2])
+
+conf.out$qconf(c(0.025, 0.975))
+```
+
+
 # Difference in Proportions
 
 ```{r}
 conf.score <- prop.conf(x, n)
-conf.ac <- prop.conf.agresti.caffo(x, n)
 
 conf.score$qconf(c(0.025, 0.975))
-conf.ac$qconf(c(0.025, 0.975))
 ```
 
 # Relative Risks
