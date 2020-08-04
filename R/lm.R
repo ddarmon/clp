@@ -1,5 +1,5 @@
 #' @export
-lm.lincom.conf <- function(mod, x){
+lm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   # Estimated expected response.
   mhat <- sum(x*coef(mod))
 
@@ -7,22 +7,21 @@ lm.lincom.conf <- function(mod, x){
   # estimated expected response.
   s.mhat <- sqrt(as.numeric(t(x)%*%vcov(mod)%*%x))
 
-  # Confidence distribution and curve based on
+  # Confidence function based on
   # Gaussian distribution for errors.
-  cd <- function(m) pt((m - mhat)/s.mhat, df = mod$df.residual)
-  cc <- function(m) abs(2*cd(m) - 1)
+  pconf <- function(m) pt((m - mhat)/s.mhat, df = mod$df.residual)
+  dconf <- function(m) dt((m - mhat)/s.mhat, df = mod$df.residual)/s.mhat
+  cconf <- function(m) abs(2*pconf(m) - 1)
+  qconf <- function(p) mhat + s.mhat*qt(p, df = mod$df.residual)
 
-  # Set up plotting limits.
-  q.lim <- c(-1, 1)*qt(0.9999, df = mod$df.residual)
-  m.lim <- mhat + q.lim*s.mhat
+  pcurve <- function(m) 1 - cconf(m)
 
-  # Generate plots.
-  par(mfrow = c(1, 2))
-  curve(cc, from = m.lim[1], to = m.lim[2], n = 2000,
-        xlab = 'Expected Response', ylab = 'cc')
-  abline(h = 0.95, lty = 3)
-  curve(cd, from = m.lim[1], to = m.lim[2], n = 2000,
-        xlab = 'Expected Response', ylab = 'cd')
+  out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve)
 
-  return(list(cc = cc, cd = cd))
+  if (plot){
+    plot.dconf(out, xlab = 'Expected Response')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
+  }
+
+  return(out)
 }

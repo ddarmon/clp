@@ -1,5 +1,5 @@
 #' @export
-glm.lincom.conf <- function(mod, x){
+glm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   # PDF / PMF from GLM
   dmod <- get_dmodel_function(mod)
 
@@ -140,29 +140,44 @@ glm.lincom.conf <- function(mod, x){
 
   resp.vals <- mod$family$linkinv(ms)
 
-  par(mfrow = c(1, 2))
-  curve(profile.lik.fun, from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'Profile Likelihood')
-  curve(dev.fun,  from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'Deviance')
-  abline(h = qchisq(c(0.5, 0.9, 0.95, 0.99), 1), lty = 3)
+  # For direct comparison with figures from CLP:
+  # par(mfrow = c(1, 2))
+  # curve(profile.lik.fun, from = min(resp.vals), to = max(resp.vals),
+  #       xlab = 'Expected Response', ylab = 'Profile Likelihood')
+  # curve(dev.fun,  from = min(resp.vals), to = max(resp.vals),
+  #       xlab = 'Expected Response', ylab = 'Deviance')
+  # abline(h = qchisq(c(0.5, 0.9, 0.95, 0.99), 1), lty = 3)
 
   signed.sqrt.dev.fun <- function(m) sign(m - mod$family$linkinv(m.mle))*sqrt(dev.fun(m))
 
   cconf <- function(m) pchisq(dev.fun(m), 1)
   pconf <- function(m) pnorm(signed.sqrt.dev.fun(m))
 
-  curve(cconf(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'cconf', n = 2001)
-  abline(h = 0.95, lty = 3)
+  dconf <-  function(m, dx = 1e-5) (pconf(m + dx) - pconf(m - dx))/(2*dx)
 
-  curve(pconf(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'pconf', n = 2001)
+  qconf <- function(p) {
+    fun.root <- function(z) pconf(z) - p
 
-  return(list(cconf = cconf, pconf = pconf, profile.lik = profile.lik.fun, deviance = dev.fun))
+    rang.ms <- range(mod$family$linkinv(ms))
+
+    return(uniroot(fun.root, interval = c(rang.ms[1], rang.ms[2]))$root) # Might need better upperbound here!
+  }
+
+  qconf <- Vectorize(qconf)
+
+  pcurve <- function(m) 1 - cconf(m)
+
+  out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, profile.lik = profile.lik.fun, deviance = dev.fun)
+
+  if (plot){
+    plot.dconf(out, xlab = 'Expected Response')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
+  }
+
+  return(out)
 }
 
-glm.lincom.conf.disp <- function(mod, x){
+glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
   n <- nrow(mod$model)
   p <- length(mod$coefficients)
 
@@ -348,14 +363,28 @@ glm.lincom.conf.disp <- function(mod, x){
   }
   cconf <- function(m) pf(profile(m)^2, df1 = 1, df2 = n - p)
 
-  curve(cconf(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'cconf', n = 2001)
-  abline(h = 0.95, lty = 3)
+  dconf <-  function(m, dx = 1e-5) (pconf(m + dx) - pconf(m - dx))/(2*dx)
 
-  curve(pconf(x), from = min(resp.vals), to = max(resp.vals),
-        xlab = 'Expected Response', ylab = 'pconf', n = 2001)
+  qconf <- function(p) {
+    fun.root <- function(z) pconf(z) - p
 
-  return(list(cconf = cconf, pconf = pconf))
+    rang.ms <- range(mod$family$linkinv(ms))
+
+    return(uniroot(fun.root, interval = c(rang.ms[1], rang.ms[2]))$root) # Might need better upperbound here!
+  }
+
+  qconf <- Vectorize(qconf)
+
+  pcurve <- function(m) 1 - cconf(m)
+
+  out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve)
+
+  if (plot){
+    plot.dconf(out, xlab = 'Expected Response')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
+  }
+
+  return(out)
 }
 
 #' @export
