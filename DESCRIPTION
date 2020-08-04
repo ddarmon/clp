@@ -9,5 +9,5 @@ Description: Currently in **very** alpha.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Depends: enrichwith (>= 0.3.1), pracma (>= 2.2.9), MASS (>= 7.3)
+Depends: R (>= 3.5.0), enrichwith (>= 0.3.1), pracma (>= 2.2.9), MASS (>= 7.3)
 RoxygenNote: 7.1.0
