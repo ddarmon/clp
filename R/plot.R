@@ -1,3 +1,4 @@
+#' @export
 plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', which = 1){
 
   if (class(obj) == 'lm.beta.conf'){
@@ -30,6 +31,7 @@ plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '
   }
 }
 
+#' @export
 plot.dconf <- function(obj, xlim = NULL, xlab = NULL, which = 1){
   if (class(obj) == 'lm.beta.conf'){
     if (is.null(xlim)) xlim <- (obj$qconf(which))(c(0.001, 0.999))

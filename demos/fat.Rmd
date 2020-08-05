@@ -23,17 +23,6 @@ plot(mod.lm)
 ```{r}
 conf.out <- lm.beta.conf(mod.lm)
 
-for (var.name in conf.out$variable.names){
-  par(mfrow = c(1, 2))
-  plot.dconf(conf.out, which = var.name)
-  plot.cconf(conf.out, which = var.name)
-}
-
-```
-
-
-
-```{r}
 alpha = 0.05
 
 ci.out <- confint(mod.lm, level = 1 - alpha)
@@ -45,23 +34,23 @@ n.plot <- 401
 for (var.name in names(coef(mod.lm))){
   par(mfrow = c(2, 2))
   
-  Qn <- conf.out$qconf(var.name)
+  Qn <- conf.out[[var.name]]$qconf
   
   xlim <- c(Qn(alpha.lower/2), Qn(1-alpha.lower/2))
   
-  curve(conf.out$pconf(var.name)(x), xlim = xlim,
+  curve(conf.out[[var.name]]$pconf(x), xlim = xlim,
         n = n.plot, xlab = var.name, ylab = 'Confidence Dist.')
   
-  curve(conf.out$cconf(var.name)(x), xlim = xlim, n = n.plot, 
+  curve(conf.out[[var.name]]$cconf(x), xlim = xlim, n = n.plot, 
         xlab = var.name, ylab = 'Confidence Curve')
   abline(v = ci.out[var.name, ], h = 1-alpha, lty = 3)
-  abline(v = c(conf.out$qconf(var.name)(alpha/2), conf.out$qconf(var.name)(1-alpha/2)), lty = 4, col = 'red')
+  abline(v = c(conf.out[[var.name]]$qconf(alpha/2), conf.out[[var.name]]$qconf(1-alpha/2)), lty = 4, col = 'red')
   
   #curve(conf.out[[var.name]]$pcurve(x), xlim = xlim, n = n.plot)
   
-  curve(conf.out$dconf(var.name)(x), xlim = xlim, n = n.plot, 
+  curve(conf.out[[var.name]]$dconf(x), xlim = xlim, n = n.plot, 
         xlab = var.name, ylab = 'Confidence Dens.')
-  curve(conf.out$scurve(var.name)(x), xlim = xlim, n = n.plot, 
+  curve(conf.out[[var.name]]$scurve(x), xlim = xlim, n = n.plot, 
         xlab = var.name, ylab = 'S-curve')
 }
 ```
