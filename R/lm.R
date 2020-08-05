@@ -28,37 +28,17 @@ lm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
 
 #' @export
 lm.beta.conf <- function(mod){
-  Pnames <- names(B0 <- coef(mod))
+  b <- coef(mod)
+  s.b <- sqrt(diag(vcov(mod)))
 
-  p <- length(Pnames)
+  pconf <- function(var.name) return(function(beta) pt((beta - b[var.name])/s.b[var.name], df = mod$df.residual))
+  dconf <- function(var.name) return(function(beta) dt((beta - b[var.name])/s.b[var.name], df = mod$df.residual)/s.b[var.name])
+  cconf <- function(var.name) return(function(beta) abs(2*pconf(var.name)(beta)-1))
+  qconf <- function(var.name) return(function(p) b[var.name] + s.b[var.name]*qt(p, df = mod$df.residual))
 
-  S.b <- diag(vcov(mod.lm))
+  out <- list(variable.names = names(coef(mod)), pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf)
 
-  return.list <- list()
+  class(out) <- 'lm.beta.conf'
 
-  for (var.name in Pnames){
-    return.list[[var.name]] <- list()
-
-    b   <- B0[var.name]
-    s.b <- sqrt(S.b[var.name])
-
-    pconf <- function(beta) pt((beta - b)/s.b, df = mod$df.residual)
-    dconf <- function(beta) dt((beta - b)/s.b, df = mod$df.residual)/s.b
-
-    cconf <- function(beta) abs(2*pconf(beta) - 1)
-    pcurve <- function(beta) 1-cconf(beta)
-    scurve <- function(beta) -log2(pcurve(beta))
-
-
-    qconf <- function(p) b + s.b*qt(p, df = mod$df.residual)
-
-    return.list[[var.name]][['pconf']] <- pconf
-    return.list[[var.name]][['dconf']] <- dconf
-    return.list[[var.name]][['qconf']] <- qconf
-    return.list[[var.name]][['cconf']] <- cconf
-    return.list[[var.name]][['pcurve']] <- pcurve
-    return.list[[var.name]][['scurve']] <- scurve
-  }
-
-  return(return.list)
+  return(out)
 }
