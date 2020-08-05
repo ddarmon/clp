@@ -1,0 +1,63 @@
+```{r}
+library(clp)
+```
+
+```{r}
+n <- 20
+
+x <- rexp(n)
+y <- rexp(n)
+
+B <- 10000
+```
+
+# One-sample
+
+```{r}
+par(mfrow = c(1, 2))
+conf.boot <- t.boot.conf(x, B = B, plot = TRUE)
+
+conf.para <- t.conf(x)
+
+xlim <- conf.para$qconf(c(0.001, 0.999))
+
+par(mfrow = c(1, 1))
+curve(conf.boot$cconf(x), xlim = xlim, n = 2001, col = 'red')
+curve(conf.para$cconf(x), n = 2001, add = TRUE, col = 'blue')
+```
+
+```{r}
+par(mfrow = c(1, 1))
+curve(conf.boot$scurve(x), xlim = conf.para$qconf(c(0.001, 0.999)), n = 2001, col = 'red')
+curve(conf.para$scurve(x), n = 2001, add = TRUE, col = 'blue')
+```
+
+# Two.sample
+
+```{r}
+par(mfrow = c(1, 2))
+conf.boot <- t.boot.conf(x, y, B = B, plot = TRUE)
+
+conf.para <- t.conf(x, y)
+
+par(mfrow = c(1, 1))
+curve(conf.boot$cconf(x), xlim = conf.para$qconf(c(0.001, 0.999)), n = 2001, col = 'red')
+curve(conf.para$cconf(x), n = 2001, add = TRUE, col = 'blue')
+```
+
+```{r}
+par(mfrow = c(1, 1))
+curve(conf.boot$scurve(x), xlim = conf.para$qconf(c(0.001, 0.999)), n = 2001, col = 'red')
+curve(conf.para$scurve(x), n = 2001, add = TRUE, col = 'blue')
+```
+
+Need to handle P-values for bootstrap that yield NAs.
+
+```{r}
+conf.boot$pcurve(0)
+conf.para$pcurve(0)
+
+conf.boot$pcurve(5)
+conf.para$pcurve(5)
+```
+
