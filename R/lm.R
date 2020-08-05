@@ -34,9 +34,13 @@ lm.beta.conf <- function(mod){
   pconf <- function(var.name) return(function(beta) pt((beta - b[var.name])/s.b[var.name], df = mod$df.residual))
   dconf <- function(var.name) return(function(beta) dt((beta - b[var.name])/s.b[var.name], df = mod$df.residual)/s.b[var.name])
   cconf <- function(var.name) return(function(beta) abs(2*pconf(var.name)(beta)-1))
+
+  pcurve <- function(var.name) return(function(beta) 1 - cconf(var.name)(beta))
+  scurve <- function(var.name) return(function(beta) -log2(pcurve(var.name)(beta)))
+
   qconf <- function(var.name) return(function(p) b[var.name] + s.b[var.name]*qt(p, df = mod$df.residual))
 
-  out <- list(variable.names = names(coef(mod)), pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf)
+  out <- list(variable.names = names(coef(mod)), pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
   class(out) <- 'lm.beta.conf'
 
