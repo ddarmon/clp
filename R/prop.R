@@ -330,3 +330,97 @@ risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
 
   return(out)
 }
+
+#' @export
+oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
+  ## See page 236 of *Confidence, Likelihood, Probability*
+  ## for the form of the confidence distribution
+  ## for the odds ratio.
+
+  y1 <- x[1]; y2 <- x[2]
+  n1 <- n[1]; n2 <- n[2]
+
+  p1 <- y1/n1
+  p2 <- y2/n2
+
+  or <- (p2*(1-p1))/(p1*(1-p2))
+
+  # Let rho be the odds ratio, and
+  #     psi be the log-odds ratio:
+  #
+  # psi = log(rho)
+
+  log.or <- log(or)
+
+  kappa.s <- 1/y1 + 1/(n1 - y1) + 1/y2 + 1/(n2 - y2)
+
+  m1 <- y1 + y2
+
+  # Use normal approximation to determine a
+  # reasonable upper-bound for the odds ratio
+  # rho:
+
+  log.or.upper <- qnorm(0.99999, mean = log.or, sd = sqrt(kappa.s))
+
+  or.upper <- exp(log.or.upper)
+
+  n <- 1000
+  rhos <- seq(0.01, or.upper, length.out = n)
+
+  pconf <- function(rho){
+    if (rho <= 0){
+      return(0)
+    }else{
+      p.i <- dnoncenhypergeom(x = NA, n1 = n1, n2 = n2, m1 = m1, psi = rho)
+
+      sum.inds <- which(p.i[, 1] > y2)
+
+      p.i <- p.i[, 2]
+
+      C <- sum(p.i[sum.inds]) + 0.5*p.i[sum.inds[1] - 1]
+
+      return(C)
+    }
+  }
+
+  pconf <- Vectorize(pconf)
+
+  cconf <- function(rho) abs(2*pconf(rho) - 1)
+  pcurve <- function(rho) 1 - cconf(rho)
+  scurve <- function(rho) -log2(pcurve(rho))
+
+  dconf <- function(rho, dx = 1e-10) (pconf(rho + dx) - pconf(rho - dx))/(2*dx)
+
+  qconf <- function(p){
+    fun.root <- function(z) {
+      diff <- pconf(z) - p
+
+      return(diff)
+    }
+
+    while (fun.root(or.upper) < 0){
+      or.upper <- or.upper*10
+    }
+
+    return(uniroot(fun.root, interval = c(0, or.upper))$root)
+  }
+
+  qconf <- Vectorize(qconf)
+
+  out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+
+  if (plot){
+    xlim <- qconf(c(0.001, 0.999))
+
+    if (log == 'x'){
+      xlab.cconf = 'log Odds Ratio (log odds[2]/odds[1])'
+    }else{
+      xlab.cconf = 'Odds Ratio (odds[2]/odds[1])'
+    }
+
+    plot.dconf(out, xlab = 'Odds Ratio (odds[2]/odds[1])', xlim = xlim)
+    plot.cconf(out, conf.level = conf.level, xlab = xlab.cconf, xlim = xlim, log = log)
+  }
+
+  return(out)
+}
