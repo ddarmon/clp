@@ -177,6 +177,7 @@ glm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   return(out)
 }
 
+#' @export
 glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
   n <- nrow(mod$model)
   p <- length(mod$coefficients)
