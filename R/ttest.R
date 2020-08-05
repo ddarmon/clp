@@ -10,7 +10,7 @@
 #' @examples
 #' t.confdist(x = 1:10, y = 7:20)
 #'
-#' @export
+#' @export t.conf
 t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) {
 
   if(!is.null(y)){
@@ -117,7 +117,7 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
 #' @examples
 #' t.confdist(c(3,5), c(1,.5), c(10, 12))
 #'
-#' @export
+#' @export t.conf.summary
 t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
 
   stopifnot(length(mean)==length(sd) && length(mean)==length(n))
