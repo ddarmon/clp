@@ -58,6 +58,8 @@ for (var.name in names(coef(mod.lm))){
 
 # Confidence curve for the expected BFP of a 170lb, 6ft, 20-year old male
 
+Need to make optimization for glm.lincom.conf.disp() more robust.
+
 ```{r}
 x <- c(1,    # Intercept
        20,   # 20 years old

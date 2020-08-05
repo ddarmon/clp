@@ -75,8 +75,8 @@ for (var.name in names(coef(mod))){
 # S-curve as evidence-against-null-in-coin-flips
 
 ```{r}
-conf.out$weight$Scurve(0)
-conf.out$smoker$Scurve(0)
+conf.out$weight$scurve(0)
+conf.out$smoker$scurve(0)
 ```
 
 # Still need to fix:

@@ -1,3 +1,9 @@
+Based on synthetic data generated using the summary statistics from this study:
+
+[Effect of Low-Fat vs Low-Carbohydrate Diet on 12-Month Weight Loss in Overweight Adults and the Association With Genotype Pattern or Insulin Secretion](https://jamanetwork.com/journals/jama/fullarticle/2673150)
+
+Converted from kg to lbs for easier interpretation for American audience.
+
 ```{r}
 library(clp)
 
@@ -11,6 +17,7 @@ comp.conf <- t.conf(x = weight$weightchange[weight$diet == 'Low Carb'], y = weig
 
 comp.conf$pcurve(0)
 ```
+
 ```{r}
 t.conf.summary(0, 1, 100)
 
