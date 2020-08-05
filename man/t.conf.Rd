@@ -23,4 +23,5 @@ Computes confidence functions for one and two sample t-tests on vectors of data.
 }
 \examples{
 t.confdist(x = 1:10, y = 7:20)
+
 }

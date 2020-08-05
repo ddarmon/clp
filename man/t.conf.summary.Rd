@@ -23,4 +23,5 @@ Computes confidence functions for one and two sample t-tests on summary data.
 }
 \examples{
 t.confdist(c(3,5), c(1,.5), c(10, 12))
+
 }

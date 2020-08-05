@@ -1,4 +1,3 @@
-
 #' Confidence functions for t-Test
 #'
 #' Computes confidence functions for one and two sample t-tests on vectors of data.
@@ -10,6 +9,7 @@
 #' @return A list containing the confidence functions.
 #' @examples
 #' t.confdist(x = 1:10, y = 7:20)
+#'
 #' @export
 t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) {
 
@@ -116,6 +116,7 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
 #' @return A list containing the confidence functions.
 #' @examples
 #' t.confdist(c(3,5), c(1,.5), c(10, 12))
+#'
 #' @export
 t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
 
@@ -197,5 +198,4 @@ t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
   }else{
     stop("Vector lengths must be 1 or 2.")
   }
-
 }
