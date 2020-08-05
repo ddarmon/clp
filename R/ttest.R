@@ -55,7 +55,10 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
     # P-curve
     pcurve <- function(mu) 1 - cconf(mu)
 
-    out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve)
+    # S-curve
+    scurve <- function(mu) -log2(pcurve(mu))
+
+    out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
     if (plot){
       plot.dconf(out, xlab = 'mean')
@@ -93,7 +96,10 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
     # P-curve
     pcurve <- function(delta) 1-cconf(delta)
 
-    out <- list(pconf = pconf, dconf = dconf, cconf =  cconf, qconf = qconf, pcurve = pcurve)
+    # S-curve
+    scurve <- function(delta) -log2(pcurve(delta))
+
+    out <- list(pconf = pconf, dconf = dconf, cconf =  cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
     if (plot){
       plot.dconf(out, xlab = 'mean[1] - mean[2]')
