@@ -1,0 +1,17 @@
+```{r}
+library(clp)
+
+weight <- readRDS('dietstudy.rda')
+
+x <- weight$weightchange[weight$diet == 'Low Carb']
+y <- weight$weightchange[weight$diet == 'Low Fat']
+
+lc.wsr.conf <- wilcox.conf(x)
+lf.wsr.conf <- wilcox.conf(y)
+
+lc.sign.conf <- sign.conf(x)
+lf.sign.conf <- sign.conf(y)
+
+comp.wrs.conf <- wilcox.conf(x, y)
+```
+
