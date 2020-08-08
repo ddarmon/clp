@@ -1,6 +1,9 @@
 ```{r}
 library(clp)
+```
 
+
+```{r}
 weight <- readRDS('dietstudy.rda')
 
 x <- weight$weightchange[weight$diet == 'Low Carb']
