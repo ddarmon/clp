@@ -88,11 +88,32 @@ sign.conf <- function(x, plot = TRUE, conf.level = 0.95){
 #' @export wilcox.conf
 wilcox.conf <- function(x, y = NULL, plot = TRUE, conf.level = 0.95){
   if (is.null(y)){
-    pconf <- Vectorize(function(mu) wilcox.test(x, mu = mu, alternative = 'greater')$p.value)
+    pconf <- Vectorize(function(mu) suppressWarnings(wilcox.test(x, mu = mu, alternative = 'greater')$p.value))
 
     cconf <- function(mu) abs(2*pconf(mu) - 1)
 
-    qconf <- Vectorize(function(p) wilcox.test(x, alternative = 'less', conf.level = p, conf.int = TRUE)$conf.int[2])
+    # Use wilcox.test()'s upper confidence bound to get quantile function.
+    #qconf <- Vectorize(function(p) suppressWarnings(wilcox.test(x, alternative = 'less', conf.level = p, conf.int = TRUE)$conf.int[2]))
+
+    x.range <- range(x)
+    x.min <- x.range[1]
+    x.max <- x.range[2]
+
+    qconf <- function(p) {
+      if (p < pconf(x.min)){
+        return(-Inf)
+      } else if (p > pconf(x.max)){
+        return(Inf)
+      } else{
+        f.root <- function(x) pconf(x) - p
+
+        q <- uniroot(f.root, interval = c(x.min-1e-10, x.max+1e-10))$root
+
+        return(q)
+      }
+    }
+
+    qconf <- Vectorize(qconf)
 
     pcurve <- function(mu) 1 - cconf(mu)
 
@@ -104,11 +125,11 @@ wilcox.conf <- function(x, y = NULL, plot = TRUE, conf.level = 0.95){
       plot.cconf(out, conf.level = conf.level, xlab = '(Psuedo)Median')
     }
   }  else{
-      pconf <- Vectorize(function(mu) wilcox.test(x, y, mu = mu, alternative = 'greater')$p.value)
+      pconf <- Vectorize(function(mu) suppressWarnings(wilcox.test(x, y, mu = mu, alternative = 'greater')$p.value))
 
       cconf <- function(mu) abs(2*pconf(mu) - 1)
 
-      qconf <- Vectorize(function(p) wilcox.test(x, y, alternative = 'less', conf.level = p, conf.int = TRUE)$conf.int[2])
+      qconf <- Vectorize(function(p) suppressWarnings(wilcox.test(x, y, alternative = 'less', conf.level = p, conf.int = TRUE)$conf.int[2]))
 
       pcurve <- function(mu) 1 - cconf(mu)
 
