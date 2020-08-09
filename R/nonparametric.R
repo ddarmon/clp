@@ -21,14 +21,14 @@ sign.conf <- function(x, plot = TRUE, conf.level = 0.95){
   # See page 66 of Hollander, Wolfe, and Chicken for P-value
   # calculation.
 
-  # Note: this only gives the correct right-sided P-value,
-  # will be too small for left-sided P-value, since should be
-  # P(C >= c), not P(C > c).
-
-  pconf <- function(mu){
+  pconf <- function(mu, lower.tail = TRUE){
     c <- sum(x <= mu)
 
-    pval <- pbinom(c, n, 0.5)
+    if (lower.tail){
+      pval <- pbinom(c, n, 0.5) # For right-sided P-values
+    }else{
+      pval <- pbinom(c-1, n, 0.5, lower.tail = FALSE) # For left-sided P-values
+    }
 
     return(pval)
   }
