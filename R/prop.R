@@ -319,7 +319,7 @@ risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
     }
 
     if (log == 'x'){
-      xlab.cconf = 'log Relative Risk (log p[2]/p[1])'
+      xlab.cconf = 'Relative Risk (p[2]/p[1]), Log-scaling'
     }else{
       xlab.cconf = 'Relative Risk (p[2]/p[1])'
     }
@@ -413,7 +413,7 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
     xlim <- qconf(c(0.001, 0.999))
 
     if (log == 'x'){
-      xlab.cconf = 'log Odds Ratio (log odds[2]/odds[1])'
+      xlab.cconf = 'Odds Ratio (odds[2]/odds[1]), Log-scaling'
     }else{
       xlab.cconf = 'Odds Ratio (odds[2]/odds[1])'
     }
