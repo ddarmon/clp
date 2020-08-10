@@ -1,0 +1,27 @@
+```{r}
+library(clp)
+```
+
+
+```{r}
+
+# Galton's data on assortative mating according to temper.
+
+# Columns: wife (good / bad) temper
+# Rows:    hustband (good / bad) temper
+
+N <- matrix(c(24, 27,
+              34, 26), nrow = 2, byrow = TRUE)
+
+conf.out <- chisq.conf(N)
+```
+
+```{r}
+
+conf.out$qconf(c(0.025, 0.975))
+
+conf.out$pcurve(0)
+
+chisq.test(N)
+```
+
