@@ -10,6 +10,8 @@ library(clp)
 # Columns: wife (good / bad) temper
 # Rows:    hustband (good / bad) temper
 
+# reported on page 78 of *Confidence, Likelihood, Probability*.
+
 N <- matrix(c(24, 27,
               34, 26), nrow = 2, byrow = TRUE)
 
