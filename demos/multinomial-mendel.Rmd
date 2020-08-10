@@ -1,0 +1,25 @@
+```{r}
+library(clp)
+```
+
+```{r}
+N <- c(315, 108, 101, 32)
+
+theta0 <- c(9, 3, 3, 1)/16
+
+names(N) <- c('Round, Yellow', 'Round, Green', 'Wrinkled, Yellow', 'Wrinkled, Green')
+
+col <- c('darkgoldenrod', 'darkgreen', 'darkgoldenrod1', 'darkolivegreen')
+
+B <- 2000
+
+conf.out <- multinomial.conf(N, B = B, col = col)
+abline(v = theta0, col = col, lty = 3)
+
+# Combine evidence across confidence curves.
+p.multinomial(conf.out, theta0)
+
+chisq.test(N, p = theta0)
+
+```
+
