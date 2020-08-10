@@ -1,4 +1,4 @@
-```{r}
+```{r, message = FALSE}
 library(clp)
 ```
 
@@ -8,7 +8,7 @@ library(clp)
 # Galton's data on assortative mating according to temper.
 
 # Columns: wife (good / bad) temper
-# Rows:    hustband (good / bad) temper
+# Rows:    husband (good / bad) temper
 
 # reported on page 78 of *Confidence, Likelihood, Probability*.
 
