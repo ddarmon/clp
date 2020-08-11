@@ -1,5 +1,7 @@
 ```{r}
 library(clp)
+
+data(fat)
 ```
 
 
@@ -8,8 +10,6 @@ library(clp)
 http://lib.stat.cmu.edu/datasets/bodyfat
 
 ```{r}
-load('fat.rda')
-
 mod.lm <- lm(body.fat ~ age + weight + height, data = fat)
 mod.glm <- glm(body.fat ~ age + weight + height, data = fat, family = gaussian)
 

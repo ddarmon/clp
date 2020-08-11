@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r, message = FALSE}
-library(LogisticDx) # This has the data set on low birth weights in infants
+#library(LogisticDx) # This has the data set on low birth weights in infants
 ```
 
 ```{r, message = FALSE}

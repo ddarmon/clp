@@ -7,13 +7,13 @@ Converted from kg to lbs for easier interpretation for American audience.
 ```{r}
 library(clp)
 
-weight <- readRDS('dietstudy.rda')
+load(dietstudy)
 
-lc.conf <- t.conf(x = weight$weightchange[weight$diet == 'Low Carb'])
+lc.conf <- t.conf(x = dietstudy$weightchange[weight$diet == 'Low Carb'])
 
-lf.conf <- t.conf(x = weight$weightchange[weight$diet == 'Low Fat'])
+lf.conf <- t.conf(x = dietstudy$weightchange[weight$diet == 'Low Fat'])
 
-comp.conf <- t.conf(x = weight$weightchange[weight$diet == 'Low Carb'], y = weight$weightchange[weight$diet == 'Low Fat'])
+comp.conf <- t.conf(x = dietstudy$weightchange[weight$diet == 'Low Carb'], y = weight$weightchange[dietstudy$diet == 'Low Fat'])
 
 comp.conf$pcurve(0)
 ```
