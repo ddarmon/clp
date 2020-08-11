@@ -156,7 +156,7 @@ gamma.fun <- function(eta){
   return(gamma.hat)
 }
 
-constraint.fun <- function(eta, gamma. N.flat){
+constraint.fun <- function(eta, gamma, N.flat){
   gamma.prof <- gamma.fun(eta)
 
   return(gamma.prof - gamma)
