@@ -144,15 +144,21 @@ gamma.fun <- function(eta){
   a <- rowSums(P)
   b <- colSums(P)
 
-  gamma.hat <- 0
+  # gamma.hat <- 0
+  #
+  # for (i in 1:nrow(N)){
+  #   for (j in 1:ncol(N)){
+  #     pr <- a[i]*b[j]
+  #
+  #     gamma.hat <- gamma.hat + (P[i, j] - pr)^2/pr
+  #   }
+  # }
 
-  for (i in 1:nrow(N)){
-    for (j in 1:ncol(N)){
-      pr <- a[i]*b[j]
+  # Vectorized computation:
 
-      gamma.hat <- gamma.hat + (P[i, j] - pr)^2/pr
-    }
-  }
+  ab <- outer(a, b)
+
+  gamma.hat <- sum((P - ab)^2/ab)
 
   return(gamma.hat)
 }
@@ -161,6 +167,20 @@ constraint.fun <- function(eta, gamma, N.flat){
   gamma.prof <- gamma.fun(eta)
 
   return(gamma.prof - gamma)
+}
+
+ineq.constraint.fun <- function(eta, gamma, N.flat){
+  con <- c(eta, # ps > 0
+           1 - eta) # ps < 1
+
+  return(con)
+}
+
+ineq.constraint.jac <- function(eta, gamma, N.flat){
+  jac <- rbind(pracma::eye(length(eta)), # for ps > 0
+               -pracma::eye(length(eta))) # for ps < 1
+
+  return(jac)
 }
 
 #' @export chisq.conf
@@ -173,7 +193,10 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
   gamma.hat <- gamma.fun(phat.flat[-length(phat.flat)])
 
   cconf <- function(gamma){
-    suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma, N.flat = N.flat))
+    # Runs faster **without** constraining 0 <= pi <= 1.
+    #suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, hin = ineq.constraint.fun, hin.jac = ineq.constraint.jac, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
+
+    suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
 
     return(pchisq(2*(ll.multinomial(opt.out$par, N.flat = N.flat) - ll.multinomial(phat.flat[-length(phat.flat)], N.flat = N.flat)), df = 1))
   }
@@ -184,7 +207,10 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
     if (gamma < 0){
       return(0)
     }else{
-      suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma, N.flat = N.flat))
+      # Runs faster **without** constraining 0 <= pi <= 1.
+      #suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, hin = ineq.constraint.fun, hin.jac = ineq.constraint.jac, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
+
+      suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
 
       return(pnorm(sign(gamma - gamma.hat)*sqrt(2*(ll.multinomial(opt.out$par, N.flat = N.flat) - ll.multinomial(phat.flat[-length(phat.flat)], N.flat = N.flat)))))
     }
