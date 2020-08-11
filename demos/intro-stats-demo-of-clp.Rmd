@@ -29,10 +29,11 @@ m1$pcurve(0) # Two-sided P-value
 ## From actual data
 
 ```{r}
-data("capability")
+data(dietstudy)
 
-m1 <- t.conf(capability$y, conf.level = 0.999)
+m1 <- t.conf(dietstudy$weightchange[dietstudy$diet == 'Low Carb'], conf.level = 0.999)
 ```
+
 # Paired Means
 
 ```{r}
@@ -143,5 +144,20 @@ abline(v = theta0, col = col, lty = 3)
 p.multinomial(conf.out, theta0)
 
 chisq.test(N, p = theta0)
+```
+# Chi-squared test of association
+
+```{r}
+# Galton's data on assortative mating according to temper.
+
+# Columns: wife (good / bad) temper
+# Rows:    husband (good / bad) temper
+
+# reported on page 78 of *Confidence, Likelihood, Probability*.
+
+N <- matrix(c(24, 27,
+              34, 26), nrow = 2, byrow = TRUE)
+
+conf.out <- chisq.conf(N)
 ```
 
