@@ -135,6 +135,7 @@ grad.multinomial <- function(eta, gamma, N.flat){
   return(-g[-length(g)])
 }
 
+# Compute chi-squared association parameter from J - 1 probabilities.
 gamma.fun <- function(eta){
   theta <- c(eta, 1 - sum(eta))
 
