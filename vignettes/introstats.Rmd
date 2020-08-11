@@ -11,3 +11,48 @@ vignette: >
 library(clp)
 ```
 
+```{r}
+data(dietstudy)
+
+head(dietstudy)
+```
+
+```{r, message = FALSE}
+library(ggformula)
+
+gf_histogram(~ weightchange | diet, data = dietstudy)
+```
+
+```{r}
+conf.mu.lowcarb <- t.conf(dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
+conf.mu.lowfat <- t.conf(dietstudy$weightchange[dietstudy$diet == 'Low Fat'])
+```
+```{r}
+conf.diff <- t.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Fat'], y = dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
+```
+
+
+```{r}
+conf.diff$qconf(c(0.025, 0.975))
+```
+
+
+```{r}
+conf.diff$pcurve(0)
+```
+
+
+```{r}
+plot.pcurve(conf.diff)
+```
+
+
+```{r}
+plot.scurve(conf.diff)
+```
+
+
+```{r}
+conf.diff$scurve(0)
+```
+
