@@ -114,7 +114,7 @@ p.multinomial <- function(obj, theta){
 
 # <--------------------------------------------------------------->
 
-ll.multinomial <- function(eta, gamma, N.flat){
+ll.multinomial <- function(eta, gamma = NULL, N.flat){
   theta <- c(eta, 1 - sum(eta))
 
   # Negative, for minimization rather than maximization.
@@ -175,7 +175,7 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
   cconf <- function(gamma){
     suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma, N.flat = N.flat))
 
-    return(pchisq(2*(ll.multinomial(opt.out$par) - ll.multinomial(phat.flat[-length(phat.flat)])), df = 1))
+    return(pchisq(2*(ll.multinomial(opt.out$par, N.flat = N.flat) - ll.multinomial(phat.flat[-length(phat.flat), N.flat = N.flat])), df = 1))
   }
 
   cconf <- Vectorize(cconf)
@@ -186,7 +186,7 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
     }else{
       suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma, N.flat = N.flat))
 
-      return(pnorm(sign(gamma - gamma.hat)*sqrt(2*(ll.multinomial(opt.out$par) - ll.multinomial(phat.flat[-length(phat.flat)])))))
+      return(pnorm(sign(gamma - gamma.hat)*sqrt(2*(ll.multinomial(opt.out$par, N.flat = N.flat) - ll.multinomial(phat.flat[-length(phat.flat)], N.flat = N.flat)))))
     }
   }
 
