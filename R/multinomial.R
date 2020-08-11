@@ -165,7 +165,7 @@ constraint.fun <- function(eta, gamma, N.flat){
 
 #' @export chisq.conf
 chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
-
+  # Flatten matrix for easier computes.
   N.flat <- as.numeric(N)
 
   phat.flat <- N.flat / sum(N.flat)
@@ -175,7 +175,7 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
   cconf <- function(gamma){
     suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma, N.flat = N.flat))
 
-    return(pchisq(2*(ll.multinomial(opt.out$par, N.flat = N.flat) - ll.multinomial(phat.flat[-length(phat.flat), N.flat = N.flat])), df = 1))
+    return(pchisq(2*(ll.multinomial(opt.out$par, N.flat = N.flat) - ll.multinomial(phat.flat[-length(phat.flat)], N.flat = N.flat)), df = 1))
   }
 
   cconf <- Vectorize(cconf)
