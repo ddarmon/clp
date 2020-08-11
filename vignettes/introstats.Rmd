@@ -1,0 +1,13 @@
+---
+title: "Basic Inferential Statistics with `clp`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Basic Inferential Statistics with `clp`}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, message = FALSE}
+library(clp)
+```
+
