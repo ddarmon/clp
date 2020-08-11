@@ -469,5 +469,7 @@ glm.beta.conf <- function(mod){
     return.list[[var.name]][['scurve']] <- Sn
   }
 
+  class(return.list) <- 'glm.beta.conf'
+
   return(return.list)
 }

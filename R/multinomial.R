@@ -1,4 +1,4 @@
-make.multinomial.multicomp.fun <- function(x, n, K, Kinv){
+make.multinomial.multicomp.obj <- function(x, n, K, Kinv){
   conf.out <- prop.conf(x, n, plot = FALSE)
 
   theta.hat <- x/n
@@ -71,7 +71,7 @@ multinomial.conf <- function(N, plot = TRUE, conf.level = 0.95, B = 2000, col = 
 
   for (j in 1:length(N)){
     conf.singlecomp[[j]] <- prop.conf(N[j], n, plot = FALSE)
-    conf.multicomp[[j]] <- make.multinomial.multicomp.fun(N[j], n, K, Kinv)
+    conf.multicomp[[j]] <- make.multinomial.multicomp.obj(N[j], n, K, Kinv)
   }
 
   n.plot <- 2001
