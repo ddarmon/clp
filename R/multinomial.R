@@ -114,55 +114,54 @@ p.multinomial <- function(obj, theta){
 
 # <--------------------------------------------------------------->
 
+
+  # Negative, for minimization rather than maximization.
+  return(-sum(N.flat*log(theta)))
+}
+
+grad.multinomial <- function(eta, gamma, N.flat){
+  theta <- c(eta, 1 - sum(eta))
+
+  # Additional term needed since each p[i, j] shows up
+  # in the final parameter.
+
+  minus.term <- N.flat[length(N.flat)]/theta[length(theta)]
+
+  g <- N.flat / theta - minus.term
+
+  # Negative, for minimization rather than maximization.
+  return(-g[-length(g)])
+}
+
+gamma.fun <- function(eta){
+  theta <- c(eta, 1 - sum(eta))
+
+  P <- matrix(theta, nrow = nrow(N))
+
+  a <- rowSums(P)
+  b <- colSums(P)
+
+  gamma.hat <- 0
+
+  for (i in 1:nrow(N)){
+    for (j in 1:ncol(N)){
+      pr <- a[i]*b[j]
+
+      gamma.hat <- gamma.hat + (P[i, j] - pr)^2/pr
+    }
+  }
+
+  return(gamma.hat)
+}
+
+constraint.fun <- function(eta, gamma){
+  gamma.prof <- gamma.fun(eta)
+
+  return(gamma.prof - gamma)
+}
+
 #' @export chisq.conf
 chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
-  ll.multinomial <- function(eta, gamma){
-    theta <- c(eta, 1 - sum(eta))
-
-    # Negative, for minimization rather than maximization.
-    return(-sum(N.flat*log(theta)))
-  }
-
-  grad.multinomial <- function(eta, gamma){
-    theta <- c(eta, 1 - sum(eta))
-
-    # Additional term needed since each p[i, j] shows up
-    # in the final parameter.
-
-    minus.term <- N.flat[length(N.flat)]/theta[length(theta)]
-
-    g <- N.flat / theta - minus.term
-
-    # Negative, for minimization rather than maximization.
-    return(-g[-length(g)])
-  }
-
-  gamma.fun <- function(eta){
-    theta <- c(eta, 1 - sum(eta))
-
-    P <- matrix(theta, nrow = nrow(N))
-
-    a <- rowSums(P)
-    b <- colSums(P)
-
-    gamma.hat <- 0
-
-    for (i in 1:nrow(N)){
-      for (j in 1:ncol(N)){
-        pr <- a[i]*b[j]
-
-        gamma.hat <- gamma.hat + (P[i, j] - pr)^2/pr
-      }
-    }
-
-    return(gamma.hat)
-  }
-
-  constraint.fun <- function(eta, gamma){
-    gamma.prof <- gamma.fun(eta)
-
-    return(gamma.prof - gamma)
-  }
 
   N.flat <- as.numeric(N)
 
@@ -171,7 +170,7 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
   gamma.hat <- gamma.fun(phat.flat[-length(phat.flat)])
 
   cconf <- function(gamma){
-    suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma))
+    suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma, N.flat = N.flat))
 
     return(pchisq(2*(ll.multinomial(opt.out$par) - ll.multinomial(phat.flat[-length(phat.flat)])), df = 1))
   }
@@ -182,7 +181,7 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
     if (gamma < 0){
       return(0)
     }else{
-      suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma))
+      suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE), gamma = gamma, N.flat = N.flat))
 
       return(pnorm(sign(gamma - gamma.hat)*sqrt(2*(ll.multinomial(opt.out$par) - ll.multinomial(phat.flat[-length(phat.flat)])))))
     }
