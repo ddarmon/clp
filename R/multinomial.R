@@ -114,6 +114,8 @@ p.multinomial <- function(obj, theta){
 
 # <--------------------------------------------------------------->
 
+ll.multinomial <- function(eta, gamma, N.flat){
+  theta <- c(eta, 1 - sum(eta))
 
   # Negative, for minimization rather than maximization.
   return(-sum(N.flat*log(theta)))
