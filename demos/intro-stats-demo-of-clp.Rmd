@@ -2,7 +2,6 @@
 title: Demo of Confidence Functions for Intro Stat Topics
 date: 090820
 author: David Darmon
-output: html_notebook
 ---
 
 ```{r, message = FALSE}
@@ -100,8 +99,8 @@ mod <- lm(eruptions ~ waiting, data = faithful)
 
 conf.lm <- lm.beta.conf(mod)
 
-plot.cconf(conf.lm, which = '(Intercept)')
-plot.cconf(conf.lm, which = 'waiting')
+plot.cconf(conf.lm$betas$`(Intercept)`, xlab = '(Intercept)')
+plot.cconf(conf.lm$betas$waiting, xlab = 'waiting')
 ```
 # Wilcoxon's signed-rank test
 
