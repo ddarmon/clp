@@ -33,6 +33,35 @@ cubic.root <- function(x, n, Delta){
 
 cubic.root <- Vectorize(cubic.root, vectorize.args = c('Delta'))
 
+#' Confidence Functions for One or Two Proportions
+#'
+#' Confidence functions for a single binomial proportion based on the
+#' mid P-value or the difference of two independent proportions based
+#' on the score test statistic.
+#'
+#' @param x the number of successes out of n trials (one proportion) or
+#'          the number of successes in two independent samples (two proportions).
+#' @param n the number of trials (one proportion) or
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for a single proportion or the difference of two proportions, as well as
+#'         the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Jan Hannig. "On generalized fiducial inference." Statistica Sinica (2009): 491-544.
+#'
+#'              Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
+#'
+#' @examples
+#' # One proportion
+#'  prop.conf(x = 0, n = 10)
+#'
+#' # Two proportions
+#'  prop.conf(x = c(1, 2), n = c(10, 20))
+#'
 #' @export
 prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95){
   if  (length(x) == 1 && length(n == 1)){
@@ -44,6 +73,24 @@ prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95){
   return(out)
 }
 
+#' Confidence Functions for One Proportion
+#'
+#' Confidence functions a single binomial proportion based on the
+#' mid P-value.
+#'
+#' @param x the number of successes out of n trials
+#' @param n the number of trials
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for a single proportion, as well as the P-curve and S-curve.
+#'
+#' @references Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'             Jan Hannig. "On generalized fiducial inference." Statistica Sinica (2009): 491-544.
+#'
+#' @examples prop.conf.1s(x = 0, n = 10)
 prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
   pconf <- function(p){
     cd <- vector(length = length(p))
@@ -90,7 +137,9 @@ prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
 
   pcurve <- function(p) 1 - cconf(p)
 
-  out <- list(pconf = pconf, dconf = dconf, qconf = qconf, cconf = cconf, pcurve = pcurve)
+  scurve <- function(p) -log2(pcurve(p))
+
+  out <- list(pconf = pconf, dconf = dconf, qconf = qconf, cconf = cconf, pcurve = pcurve, scurve = scurve)
 
   if (plot){
     plot.dconf(out, xlab = 'Proportion p')
@@ -100,6 +149,24 @@ prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
   return(out)
 }
 
+#' Confidence Functions for the Difference of Two Proportions
+#'
+#' Confidence functions for the difference of two binomial proportions
+#' based on the score statistic.
+#'
+#' @param x a vector of counts of successes in each independent sample
+#' @param n a vector of the number of trials in each independent sample
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the difference of two proportions, as well as the P-curve and S-curve.
+#'
+#' @references Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'             Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
+#'
+#' @examples prop.conf.2s(x = c(1, 2), n = c(10, 10))
 prop.conf.2s <- function(x, n, plot = TRUE, conf.level = 0.95){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
