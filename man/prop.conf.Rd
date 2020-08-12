@@ -39,5 +39,7 @@ Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. 
 
              Jan Hannig. "On generalized fiducial inference." Statistica Sinica (2009): 491-544.
 
+             Olli Miettinen and Markku Nurminen. "Comparative analysis of two rates." Statistics in Medicine 4.2 (1985): 213-226.
+
              Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
 }

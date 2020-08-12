@@ -53,6 +53,8 @@ cubic.root <- Vectorize(cubic.root, vectorize.args = c('Delta'))
 #'
 #'              Jan Hannig. "On generalized fiducial inference." Statistica Sinica (2009): 491-544.
 #'
+#'              Olli Miettinen and Markku Nurminen. "Comparative analysis of two rates." Statistics in Medicine 4.2 (1985): 213-226.
+#'
 #'              Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
 #'
 #' @examples
@@ -163,6 +165,8 @@ prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
 #'         for the difference of two proportions, as well as the P-curve and S-curve.
 #'
 #' @references Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'             Olli Miettinen and Markku Nurminen. "Comparative analysis of two rates." Statistics in Medicine 4.2 (1985): 213-226.
 #'
 #'             Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
 #'

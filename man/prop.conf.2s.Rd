@@ -29,5 +29,7 @@ prop.conf.2s(x = c(1, 2), n = c(10, 10))
 \references{
 Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
 
+            Olli Miettinen and Markku Nurminen. "Comparative analysis of two rates." Statistics in Medicine 4.2 (1985): 213-226.
+
             Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
 }
