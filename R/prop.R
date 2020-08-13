@@ -458,11 +458,12 @@ dncd <- function(y2, n1, n2, z, rho){
   # for the noncentral hypergeometric distribution.
   up <- min(z, n2)
 
-  num <- choose(n1, z - y2)*choose(n2, y2)*rho^y2
+  # Handle on logarithmic scale, to deal with large values.
+  num <- exp(lchoose(n1, z - y2) + lchoose(n2, y2) + y2*log(rho))
 
   y2s <- 0:z
 
-  denom <- sum(choose(n1, z - y2s)*choose(n2, y2s)*rho^y2s)
+  denom <- sum(exp(lchoose(n1, z - y2s) + lchoose(n2, y2s) + y2s*log(rho)))
 
   return(num/denom)
 }
@@ -527,30 +528,36 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
 
   kappa.s <- 1/y1 + 1/(n1 - y1) + 1/y2 + 1/(n2 - y2)
 
-  m1 <- y1 + y2
+  z <- y1 + y2
 
   # Use normal approximation to determine a
   # reasonable upper-bound for the odds ratio
   # rho:
 
-  log.or.upper <- qnorm(0.99, mean = log.or, sd = sqrt(kappa.s))
+  log.or.upper <- qnorm(0.9, mean = log.or, sd = sqrt(kappa.s))
 
   or.upper <- exp(log.or.upper)
 
-  n <- 1000
-  rhos <- seq(0.01, or.upper, length.out = n)
+  # Use large-sample approximation for large samples, since
+  # large samples can overwhelm dncd:
 
-  pconf <- function(rho){
-    if (rho <= 0){
-      return(0)
-    }else{
-      ys <- (y2 + 1):min(m1, n2)
+  # DMD: Might need to do better than this...
 
-      # mid P-value
+  if (n[1] >= 100 && n[2] >= 100){
+    pconf <- function(rho) pnorm(log(rho), mean = log.or, sd = sqrt(kappa.s))
+  }else{
+    pconf <- function(rho){
+      if (rho <= 0){
+        return(0)
+      }else{
+        ys <- (y2 + 1):min(z, n2)
 
-      C <- sum(dncd(ys, n1, n2, m1, rho)) + 0.5*dncd(y2, n1, n2, m1, rho)
+        # mid P-value
 
-      return(C)
+        C <- sum(dncd(ys, n1, n2, z, rho)) + 0.5*dncd(y2, n1, n2, z, rho)
+
+        return(C)
+      }
     }
   }
 
