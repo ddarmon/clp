@@ -39,10 +39,10 @@ conf.score$qconf(c(0.025, 0.975))
 # Relative Risks
 
 ```{r}
-conf.risk <- risk.conf(x, n)
-conf.risk <- risk.conf(x, n, log = 'x')
+conf.riskratio <- riskratio.conf(x, n)
+conf.riskratio <- riskratio.conf(x, n, log = 'x')
 
-conf.risk$qconf(c(0.025, 0.975))
+conf.riskratio$qconf(c(0.025, 0.975))
 ```
 # Odds Ratio
 

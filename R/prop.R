@@ -164,9 +164,7 @@ prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
 #' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
 #'         for the difference of two proportions, as well as the P-curve and S-curve.
 #'
-#' @references Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
-#'
-#'             Olli Miettinen and Markku Nurminen. "Comparative analysis of two rates." Statistics in Medicine 4.2 (1985): 213-226.
+#' @references Olli Miettinen and Markku Nurminen. "Comparative analysis of two rates." Statistics in Medicine 4.2 (1985): 213-226.
 #'
 #'             Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
 #'
@@ -291,8 +289,45 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
   return(out)
 }
 
+#' Confidence Functions for the Relative Risk Between Two Proportions
+#'
+#' Confidence functions for the relative risk between two binomial proportions
+#' based on the score statistic.
+#'
+#' @param x a vector of counts of successes in each independent sample
+#' @param n a vector of the number of trials in each independent sample
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the relative risk between two proportions, as well as the P-curve and S-curve.
+#'
+#' @references Olli Miettinen and Markku Nurminen. "Comparative analysis of two rates." Statistics in Medicine 4.2 (1985): 213-226.
+#'
+#'             Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
+#'
+#' @examples
+#'
+#' # From Physician's Health Study, on whether regular
+#' # intake of aspirin reduces the rate of heart disease.
+#' #
+#' # Data:
+#' #
+#' #         | Yes |   No  | Total
+#' # -----------------------------
+#' # Placebo | 189 | 10845 | 11034
+#' # Aspirin | 104 | 10933 | 11037
+#'
+#' x <- c(189, 104)
+#' n <- c(11034, 11037)
+#'
+#' riskratio.conf(x, n)
+#'
+#' riskratio.conf(x, n, log = 'x') # Show risk ratio with
+#'                                  # log-scaling of horizontal axis.
+#'
 #' @export
-risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
+riskratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
 
@@ -372,7 +407,7 @@ risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
       ub <- ub*10
     }
 
-    return(uniroot(fun.root, interval = c(0, ub))$root) # Might need better upperbound here!
+    return(uniroot(fun.root, interval = c(0, ub))$root)
   }
 
   qconf.score <- Vectorize(qconf.score)
@@ -402,6 +437,41 @@ risk.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   return(out)
 }
 
+#' Confidence Functions for the Odds Ratio Between Two Proportions
+#'
+#' Confidence functions for the odds ratio between two binomial proportions
+#' based on the mid P-value for the exact test.
+#'
+#' @param x a vector of counts of successes in each independent sample
+#' @param n a vector of the number of trials in each independent sample
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the relative risk between two proportions, as well as the P-curve and S-curve.
+#'
+#' @references Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#' @examples
+#'
+#' # From Physician's Health Study, on whether regular
+#' # intake of aspirin reduces the rate of heart disease.
+#' #
+#' # Data:
+#' #
+#' #         | Yes |   No  | Total
+#' # -----------------------------
+#' # Placebo | 189 | 10845 | 11034
+#' # Aspirin | 104 | 10933 | 11037
+#'
+#' x <- c(189, 104)
+#' n <- c(11034, 11037)
+#'
+#' oddsratio.conf(x, n)
+#'
+#' oddsratio.conf(x, n, log = 'x') # Show odds ratio with
+#'                                 # log-scaling of horizontal axis.
+#'
 #' @export
 oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   ## See page 236 of *Confidence, Likelihood, Probability*

@@ -75,11 +75,11 @@ p2s$pcurve(0) # Test for p1 - p2 = delta = 0
 # Test of two proportions (risk)
 
 ```{r}
-risk <- risk.conf(x = c(15, 5), n = c(30, 30))
+riskratio <- riskratio.conf(x = c(15, 5), n = c(30, 30))
 
-risk$pcurve(1) # Test for no difference in risk
+riskratio$pcurve(1) # Test for no difference in risk
 
-risk <- risk.conf(x = c(15, 5), n = c(30, 30), log = 'x') # Log-scale for confidence curve
+riskratio <- riskratio.conf(x = c(15, 5), n = c(30, 30), log = 'x') # Log-scale for confidence curve
 ```
 # Test of two proportions (odds)
 
