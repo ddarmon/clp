@@ -437,6 +437,38 @@ riskratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   return(out)
 }
 
+#' Probability Mass Function for Noncentral Hypergeometric Distribution
+#'
+#' Computes the probability mass function for the
+#' noncentral hypergeometric distribution.
+#'
+#' @param y2 the number of successes in the second group
+#' @param n1 the sample size for the first group
+#' @param n2 the sample size for the second group
+#' @param z the total number of successes in both groups
+#' @param rho the odds ratio
+#'
+#' @return The probability of y2 successes in the second group,
+#'         conditional on z successes overall, with an odds
+#'         ratio of rho.
+#'
+dncd <- function(y2, n1, n2, z, rho){
+  # See page 236 of *Confidence, Likelihood, Probability* by
+  # Schweder and Hjort for the probability mass function
+  # for the noncentral hypergeometric distribution.
+  up <- min(z, n2)
+
+  num <- choose(n1, z - y2)*choose(n2, y2)*rho^y2
+
+  y2s <- 0:z
+
+  denom <- sum(choose(n1, z - y2s)*choose(n2, y2s)*rho^y2s)
+
+  return(num/denom)
+}
+
+dncd <- Vectorize(dncd, vectorize.args = 'y2')
+
 #' Confidence Functions for the Odds Ratio Between Two Proportions
 #'
 #' Confidence functions for the odds ratio between two binomial proportions
@@ -501,7 +533,7 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   # reasonable upper-bound for the odds ratio
   # rho:
 
-  log.or.upper <- qnorm(0.99999, mean = log.or, sd = sqrt(kappa.s))
+  log.or.upper <- qnorm(0.99, mean = log.or, sd = sqrt(kappa.s))
 
   or.upper <- exp(log.or.upper)
 
@@ -512,13 +544,11 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
     if (rho <= 0){
       return(0)
     }else{
-      p.i <- dnoncenhypergeom(x = NA, n1 = n1, n2 = n2, m1 = m1, psi = rho)
+      ys <- (y2 + 1):min(m1, n2)
 
-      sum.inds <- which(p.i[, 1] > y2)
+      # mid P-value
 
-      p.i <- p.i[, 2]
-
-      C <- sum(p.i[sum.inds]) + 0.5*p.i[sum.inds[1] - 1]
+      C <- sum(dncd(ys, n1, n2, m1, rho)) + 0.5*dncd(y2, n1, n2, m1, rho)
 
       return(C)
     }
@@ -540,7 +570,7 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
     }
 
     while (fun.root(or.upper) < 0){
-      or.upper <- or.upper*10
+      or.upper <- or.upper*2
     }
 
     return(uniroot(fun.root, interval = c(0, or.upper))$root)
