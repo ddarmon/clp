@@ -1,5 +1,42 @@
+#' Perform BCa Bootstrap for a Given Statistic
+#'
+#' Approximate the bootstrap distribution and estimate bias and acceleration
+#' parameters for the BCa bootstrap, given a statistic as would be supplied to
+#' boot from the boot package.
+#'
+#' @param data the dataframe or data matrix
+#' @param statistic a function that computes the statistic from data
+#' @param B the number of bootstrap replicates
+#' @param stratified whether or not (default) to use the use stratified
+#'                   sampling for the bootstrapping.
+#'
+#' @return A list containing the sample estimate, bootstrap estimates,
+#'         bootstrap CDF, bias, and acceleration parameters for the
+#'         BCa bootstrap.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron. "Better bootstrap confidence intervals." Journal of the American Statistical Association 82.397 (1987): 171-185.
+#'
+#'              Thomas J. DiCiccio and Bradley Efron. "Bootstrap confidence intervals." Statistical Science (1996): 189-212.
+#'
+#' @examples
+#' t.one.sample <- function(data, id = 1:length(data)){
+#'   dat <- data[id]
+#'
+#'   d <- mean(dat)
+#'
+#'   return(d)
+#' }
+#'
+#' data(dietstudy)
+#'
+#' bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+#'         statistic = t.one.sample,
+#'         B = 2000)
+#'
 #' @export
-bootcurve <- function(data, statistic, B = 2000, stratified = FALSE){
+bcaboot <- function(data, statistic, B = 2000, stratified = FALSE){
   if (stratified){
     strata <- data[, ncol(data)]
 
@@ -127,12 +164,12 @@ t.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
 
   if (is.null(y)){
     dat <- x
-    bc <- bootcurve(dat, t.one.sample, B = B)
+    bc <- bcaboot(dat, t.one.sample, B = B)
 
     xlab <- 'mean'
   }else{
     dat <- cbind(c(x, y), c(rep(1, length(x)), rep(2, length(y))))
-    bc <- bootcurve(dat, t.two.sample, B = B, stratified = TRUE)
+    bc <- bcaboot(dat, t.two.sample, B = B, stratified = TRUE)
 
     xlab <- 'mean[1] - mean[2]'
   }
