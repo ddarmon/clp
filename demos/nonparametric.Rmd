@@ -4,10 +4,10 @@ library(clp)
 
 
 ```{r}
-weight <- readRDS('dietstudy.rda')
+data(dietstudy)
 
-x <- weight$weightchange[weight$diet == 'Low Carb']
-y <- weight$weightchange[weight$diet == 'Low Fat']
+x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
+y <- dietstudy$weightchange[dietstudy$diet == 'Low Fat']
 
 lc.wsr.conf <- wilcox.conf(x)
 lf.wsr.conf <- wilcox.conf(y)
