@@ -52,4 +52,18 @@ conf.or <- oddsratio.conf(x, n, plot = TRUE, log = 'x')
 
 conf.or$qconf(c(0.025, 0.975))
 ```
+# Matched Proportions
+
+```{r}
+n <- 1000
+
+b <- 20
+c <- 10
+
+out <- matchedprop.conf(b, c, n, plot = TRUE)
+
+out$qconf(c(0.025, 0.975))
+
+out$pcurve(0)
+```
 
