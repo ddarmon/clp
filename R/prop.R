@@ -602,3 +602,79 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
 
   return(out)
 }
+
+#' Confidence Functions for the Difference of Two Matched Proportions
+#'
+#' Confidence functions for the difference of two matched proportions
+#' based on the score statistic.
+#'
+#' @param b the number of trials where the first outcome is a failure
+#'          and the second outcome is a success
+#' @param c the number of trials where the first outcome is a success
+#'          and the second outcome is a failure
+#' @param n the number of trials
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the difference of two matched proportions, as well as the P-curve and S-curve.
+#'
+#' @references Toshiro Tango. "Equivalence test and confidence interval for the difference in proportions for the paired‐sample design." Statistics in Medicine 17.8 (1998): 891-908.
+#'
+#' @examples matchedprop.conf(a = 5, b = 10, n = 100)
+#'
+#' @export
+matchedprop.conf <- function(b, c, n, plot = TRUE, conf.level = 0.95){
+  pconf <- function(delta){
+    A <- 2*n
+    B <- -b - c -(2*n - b + c)*delta
+    C <- c*delta*(delta + 1)
+
+    q21 <- (sqrt(B^2 - 4*A*C) - B)/(2*A)
+
+    num <- b - c + n*delta
+    denom <- sqrt(n*(2*q21 - delta*(delta + 1)))
+
+    return(pnorm(num/denom))
+  }
+
+  cconf <- function(delta) abs(2*pconf(delta) - 1)
+
+  # dconf <- function(delta){
+  #   A <- 2*n
+  #   B <- -b - c -(2*n - b + c)*delta
+  #   C <- c*delta*(delta + 1)
+  #
+  #   q21 <- (sqrt(B^2 - 4*A*C) - B)/(2*A)
+  #
+  #   num <- b - c + n*delta
+  #   denom <- sqrt(n*(2*q21 - delta*(delta + 1)))
+  #
+  #   dfactor <- -1/2*(2*(b - c)*delta - delta*n + 4*n*q21 + b - c)*sqrt(-(delta^2 + delta)*n + 2*n*q21)/(4*(delta^2 + delta)*n*q21 - 4*n*q21^2 - (delta^4 + 2*delta^3 + delta^2)*n)
+  #
+  #   return(dfactor*dnorm(num/denom))
+  # }
+
+  dconf <- function(delta, dx = 1e-6){
+    return((pconf(delta + dx) - pconf(delta - dx))/(2*dx))
+  }
+
+  qconf <- function(p){
+    return(uniroot(function(x) pconf(x) - p, interval = c(-1, 1))$root)
+  }
+
+  qconf <- Vectorize(qconf)
+
+  pcurve <- function(delta) 1 - cconf(delta)
+
+  scurve <- function(delta) -log2(pcurve(delta))
+
+  out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+
+  if (plot){
+    plot.dconf(out, xlab = 'p[2] - p[1]')
+    plot.cconf(out, conf.level = conf.level, xlab = 'p[2] - p[1]')
+  }
+
+  return(out)
+}
