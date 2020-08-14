@@ -127,8 +127,8 @@ confdist = function(bc, theta, param){
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
 confdens = function(bc, param){
-  # density.out = density(bc$t[, param], bw = "SJ") # Seems to undersmooth
-  density.out = density(bc$t[, param], bw = "bcv", n = 1024) # Seems to oversmooth, which in this case is good.
+  density.out = density(bc$t[, param], bw = "SJ") # Seems to undersmooth
+  # density.out = density(bc$t[, param], bw = "bcv", n = 1024) # Seems to oversmooth
 
   gn.percentile = density.out$y
   thetas = density.out$x
@@ -147,10 +147,18 @@ confdens = function(bc, param){
 
   gn.bca = gn.percentile*w(thetas, Gn, z0, a)
 
-  # Reweight so sums to 1, at the given discretization of theta.
-  gn.bca = gn.bca/(sum(gn.bca, na.rm = TRUE)*diff(thetas[1:2]))
+  # Reweight so integrates to 1:
+  gn.bca = gn.bca/sum(gn.bca, na.rm = TRUE)/(thetas[2] - thetas[1])
 
-  dconf <- splinefun(thetas, gn.bca)
+  gn.approx <- approxfun(thetas, gn.bca)
+
+  dconf <- function(thetas){
+    g <- gn.approx(thetas)
+
+    g[is.na(g)] <- 0
+
+    return(g)
+  }
 
   return(dconf)
 }

@@ -41,10 +41,10 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
     se.xbar <- sx/sqrt(nx)
 
     # Confidence Distribution
-    pconf <- function(mu) pt((mu - xbar)/se.xbar, df = (nx-1))
+    pconf <- function(mu) pt((mu - xbar)/se.xbar, df = nx-1)
 
     # Confidence Density
-    dconf <- function(mu) dt((mu - xbar)/se.xbar, df = nx-1)
+    dconf <- function(mu) dt((mu - xbar)/se.xbar, df = nx-1)/se.xbar
 
     # Confidence Curve
     cconf <- function(mu) abs(2*pconf(mu) - 1)
@@ -137,10 +137,10 @@ t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
     se.xbar <- sx/sqrt(nx)
 
     # Confidence Distribution
-    pconf <- function(mu) pt((mu - xbar)/se.xbar, df = (nx-1))
+    pconf <- function(mu) pt((mu - xbar)/se.xbar, df = nx-1)
 
     # Confidence Density
-    dconf <- function(mu) dt((mu - xbar)/se.xbar, df = nx-1)
+    dconf <- function(mu) dt((mu - xbar)/se.xbar, df = nx-1)/se.xbar
 
     # Confidence Curve
     cconf <- function(mu) abs(2*pconf(mu) - 1)

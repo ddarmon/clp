@@ -15,11 +15,15 @@ B <- 10000
 
 ```{r}
 par(mfrow = c(1, 2))
-conf.boot <- t.boot.conf(x, B = B, plot = TRUE)
 
+conf.boot <- t.boot.conf(x, B = B, plot = TRUE)
 conf.para <- t.conf(x)
 
 xlim <- conf.para$qconf(c(0.001, 0.999))
+
+par(mfrow = c(1, 1))
+curve(conf.boot$dconf(x), xlim = xlim, n = 2001, col = 'red')
+curve(conf.para$dconf(x), n = 2001, add = TRUE, col = 'blue')
 
 par(mfrow = c(1, 1))
 curve(conf.boot$cconf(x), xlim = xlim, n = 2001, col = 'red')
@@ -40,8 +44,14 @@ conf.boot <- t.boot.conf(x, y, B = B, plot = TRUE)
 
 conf.para <- t.conf(x, y)
 
+xlim <- conf.para$qconf(c(0.001, 0.999))
+
 par(mfrow = c(1, 1))
-curve(conf.boot$cconf(x), xlim = conf.para$qconf(c(0.001, 0.999)), n = 2001, col = 'red')
+curve(conf.boot$dconf(x), xlim = xlim, n = 2001, col = 'red')
+curve(conf.para$dconf(x), n = 2001, add = TRUE, col = 'blue')
+
+par(mfrow = c(1, 1))
+curve(conf.boot$cconf(x), xlim = xlim, n = 2001, col = 'red')
 curve(conf.para$cconf(x), n = 2001, add = TRUE, col = 'blue')
 ```
 
