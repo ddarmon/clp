@@ -14,9 +14,7 @@
 #'         bootstrap CDF, bias, and acceleration parameters for the
 #'         BCa bootstrap.
 #'
-#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
-#'
-#'              Bradley Efron. "Better bootstrap confidence intervals." Journal of the American Statistical Association 82.397 (1987): 171-185.
+#' @references  Bradley Efron. "Better bootstrap confidence intervals." Journal of the American Statistical Association 82.397 (1987): 171-185.
 #'
 #'              Thomas J. DiCiccio and Bradley Efron. "Bootstrap confidence intervals." Statistical Science (1996): 189-212.
 #'
@@ -89,6 +87,21 @@ bcaboot <- function(data, statistic, B = 2000, stratified = FALSE){
   return(list(t0 = boot.out$t0, t = boot.out$t, Gn = Gn, z0 = z0, a = a))
 }
 
+#' Construct the Confidence Distribution from a BCa Bootstrap for a Given Statistic
+#'
+#' Construct the BCa confidence distribution from a bootstrap sample constructed using
+#' bcaboot.
+#'
+#' @param bc an object returned by bcaboot
+#' @param theta the parameter value at which to evaluate the BCa confidence distribution
+#' @param param which parameter value to construct the BCa confidence distribution for
+#'
+#' @return The BCa confidence distribution for param evaluated at theta.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
 confdist = function(bc, theta, param){
   Gn = bc$Gn[[param]]
   Phi.invs = qnorm(Gn(theta))
@@ -99,6 +112,20 @@ confdist = function(bc, theta, param){
   return(Hn)
 }
 
+#' Construct the Confidence Density from a BCa Bootstrap for a Given Statistic
+#'
+#' Construct the BCa confidence density from a bootstrap sample constructed using
+#' bcaboot.
+#'
+#' @param bc an object returned by bcaboot
+#' @param param which parameter value to construct the BCa confidence density for
+#'
+#' @return A spline approximation the BCa confidence density.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
 confdens = function(bc, param){
   # density.out = density(bc$t[, param], bw = "SJ") # Seems to undersmooth
   density.out = density(bc$t[, param], bw = "bcv", n = 1024) # Seems to oversmooth, which in this case is good.
@@ -123,11 +150,26 @@ confdens = function(bc, param){
   # Reweight so sums to 1, at the given discretization of theta.
   gn.bca = gn.bca/(sum(gn.bca, na.rm = TRUE)*diff(thetas[1:2]))
 
-  dconf <- splinefun(thetas, gn.percentile)
+  dconf <- splinefun(thetas, gn.bca)
 
   return(dconf)
 }
 
+#' Construct the Confidence Quantile Function from a BCa Bootstrap for a Given Statistic
+#'
+#' Construct the BCa confidence quantile function from a bootstrap sample constructed using
+#' bcaboot.
+#'
+#' @param bc an object returned by bcaboot
+#' @param p the desired probability value at which to evaluate the confidence quantile function
+#' @param param which parameter value to construct the BCa confidence quantile function for
+#'
+#' @return The BCa confidence quantile function for param evaluated at p.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
 confquant <- function(bc, p, param){
   Gn <- bc$Gn[[param]]
   z0 <- bc$z0[param]
@@ -143,6 +185,19 @@ confquant <- function(bc, p, param){
   return(Qn)
 }
 
+#' Statistic for Bootstrapped Two-sample t-test.
+#'
+#' The function to pass to bcaboot to perform the two-sample t-test
+#' via bootstrapping.
+#'
+#' @param data (m + n) x 2 matrix containing the first and second samples,
+#'             with the first column containing the data values and the second
+#'             column containing an indicator for which sample the data values
+#'             are from.
+#' @param id the id variable used by boot
+#'
+#' @return A single value of the difference of the two bootstrapped sample means.
+#'
 t.two.sample <- function(data, id = 1:nrow(data)){
   dat <- data[id, ]
 
@@ -151,6 +206,16 @@ t.two.sample <- function(data, id = 1:nrow(data)){
   return(d)
 }
 
+#' Statistic for Bootstrapped One-sample t-test.
+#'
+#' The function to pass to bcaboot to perform the one-sample t-test
+#' via bootstrapping.
+#'
+#' @param data a vector containing the sample
+#' @param id the id variable used by boot
+#'
+#' @return A single value of the bootstrapped sample mean.
+#'
 t.one.sample <- function(data, id = 1:length(data)){
   dat <- data[id]
 
@@ -159,6 +224,41 @@ t.one.sample <- function(data, id = 1:length(data)){
   return(d)
 }
 
+#' Bootstrapped Confidence Functions for One or Two Means
+#'
+#' Bootstrapped confidence functions for a single mean or the difference
+#' of two means using the BCa bootstrap.
+#'
+#' @param x a vector containing the first sample
+#' @param y a vector containing the second sample (optional)
+#' @param B the number of bootstrap samples used to approximate the
+#'          bootstrap distribution
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for a single mean or the difference of two means, as well as
+#'         the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
+#' @examples
+#'
+#' data(dietstudy)
+#'
+#' # One mean
+#'
+#' t.boot.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+#'             B = 2000)
+#'
+#' # Two means
+#'
+#' t.boot.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+#'             y = dietstudy$weightchange[dietstudy$diet == 'Low Fat'],
+#'             B = 2000)
+#'
 #' @export t.boot.conf
 t.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
 

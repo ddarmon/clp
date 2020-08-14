@@ -43,9 +43,7 @@ bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
 
 }
 \references{
-Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
-
-             Bradley Efron. "Better bootstrap confidence intervals." Journal of the American Statistical Association 82.397 (1987): 171-185.
+Bradley Efron. "Better bootstrap confidence intervals." Journal of the American Statistical Association 82.397 (1987): 171-185.
 
              Thomas J. DiCiccio and Bradley Efron. "Bootstrap confidence intervals." Statistical Science (1996): 189-212.
 }
