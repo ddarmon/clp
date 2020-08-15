@@ -127,15 +127,13 @@ confdist = function(bc, theta, param){
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
 confdens = function(bc, param){
-  density.out = density(bc$t[, param], bw = "SJ") # Seems to undersmooth
-  # density.out = density(bc$t[, param], bw = "bcv", n = 1024) # Seems to oversmooth
+  # See page 202 of *Computer Age Statistical Inference* by 
+  # Efron and Hastie for the appropriate weights for the 
+  # BCa confidence density.
+  
+  z0 <- bc$z0[param]; a <- bc$a[param]
 
-  gn.percentile = density.out$y
-  thetas = density.out$x
-
-  z0 = bc$z0[param]; a = bc$a[param]
-
-  Gn = bc$Gn[[param]]
+  Gn <- bc$Gn[[param]]
 
   w = function(theta, Gn, z0, a){
     ztheta = qnorm(Gn(theta)) - z0
@@ -144,11 +142,18 @@ confdens = function(bc, param){
 
     return(bca.fac)
   }
-
-  gn.bca = gn.percentile*w(thetas, Gn, z0, a)
-
-  # Reweight so integrates to 1:
-  gn.bca = gn.bca/sum(gn.bca, na.rm = TRUE)/(thetas[2] - thetas[1])
+  
+  Ws <- w(bc$t[, param], Gn, z0, a)
+  
+  Ws[is.na(Ws)] <- 0
+  
+  Ws <- Ws/sum(Ws)
+  
+  density.out <- density(bc$t[, param], bw = "SJ", weights = Ws, n = 1024) # Seems to undersmooth
+  # density.out = density(bc$t[, param], bw = "bcv", weights = Ws, n = 1024) # Seems to oversmooth
+  
+  gn.bca <- density.out$y
+  thetas <- density.out$x
 
   gn.approx <- approxfun(thetas, gn.bca)
 
