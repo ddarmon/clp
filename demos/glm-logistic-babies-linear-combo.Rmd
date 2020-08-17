@@ -6,19 +6,15 @@ output: html_document
 ---
 
 ```{r, message = FALSE}
-#library(LogisticDx) # This has the data set on low birth weights in infants
-```
-
-```{r, message = FALSE}
 library(clp)
 ```
 
-# Reformat Data Set to Match Example 2.4 on Page 38 of CLP
+# Example 2.4 on Page 38 of CLP
 
 ```{r}
 data(lbw)
 
-mod <- glm(low ~ weight + age + black + other + smoker, data = lbw.clp, family = binomial)
+mod <- glm(low ~ weight + age + black + other + smoker, data = lbw, family = binomial)
 ```
 
 # Determine Confidence Curve for Expected Response at the Following Covariate Valuess
