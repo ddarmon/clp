@@ -18,21 +18,6 @@ library(clp)
 ```{r}
 data(lbw)
 
-lbw.clp <- data.frame(low = lbw$LOW)
-
-lbw.clp$age <- lbw$AGE
-lbw.clp$weight <- lbw$LWT/2.20462 # Convert to kilograms
-lbw.clp$black <- lbw$RACE == 'black'
-lbw.clp$other <- lbw$RACE == 'other'
-lbw.clp$smoker <- lbw$SMOKE == 'yes'
-
-# Convert race and smoke factors into dummy variables.
-lbw.clp[, 2:ncol(lbw.clp)] <- apply(lbw.clp[, 2:ncol(lbw.clp)], 2, as.numeric)
-```
-
-# Fit Model
-
-```{r}
 mod <- glm(low ~ weight + age + black + other + smoker, data = lbw.clp, family = binomial)
 ```
 

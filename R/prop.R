@@ -40,8 +40,9 @@ cubic.root <- Vectorize(cubic.root, vectorize.args = c('Delta'))
 #' on the score test statistic.
 #'
 #' @param x the number of successes out of n trials (one proportion) or
-#'          the number of successes in two independent samples (two proportions).
-#' @param n the number of trials (one proportion) or
+#'          a vector with the number of successes in two independent samples (two proportions).
+#' @param n the number of trials (one proportion) or a vector with the number of trials
+#'          in two independent samples (two proportions)
 #' @param plot whether to plot the confidence density and curve
 #' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #'

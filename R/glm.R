@@ -1,3 +1,30 @@
+#' Confidence Functions for the Expected Response of a GLM with Dispersion
+#'
+#' Confidence functions for the expected response of a GLM without dispersion.
+#'
+#' @param mod an output from glm
+#' @param x a vector containing the predictor values for which the expected
+#'          response is desired
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the expected response at x, as well as the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'
+#' @examples
+#' # Low birth weight example from page 38 of *Confidence, Likelihood, Probability*,
+#'
+#' data(lbw)
+#'
+#' mod <- glm(low ~ weight + age + black + other + smoker, data = lbw, family = binomial)
+#'
+#' x.black <- c(1, 50, 23.238, 1, 0, 1)
+#'
+#' pred.black <- glm.lincom.conf(mod, x.black)
+#'
 #' @export
 glm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   # PDF / PMF from GLM

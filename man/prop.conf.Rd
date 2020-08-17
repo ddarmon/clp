@@ -8,9 +8,10 @@ prop.conf(x, n, plot = TRUE, conf.level = 0.95)
 }
 \arguments{
 \item{x}{the number of successes out of n trials (one proportion) or
-the number of successes in two independent samples (two proportions).}
+a vector with the number of successes in two independent samples (two proportions).}
 
-\item{n}{the number of trials (one proportion) or}
+\item{n}{the number of trials (one proportion) or a vector with the number of trials
+in two independent samples (two proportions)}
 
 \item{plot}{whether to plot the confidence density and curve}
 
