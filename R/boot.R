@@ -34,13 +34,13 @@
 #'         B = 2000)
 #'
 #' @export
-bcaboot <- function(data, statistic, B = 2000, stratified = FALSE){
+bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL){
   if (stratified){
     strata <- data[, ncol(data)]
 
-    boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B)
+    boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
   }else{
-    boot.out <- boot(data = data, statistic = statistic, R = B)
+    boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
   }
 
 
@@ -287,19 +287,7 @@ t.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
     xlab <- 'mean[1] - mean[2]'
   }
 
-
-  pconf <- function(x) confdist(bc, x, 1)
-  cconf <- function(x) abs(2*pconf(x) - 1)
-
-  # Only valid within the approximate range of the data!
-  dconf <- function(x) confdens(bc, 1)(x)
-
-  qconf <- function(p) confquant(bc, p, 1)
-
-  pcurve <- function(x) 1 - cconf(x)
-  scurve <- function(x) -log2(pcurve(x))
-
-  out <- list(pconf = pconf, cconf = cconf, dconf = dconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+  out <- conffuns.from.bcaboot(bc, 1)
 
   if (plot){
     plot.dconf(out, xlab = xlab)
@@ -307,4 +295,50 @@ t.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
   }
 
   return(out)
+}
+
+#' @export conffuns.from.bcaboot.single
+conffuns.from.bcaboot.single <- function(bc, ind){
+  ind
+
+  pconf <- function(x) confdist(bc, x, ind)
+  cconf <- function(x) abs(2*pconf(x) - 1)
+  
+  # Only valid within the approximate range of the data!
+  dconf <- function(x) confdens(bc, ind)(x)
+  
+  qconf <- function(p) confquant(bc, p, ind)
+  
+  pcurve <- function(x) 1 - cconf(x)
+  scurve <- function(x) -log2(pcurve(x))
+  
+  out <- list(pconf = pconf, cconf = cconf, dconf = dconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+  
+  return(out)
+}
+
+#' @export conffuns.from.bcaboot
+conffuns.from.bcaboot <- function(bc){
+  if (length(bc$t0) > 1){ # Parameter vector
+    # DMD: This may not work without first calling items first.
+    
+    out <- list()
+    
+    if (is.null(names(bc$t0))){
+      theta.names <- paste0('theta', 1:length(bc$t0))
+    }else{
+      theta.names <- names(bc$t0)
+    }
+    
+    for (ind in 1:length(theta.names)){
+      out[[theta.names[ind]]] <- conffuns.from.bcaboot.single(bc, ind)
+    }
+    
+    return(out)
+  }else{ # Single parameter
+    
+    out <- conffuns.from.bcaboot.single(bc, 1)
+    
+    return(out)
+  }
 }
