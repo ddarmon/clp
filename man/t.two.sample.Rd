@@ -4,7 +4,7 @@
 \alias{t.two.sample}
 \title{Statistic for Bootstrapped Two-sample t-test.}
 \usage{
-\method{t}{two.sample}(data, id = 1:nrow(data))
+\method{t}{two.sample}(data, id = 1:nrow(data), ...)
 }
 \arguments{
 \item{data}{(m + n) x 2 matrix containing the first and second samples,

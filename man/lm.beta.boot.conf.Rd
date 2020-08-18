@@ -2,30 +2,26 @@
 % Please edit documentation in R/boot.R
 \name{lm.beta.boot.conf}
 \alias{lm.beta.boot.conf}
-\title{Bootstrapped Confidence Functions for One or Two Means}
+\title{Bootstrapped Confidence Functions for Coefficients of a Linear Model}
 \usage{
 lm.beta.boot.conf(formula, data, B = 2000)
 }
 \arguments{
+\item{formula}{the model to be fitted}
+
+\item{data}{the data frame containing the data for fitting}
+
 \item{B}{the number of bootstrap samples used to approximate the
 bootstrap distribution}
-
-\item{x}{a vector containing the first sample}
-
-\item{y}{a vector containing the second sample (optional)}
-
-\item{plot}{whether to plot the confidence density and curve}
-
-\item{conf.level}{the confidence level for the confidence interval indicated on the confidence curve}
 }
 \value{
-A list containing the confidence functions pconf, dconf, cconf, and qconf
-        for a single mean or the difference of two means, as well as
+A list of lists containing the confidence functions pconf, dconf, cconf, and qconf
+        for each coefficient of the linear model, as well as
         the P-curve and S-curve.
 }
 \description{
-Bootstrapped confidence functions for a single mean or the difference
-of two means using the BCa bootstrap.
+Bootstrapped confidence functions for coefficients of a linear model
+using BCa and the case resampling bootstrap.
 }
 \examples{
 data(fat)

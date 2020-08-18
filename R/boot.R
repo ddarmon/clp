@@ -25,7 +25,7 @@
 #' @examples
 #' # Bootstrap confidence functions for a single mean.
 #'
-#' t.one.sample <- function(data, id = 1:length(data)){
+#' t.one.sample <- function(data, id = 1:length(data), ...){
 #'   dat <- data[id]
 #'
 #'   d <- mean(dat)
@@ -240,7 +240,7 @@ confquant <- function(bc, p, param){
 #'
 #' @return A single value of the difference of the two bootstrapped sample means.
 #'
-t.two.sample <- function(data, id = 1:nrow(data)){
+t.two.sample <- function(data, id = 1:nrow(data), ...){
   dat <- data[id, ]
 
   d <- mean(dat[dat[, 2] == 1, 1]) - mean(dat[dat[, 2] == 2, 1])
@@ -258,7 +258,7 @@ t.two.sample <- function(data, id = 1:nrow(data)){
 #'
 #' @return A single value of the bootstrapped sample mean.
 #'
-t.one.sample <- function(data, id = 1:length(data)){
+t.one.sample <- function(data, id = 1:length(data), ...){
   dat <- data[id]
 
   d <- mean(dat)
@@ -333,20 +333,18 @@ lm.beta.for.boot <- function(data, id = 1:nrow(data), formula){
   return(mod$coefficients)
 }
 
-#' Bootstrapped Confidence Functions for One or Two Means
+#' Bootstrapped Confidence Functions for Coefficients of a Linear Model
 #'
-#' Bootstrapped confidence functions for a single mean or the difference
-#' of two means using the BCa bootstrap.
+#' Bootstrapped confidence functions for coefficients of a linear model
+#' using BCa and the case resampling bootstrap.
 #'
-#' @param x a vector containing the first sample
-#' @param y a vector containing the second sample (optional)
+#' @param formula the model to be fitted
+#' @param data the data frame containing the data for fitting
 #' @param B the number of bootstrap samples used to approximate the
 #'          bootstrap distribution
-#' @param plot whether to plot the confidence density and curve
-#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #'
-#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
-#'         for a single mean or the difference of two means, as well as
+#' @return A list of lists containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for each coefficient of the linear model, as well as
 #'         the P-curve and S-curve.
 #'
 #' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.

@@ -4,7 +4,7 @@
 \alias{t.one.sample}
 \title{Statistic for Bootstrapped One-sample t-test.}
 \usage{
-\method{t}{one.sample}(data, id = 1:length(data))
+\method{t}{one.sample}(data, id = 1:length(data), ...)
 }
 \arguments{
 \item{data}{a vector containing the sample}
