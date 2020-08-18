@@ -1,3 +1,37 @@
+#' Confidence Functions for the Expected Response of a Linear Model
+#'
+#' Confidence functions for the expected response of a linear model under
+#' Gaussian noise assumptions.
+#'
+#' @param mod an output from lm
+#' @param x a vector containing the predictor values for which the expected
+#'          response is desired
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the expected response at x, as well as the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'
+#' @examples
+#'
+#' # Prediction of body fat percentage from other body measurements.
+#'
+#' data(fat)
+#'
+#' mod <- lm(body.fat ~ age + weight + height, data = fat)
+#'
+#' # Confidence curve for the expected BFP of a 170lb, 6ft, 20-year old male
+#'
+#' x <- c(1,    # Intercept
+#'        20,   # 20 years old
+#'        170,  # 170 lbs
+#'        6*12) # 72 inches (6 feet)
+#'
+#' m.conf <- lm.lincom.conf(mod, x)
+#'
 #' @export
 lm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   # Estimated expected response.
@@ -43,6 +77,31 @@ make.lm.beta.conf.obj <- function(b, s.b, df){
   return(out)
 }
 
+#' Confidence Functions for the Coefficients of a Linear Model
+#'
+#' Confidence functions for the coefficients of a linear model under
+#' Gaussian noise assumptions.
+#'
+#' @param mod an output from lm
+#'
+#' @return A list of lists containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for each coefficient of the linear model, as well as the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'
+#' @examples
+#'
+#' # Prediction of body fat percentage from other body measurements.
+#'
+#' data(fat)
+#'
+#' mod <- lm(body.fat ~ age + weight + height, data = fat)
+#'
+#' beta.conf <- lm.beta.conf(mod)
+#'
+#' plot.cconf(beta.conf$weight)
+#'
 #' @export
 lm.beta.conf <- function(mod){
   vnames <- names(coef(mod))
@@ -58,7 +117,7 @@ lm.beta.conf <- function(mod){
     betas[[var]] <- make.lm.beta.conf.obj(as.numeric(b[var]), as.numeric(s.b[var]), df)
   }
 
-  out <- list(variable.names = vnames, betas = betas)
+  out <- betas
 
   class(out) <- 'lm.beta.conf'
 

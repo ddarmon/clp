@@ -34,7 +34,7 @@ n.plot <- 401
 for (var.name in names(coef(mod.lm))){
   par(mfrow = c(2, 2))
   
-  cur.conf <- conf.out$betas[[var.name]]
+  cur.conf <- conf.out[[var.name]]
   
   xlim <- cur.conf$qconf(c(alpha.lower/2, 1-alpha.lower/2))
   
@@ -53,11 +53,11 @@ for (var.name in names(coef(mod.lm))){
 }
 ```
 ```{r}
-plot.dconf(conf.out$betas$age)
-plot.cconf(conf.out$betas$age)
+plot.dconf(conf.out$age)
+plot.cconf(conf.out$age)
 
-plot.dconf(conf.out$betas$height)
-plot.cconf(conf.out$betas$height)
+plot.dconf(conf.out$height)
+plot.cconf(conf.out$height)
 ```
 
 
