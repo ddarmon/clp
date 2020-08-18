@@ -4,7 +4,15 @@
 \alias{bcaboot}
 \title{Perform BCa Bootstrap for a Given Statistic}
 \usage{
-bcaboot(data, statistic, B = 2000, stratified = FALSE)
+bcaboot(
+  data,
+  statistic,
+  B = 2000,
+  sim = "ordinary",
+  stratified = FALSE,
+  ran.gen = function(d, p) d,
+  mle = NULL
+)
 }
 \arguments{
 \item{data}{the dataframe or data matrix}
@@ -13,8 +21,14 @@ bcaboot(data, statistic, B = 2000, stratified = FALSE)
 
 \item{B}{the number of bootstrap replicates}
 
+\item{sim}{either "ordinary" (for case resampling bootstrap) or "parametric" (for parametric bootstrap)}
+
 \item{stratified}{whether or not (default) to use the use stratified
 sampling for the bootstrapping.}
+
+\item{ran.gen}{a function returning a random sample, for the parametric bootstrap}
+
+\item{mle}{the maximum likelihood estimate from the original sample, for the parametric bootstrap}
 }
 \value{
 A list containing the sample estimate, bootstrap estimates,

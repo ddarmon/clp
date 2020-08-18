@@ -7,8 +7,11 @@
 #' @param data the dataframe or data matrix
 #' @param statistic a function that computes the statistic from data
 #' @param B the number of bootstrap replicates
+#' @param sim either "ordinary" (for case resampling bootstrap) or "parametric" (for parametric bootstrap)
 #' @param stratified whether or not (default) to use the use stratified
 #'                   sampling for the bootstrapping.
+#' @param ran.gen a function returning a random sample, for the parametric bootstrap
+#' @param mle the maximum likelihood estimate from the original sample, for the parametric bootstrap
 #'
 #' @return A list containing the sample estimate, bootstrap estimates,
 #'         bootstrap CDF, bias, and acceleration parameters for the
@@ -127,10 +130,10 @@ confdist = function(bc, theta, param){
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
 confdens = function(bc, param){
-  # See page 202 of *Computer Age Statistical Inference* by 
-  # Efron and Hastie for the appropriate weights for the 
+  # See page 202 of *Computer Age Statistical Inference* by
+  # Efron and Hastie for the appropriate weights for the
   # BCa confidence density.
-  
+
   z0 <- bc$z0[param]; a <- bc$a[param]
 
   Gn <- bc$Gn[[param]]
@@ -142,16 +145,16 @@ confdens = function(bc, param){
 
     return(bca.fac)
   }
-  
+
   Ws <- w(bc$t[, param], Gn, z0, a)
-  
+
   Ws[is.na(Ws)] <- 0
-  
+
   Ws <- Ws/sum(Ws)
-  
+
   density.out <- density(bc$t[, param], bw = "SJ", weights = Ws, n = 1024) # Seems to undersmooth
   # density.out = density(bc$t[, param], bw = "bcv", weights = Ws, n = 1024) # Seems to oversmooth
-  
+
   gn.bca <- density.out$y
   thetas <- density.out$x
 
@@ -303,17 +306,17 @@ conffuns.from.bcaboot.single <- function(bc, ind){
 
   pconf <- function(x) confdist(bc, x, ind)
   cconf <- function(x) abs(2*pconf(x) - 1)
-  
+
   # Only valid within the approximate range of the data!
   dconf <- function(x) confdens(bc, ind)(x)
-  
+
   qconf <- function(p) confquant(bc, p, ind)
-  
+
   pcurve <- function(x) 1 - cconf(x)
   scurve <- function(x) -log2(pcurve(x))
-  
+
   out <- list(pconf = pconf, cconf = cconf, dconf = dconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
-  
+
   return(out)
 }
 
@@ -321,24 +324,24 @@ conffuns.from.bcaboot.single <- function(bc, ind){
 conffuns.from.bcaboot <- function(bc){
   if (length(bc$t0) > 1){ # Parameter vector
     # DMD: This may not work without first calling items first.
-    
+
     out <- list()
-    
+
     if (is.null(names(bc$t0))){
       theta.names <- paste0('theta', 1:length(bc$t0))
     }else{
       theta.names <- names(bc$t0)
     }
-    
+
     for (ind in 1:length(theta.names)){
       out[[theta.names[ind]]] <- conffuns.from.bcaboot.single(bc, ind)
     }
-    
+
     return(out)
   }else{ # Single parameter
-    
+
     out <- conffuns.from.bcaboot.single(bc, 1)
-    
+
     return(out)
   }
 }

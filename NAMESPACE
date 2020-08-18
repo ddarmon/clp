@@ -2,6 +2,8 @@
 
 export(bcaboot)
 export(chisq.conf)
+export(conffuns.from.bcaboot)
+export(conffuns.from.bcaboot.single)
 export(glm.beta.conf)
 export(glm.lincom.conf)
 export(glm.lincom.conf.disp)
