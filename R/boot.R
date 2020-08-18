@@ -290,7 +290,7 @@ t.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
     xlab <- 'mean[1] - mean[2]'
   }
 
-  out <- conffuns.from.bcaboot(bc, 1)
+  out <- conffuns.from.bcaboot(bc)
 
   if (plot){
     plot.dconf(out, xlab = xlab)
