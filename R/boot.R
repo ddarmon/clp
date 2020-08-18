@@ -12,6 +12,7 @@
 #'                   sampling for the bootstrapping.
 #' @param ran.gen a function returning a random sample, for the parametric bootstrap
 #' @param mle the maximum likelihood estimate from the original sample, for the parametric bootstrap
+#' @param formula for use with interfacing to lm, glm, etc.
 #'
 #' @return A list containing the sample estimate, bootstrap estimates,
 #'         bootstrap CDF, bias, and acceleration parameters for the
@@ -62,13 +63,13 @@
 #'                          Sigma = cov(scor)*((nrow(scor)-1)/nrow(scor))))
 #'
 #' @export
-bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL){
+bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
   if (stratified){
     strata <- data[, ncol(data)]
 
-    boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+    boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
   }else{
-    boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+    boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
   }
 
 
@@ -101,7 +102,7 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
   n1 <- sqrt(n * (n - 1))
 
   for (i in seq_len(n)) {
-    u[i, ] <- statistic(data[-i, ], seq_len(n-1))
+    u[i, ] <- statistic(data[-i, ], seq_len(n-1), formula = formula)
   }
   t. <- sweep(-u, 2, colMeans(u), "+") * (n - 1)
   a <- (1 / 6) * colSums(t.^3) / (colSums(t.^2))^1.5
@@ -320,6 +321,50 @@ t.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
     plot.dconf(out, xlab = xlab)
     plot.cconf(out, conf.level = conf.level, xlab = xlab)
   }
+
+  return(out)
+}
+
+lm.beta.for.boot <- function(data, id = 1:nrow(data), formula){
+  dat <- data[id, ]
+
+  mod <- lm(formula, data = dat)
+
+  return(mod$coefficients)
+}
+
+#' Bootstrapped Confidence Functions for One or Two Means
+#'
+#' Bootstrapped confidence functions for a single mean or the difference
+#' of two means using the BCa bootstrap.
+#'
+#' @param x a vector containing the first sample
+#' @param y a vector containing the second sample (optional)
+#' @param B the number of bootstrap samples used to approximate the
+#'          bootstrap distribution
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for a single mean or the difference of two means, as well as
+#'         the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
+#' @examples
+#' data(fat)
+#'
+#' beta.boot.conf <- lm.beta.boot.conf(body.fat ~ age + weight + height, data = fat, B = 2000)
+#'
+#' plot.cconf(beta.boot.conf$weight)
+#'
+#' @export lm.beta.boot.conf
+lm.beta.boot.conf <- function(formula, data, B = 2000){
+  bc <- bcaboot(data = data, statistic = lm.beta.for.boot, B = B, formula = formula)
+
+  out <- conffuns.from.bcaboot(bc)
 
   return(out)
 }

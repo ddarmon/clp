@@ -11,7 +11,8 @@ bcaboot(
   sim = "ordinary",
   stratified = FALSE,
   ran.gen = function(d, p) d,
-  mle = NULL
+  mle = NULL,
+  formula = NULL
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ sampling for the bootstrapping.}
 \item{ran.gen}{a function returning a random sample, for the parametric bootstrap}
 
 \item{mle}{the maximum likelihood estimate from the original sample, for the parametric bootstrap}
+
+\item{formula}{for use with interfacing to lm, glm, etc.}
 }
 \value{
 A list containing the sample estimate, bootstrap estimates,

@@ -11,7 +11,7 @@ y <- rexp(n)
 B <- 10000
 ```
 
-# One-sample
+# One-sample Mean
 
 ```{r}
 par(mfrow = c(1, 2))
@@ -36,7 +36,7 @@ curve(conf.boot$scurve(x), xlim = conf.para$qconf(c(0.001, 0.999)), n = 2001, co
 curve(conf.para$scurve(x), n = 2001, add = TRUE, col = 'blue')
 ```
 
-# Two.sample
+# Two-sample Mean
 
 ```{r}
 par(mfrow = c(1, 2))
@@ -69,5 +69,31 @@ conf.para$pcurve(0)
 
 conf.boot$pcurve(5)
 conf.para$pcurve(5)
+```
+
+# Bootstrap for Coefficients of Linear Model
+
+```{r}
+data(fat)
+
+formula <- body.fat ~ age + weight + height
+
+mod <- lm(formula, data = fat)
+
+beta.conf <- lm.beta.conf(mod)
+
+beta.boot.conf <- lm.beta.boot.conf(formula, data = fat, B = 2000)
+
+for (nam in names(beta.boot.conf)){
+  xlim <- beta.boot.conf[[nam]]$qconf(c(0.001, 0.999))
+  curve(beta.conf[[nam]]$cconf(x), xlim = xlim, col = 'red', n = 2000, xlab = nam)
+  curve(beta.boot.conf[[nam]]$cconf(x), add = TRUE, col = 'blue', n = 2000)
+}
+
+for (nam in names(beta.boot.conf)){
+  xlim <- beta.boot.conf[[nam]]$qconf(c(0.001, 0.999))
+  curve(beta.conf[[nam]]$dconf(x), xlim = xlim, col = 'red', n = 2000, xlab = nam)
+  curve(beta.boot.conf[[nam]]$dconf(x), add = TRUE, col = 'blue', n = 2000)
+}
 ```
 
