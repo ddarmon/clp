@@ -25,7 +25,7 @@ bootstrap confidence functions straightforward.
 
 scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
 
-statistic <- function(data, id = 1:nrow(data)){
+statistic <- function(data, id = 1:nrow(data), ...){
   dat <- data[id, ]
 
   Sigma <- cov(dat)*((nrow(dat)-1)/nrow(dat))
