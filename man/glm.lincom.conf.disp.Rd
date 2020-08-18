@@ -23,9 +23,6 @@ A list containing the confidence functions pconf, dconf, cconf, and qconf
 \description{
 Confidence functions for the expected response of a GLM with dispersion.
 }
-\examples{
-
-}
 \references{
 Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
 }

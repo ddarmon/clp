@@ -22,6 +22,8 @@
 #'              Thomas J. DiCiccio and Bradley Efron. "Bootstrap confidence intervals." Statistical Science (1996): 189-212.
 #'
 #' @examples
+#' # Bootstrap confidence functions for a single mean.
+#'
 #' t.one.sample <- function(data, id = 1:length(data)){
 #'   dat <- data[id]
 #'
@@ -35,6 +37,29 @@
 #' bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
 #'         statistic = t.one.sample,
 #'         B = 2000)
+#'
+#' # Reproduce BCa confidence density from Figure 11.7
+#' # of *Computer Age Statistical Inference*.
+#'
+#' scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
+#'
+#' statistic <- function(data, id = 1:nrow(data)){
+#'   dat <- data[id, ]
+#'
+#'   Sigma <- cov(dat)*((nrow(dat)-1)/nrow(dat))
+#'
+#'   lams <- eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values
+#'
+#'   return(lams[1])
+#' }
+#'
+#' ran.gen <- function(data, mle){
+#'   mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
+#' }
+#'
+#' bc <- bcaboot(data = scor, statistic = statistic, B = 8000, sim = "parametric", ran.gen = ran.gen,
+#'               mle = list(mu = colMeans(scor),
+#'                          Sigma = cov(scor)*((nrow(scor)-1)/nrow(scor))))
 #'
 #' @export
 bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL){
@@ -261,7 +286,6 @@ t.one.sample <- function(data, id = 1:length(data)){
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
 #' @examples
-#'
 #' data(dietstudy)
 #'
 #' # One mean
@@ -320,10 +344,56 @@ conffuns.from.bcaboot.single <- function(bc, ind){
   return(out)
 }
 
+#' Construct Confidence Functions from an Output of bcaboot
+#'
+#' Construct confidence functions from the output of bcaboot.
+#' This is a helper function to make constructing ones own
+#' bootstrap confidence functions straightforward.
+#'
+#' @param bc an output from bcaboot
+#'
+#' @return A list or list of lists containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the parameter associated with the statistic(s) used with
+#'         bcaboot.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
+#' @examples
+#' # Reproduce BCa confidence density from Figure 11.7
+#' # of *Computer Age Statistical Inference*.
+#'
+#' scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
+#'
+#' statistic <- function(data, id = 1:nrow(data)){
+#'   dat <- data[id, ]
+#'
+#'   Sigma <- cov(dat)*((nrow(dat)-1)/nrow(dat))
+#'
+#'   lams <- eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values
+#'
+#'   return(lams[1])
+#' }
+#'
+#' ran.gen <- function(data, mle){
+#'   mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
+#' }
+#'
+#' bc <- bcaboot(data = scor, statistic = statistic, B = 8000, sim = "parametric", ran.gen = ran.gen,
+#'               mle = list(mu = colMeans(scor),
+#'                          Sigma = cov(scor)*((nrow(scor)-1)/nrow(scor))))
+#'
+#' lam.conf <- conffuns.from.bcaboot(bc)
+#'
+#' plot.cconf(lam.conf, xlab = 'Largest Eigenvalue')
+#' plot.dconf(lam.conf, xlab = 'Largest Eigenvalue')
+#'
+#' lam.conf$qconf(c(0.025, 0.975))
+#'
 #' @export conffuns.from.bcaboot
 conffuns.from.bcaboot <- function(bc){
   if (length(bc$t0) > 1){ # Parameter vector
-    # DMD: This may not work without first calling items first.
 
     out <- list()
 

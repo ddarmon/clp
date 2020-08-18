@@ -24,7 +24,6 @@ Confidence functions for the relative risk between two binomial proportions
 based on the score statistic.
 }
 \examples{
-
 # From Physician's Health Study, on whether regular
 # intake of aspirin reduces the rate of heart disease.
 #

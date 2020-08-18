@@ -28,7 +28,6 @@ Bootstrapped confidence functions for a single mean or the difference
 of two means using the BCa bootstrap.
 }
 \examples{
-
 data(dietstudy)
 
 # One mean

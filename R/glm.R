@@ -224,8 +224,6 @@ glm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
 #' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
 #'
 #'
-#' @examples
-#'
 #' @export
 glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
   n <- nrow(mod$model)

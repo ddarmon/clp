@@ -24,7 +24,6 @@ Confidence functions for the odds ratio between two binomial proportions
 based on the mid P-value for the exact test.
 }
 \examples{
-
 # From Physician's Health Study, on whether regular
 # intake of aspirin reduces the rate of heart disease.
 #

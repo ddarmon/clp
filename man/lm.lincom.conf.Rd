@@ -25,7 +25,6 @@ Confidence functions for the expected response of a linear model under
 Gaussian noise assumptions.
 }
 \examples{
-
 # Prediction of body fat percentage from other body measurements.
 
 data(fat)

@@ -308,7 +308,6 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
 #'             Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
 #'
 #' @examples
-#'
 #' # From Physician's Health Study, on whether regular
 #' # intake of aspirin reduces the rate of heart disease.
 #' #
@@ -487,7 +486,6 @@ dncd <- Vectorize(dncd, vectorize.args = 'y2')
 #' @references Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
 #'
 #' @examples
-#'
 #' # From Physician's Health Study, on whether regular
 #' # intake of aspirin reduces the rate of heart disease.
 #' #

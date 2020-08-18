@@ -16,7 +16,6 @@
 #'
 #'
 #' @examples
-#'
 #' # Prediction of body fat percentage from other body measurements.
 #'
 #' data(fat)
@@ -91,7 +90,6 @@ make.lm.beta.conf.obj <- function(b, s.b, df){
 #'
 #'
 #' @examples
-#'
 #' # Prediction of body fat percentage from other body measurements.
 #'
 #' data(fat)

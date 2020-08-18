@@ -41,6 +41,8 @@ parameters for the BCa bootstrap, given a statistic as would be supplied to
 boot from the boot package.
 }
 \examples{
+# Bootstrap confidence functions for a single mean.
+
 t.one.sample <- function(data, id = 1:length(data)){
   dat <- data[id]
 
@@ -54,6 +56,29 @@ data(dietstudy)
 bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
         statistic = t.one.sample,
         B = 2000)
+
+# Reproduce BCa confidence density from Figure 11.7
+# of *Computer Age Statistical Inference*.
+
+scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
+
+statistic <- function(data, id = 1:nrow(data)){
+  dat <- data[id, ]
+
+  Sigma <- cov(dat)*((nrow(dat)-1)/nrow(dat))
+
+  lams <- eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values
+
+  return(lams[1])
+}
+
+ran.gen <- function(data, mle){
+  mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
+}
+
+bc <- bcaboot(data = scor, statistic = statistic, B = 8000, sim = "parametric", ran.gen = ran.gen,
+              mle = list(mu = colMeans(scor),
+                         Sigma = cov(scor)*((nrow(scor)-1)/nrow(scor))))
 
 }
 \references{
