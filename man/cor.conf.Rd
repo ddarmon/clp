@@ -4,7 +4,7 @@
 \alias{cor.conf}
 \title{Confidence Functions for Pearson's Correlation Coefficient}
 \usage{
-cor.conf(x, y, plot = TRUE, conf.level = 0.95, exact = TRUE)
+cor.conf(x, y, plot = TRUE, conf.level = 0.95, exact = FALSE)
 }
 \arguments{
 \item{plot}{whether to plot the confidence density and curve}
@@ -31,7 +31,7 @@ for a bivariate Gaussian.
 data(fat)
 
 # Using the exact sampling distribution of R
-cor.conf(x = fat$body.fat, y = fat$weight)
+cor.conf(x = fat$body.fat, y = fat$weight, exact = TRUE)
 
 # Using Fisher's Z-transformation (to match cor.test())
 cor.conf(x = fat$body.fat, y = fat$weight, exact = FALSE)
