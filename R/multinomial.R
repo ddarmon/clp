@@ -141,6 +141,31 @@ multinomial.conf <- function(N, plot = TRUE, conf.level = 0.95, B = 2000, col = 
   return(list(singlecomp = singlecomp, multicomp = multicomp))
 }
 
+#' Compute a P-value for Specified Multinomial Proportions
+#'
+#' Compute a P-value for specified multinomial proportions
+#' using the confidence net returned by conf.multinomial().
+#'
+#' @param obj an output from conf.multinomial().
+#' @param theta a vector as the same length as the N used
+#'              to construct obj; the null value of the
+#'              multinomial proportions.
+#'
+#' @return A P-value from theta.
+#'
+#' @examples
+#' # A hypothetical Punnett square experiment with peas.
+#'
+#' N <- c(315, 108, 101, 32)
+#'
+#' names(N) <- c('Round, Yellow', 'Round, Green', 'Wrinkled, Yellow', 'Wrinkled, Green')
+#'
+#' col <- c('darkgoldenrod', 'darkgreen', 'darkgoldenrod1', 'darkolivegreen')
+#'
+#' peas.conf <- multinomial.conf(N, col = col)
+#'
+#' p.multinomial(peas.conf, c(9, 3, 3, 1)/16)
+#'
 #' @export p.multinomial
 p.multinomial <- function(obj, theta){
   mod <- obj$multicomp

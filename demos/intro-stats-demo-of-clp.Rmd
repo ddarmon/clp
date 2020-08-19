@@ -99,9 +99,16 @@ mod <- lm(eruptions ~ waiting, data = faithful)
 
 conf.lm <- lm.beta.conf(mod)
 
-plot.cconf(conf.lm$betas$`(Intercept)`, xlab = '(Intercept)')
-plot.cconf(conf.lm$betas$waiting, xlab = 'waiting')
+plot.cconf(conf.lm$`(Intercept)`, xlab = '(Intercept)')
+plot.cconf(conf.lm$waiting, xlab = 'waiting')
 ```
+# Correlation
+
+```{r}
+corr.out <- cor.conf(faithful$eruptions, faithful$waiting)
+```
+
+
 # Wilcoxon's signed-rank test
 
 ```{r}
