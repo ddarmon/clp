@@ -1,24 +1,69 @@
+dcorr <- function(x, rho, n){
+  prefactor <- function(r, rho, n){
+    (n - 2)*(1 - rho^2)^((n-1)/2)*(1 - r^2)^((n-4)/2)/pi
+  }
+
+  integrand <- function(w, r, rho, n){
+    1/(cosh(w) - rho*r)^(n-1)
+  }
+
+  definite.integral <- function(r, rho, n){
+    integrate(integrand, lower = 0, upper = Inf, r = r, rho = rho, n = n)$value
+  }
+  definite.integral <- Vectorize(definite.integral, vectorize.args = 'r')
+
+  I <- definite.integral(x, rho, n)
+
+  fn <- prefactor(x, rho, n)*I
+
+  return(fn)
+}
+
+dcorr <- Vectorize(dcorr)
+
+pcorr <- function(q, rho, n, lower.tail = TRUE){
+  if (lower.tail){
+    integrate(dcorr, lower = -1, upper = q, rho = rho, n = n)$value
+  }else{
+    integrate(dcorr, lower = q, upper = 1, rho = rho, n = n)$value
+  }
+
+}
+
+Vectorize(pcorr, vectorize.args = 'rho')
+
 #' Confidence Functions for Pearson's Correlation Coefficient
 #'
 #' Confidence functions for Pearson's correlation coefficient
-#' via Fisher's Z-transformation.
+#' for a bivariate Gaussian.
 #'
 #' @param "x, y" numeric vectors of data values. x and y must have the same length.
 #' @param plot whether to plot the confidence density and curve
 #' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#' @param exact whether the exact sampling distribution of the
+#'              sample correlation coefficient (TRUE) or
+#'              Fisher's Z-transformation (FALSE) should be
+#'              used in constructing the confidence functions.
 #'
 #' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
-#'         for Pearson's correlation coefficient via Fisher's Z-transformation, as well as
+#'         for Pearson's correlation coefficient for a bivariate Gaussian, as well as
 #'         the P-curve and S-curve.
 #'
 #' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
 #'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
 #' @examples
 #' data(fat)
+#'
+#' # Using the exact sampling distribution of R
 #' cor.conf(x = fat$body.fat, y = fat$weight)
 #'
+#' # Using Fisher's Z-transformation (to match cor.test())
+#' cor.conf(x = fat$body.fat, y = fat$weight, exact = FALSE)
+#'
 #' @export cor.conf
-cor.conf <- function(x, y, plot = TRUE, conf.level = 0.95){
+cor.conf <- function(x, y, plot = TRUE, conf.level = 0.95, exact = TRUE){
   n <- length(x)
 
   if (n != length(y)){
@@ -31,17 +76,51 @@ cor.conf <- function(x, y, plot = TRUE, conf.level = 0.95){
 
   R <- cor(x, y)
 
-  Rt <- atanh(R)
+  if (exact){ # Use exact sampling distribution of R
+    pconf <- function(rho) {
+      if (rho <= -1){
+        return(0)
+      }else if (rho >= 1){
+        return(1)
+      }else{
+        return(pcorr(R, rho, n, lower.tail = FALSE))
+      }
+    }
 
-  se <- 1/sqrt(n-3)
+    pconf <- Vectorize(pconf)
 
-  pconf <- function(rho) pnorm((atanh(rho) - Rt)*sqrt(n - 3))
+    dconf <- function(rho, dx = 1e-5) {
+      if (rho <= -1 | rho >= 1){
+        return(0)
+      }else{
+        return((pconf(rho + dx) - pconf(rho - dx))/(2*dx))
+      }
+    }
 
-  dconf <- function(rho) dnorm((atanh(rho) - Rt)*sqrt(n - 3))*sqrt(n - 3)/(1 - rho^2)
+    dconf <- Vectorize(dconf)
 
-  cconf <- function(rho) abs(2*pconf(rho) - 1)
+    cconf <- function(rho) abs(2*pconf(rho) - 1)
 
-  qconf <- function(p) tanh(Rt + qnorm(p)*se)
+    qconf <- function(p){
+      fun.root <- function(x) pconf(x) - p
+
+      return(uniroot(fun.root, interval = c(-1, 1))$root)
+    }
+
+    qconf <- Vectorize(qconf)
+  }else{ # Use Fisher's Z-transformation
+    Rt <- atanh(R)
+
+    se <- 1/sqrt(n-3)
+
+    pconf <- function(rho) pnorm((atanh(rho) - Rt)*sqrt(n - 3))
+
+    dconf <- function(rho) dnorm((atanh(rho) - Rt)*sqrt(n - 3))*sqrt(n - 3)/(1 - rho^2)
+
+    cconf <- function(rho) abs(2*pconf(rho) - 1)
+
+    qconf <- function(p) tanh(Rt + qnorm(p)*se)
+  }
 
   pcurve <- function(rho) 1 - cconf(rho)
 

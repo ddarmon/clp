@@ -4,29 +4,41 @@
 \alias{cor.conf}
 \title{Confidence Functions for Pearson's Correlation Coefficient}
 \usage{
-cor.conf(x, y, plot = TRUE, conf.level = 0.95)
+cor.conf(x, y, plot = TRUE, conf.level = 0.95, exact = TRUE)
 }
 \arguments{
 \item{plot}{whether to plot the confidence density and curve}
 
 \item{conf.level}{the confidence level for the confidence interval indicated on the confidence curve}
 
+\item{exact}{whether the exact sampling distribution of the
+sample correlation coefficient (TRUE) or
+Fisher's Z-transformation (FALSE) should be
+used in constructing the confidence functions.}
+
 \item{"x, }{y" numeric vectors of data values. x and y must have the same length.}
 }
 \value{
 A list containing the confidence functions pconf, dconf, cconf, and qconf
-        for Pearson's correlation coefficient via Fisher's Z-transformation, as well as
+        for Pearson's correlation coefficient for a bivariate Gaussian, as well as
         the P-curve and S-curve.
 }
 \description{
 Confidence functions for Pearson's correlation coefficient
-via Fisher's Z-transformation.
+for a bivariate Gaussian.
 }
 \examples{
 data(fat)
+
+# Using the exact sampling distribution of R
 cor.conf(x = fat$body.fat, y = fat$weight)
+
+# Using Fisher's Z-transformation (to match cor.test())
+cor.conf(x = fat$body.fat, y = fat$weight, exact = FALSE)
 
 }
 \references{
 Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+
+             Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 }
