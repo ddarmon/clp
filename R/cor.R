@@ -57,13 +57,13 @@ Vectorize(pcorr, vectorize.args = 'rho')
 #' data(fat)
 #'
 #' # Using the exact sampling distribution of R
-#' cor.conf(x = fat$body.fat, y = fat$weight)
+#' cor.conf(x = fat$body.fat, y = fat$weight, exact = TRUE)
 #'
 #' # Using Fisher's Z-transformation (to match cor.test())
 #' cor.conf(x = fat$body.fat, y = fat$weight, exact = FALSE)
 #'
 #' @export cor.conf
-cor.conf <- function(x, y, plot = TRUE, conf.level = 0.95, exact = TRUE){
+cor.conf <- function(x, y, plot = TRUE, conf.level = 0.95, exact = FALSE){
   n <- length(x)
 
   if (n != length(y)){
@@ -129,8 +129,8 @@ cor.conf <- function(x, y, plot = TRUE, conf.level = 0.95, exact = TRUE){
   out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
   if (plot){
-    plot.dconf(out, xlab = 'cor')
-    plot.cconf(out, conf.level = conf.level, xlab = 'cor')
+    plot.dconf(out, xlab = 'cor', n = 201)
+    plot.cconf(out, conf.level = conf.level, xlab = 'cor', n = 201)
   }
 
   return(out)
