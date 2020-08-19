@@ -1,3 +1,7 @@
+# Function to generate the multinomial confidence functions
+# using bootstrapping and the method of Rudolf Beran (1988):
+#
+# Rudolf Beran. "Balanced simultaneous confidence sets." Journal of the American Statistical Association 83.403 (1988): 679-686.
 make.multinomial.multicomp.obj <- function(x, n, K, Kinv){
   conf.out <- prop.conf(x, n, plot = FALSE)
 
@@ -32,6 +36,44 @@ make.multinomial.multicomp.obj <- function(x, n, K, Kinv){
   return(out)
 }
 
+#' Simultaneous Confidence Functions for Multinomial Proportions.
+#'
+#' Confidence functions for a multinomial proportions based on the
+#' mid P-value for each proportion, with balancing across
+#' proportions via bootstrapping with Beran's simultaneous
+#' confidence sets.
+#'
+#' @param N a vector of counts in each category from a sample of size n
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#' @param B the number of bootstrap samples to use with Beran's method
+#' @param col a vector of colors to use for plotting confidence functions of each proportion
+#'
+#' @return A list of lists of lists containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for each proportion without correction for multiple comparison (singlecomp) or with
+#'         correction for multiple comparison (multicomp).
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, Likelihood, Probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Tore Schweder. "Confidence nets for curves." Advances In Statistical Modeling And Inference: Essays in Honor of Kjell A Doksum. 2007. 593-609.
+#'
+#'              Rudolf Beran. "Balanced simultaneous confidence sets." Journal of the American Statistical Association 83.403 (1988): 679-686.
+#'
+#' @examples
+#' # A hypothetical Punnett square experiment with peas.
+#'
+#' N <- c(315, 108, 101, 32)
+#'
+#' names(N) <- c('Round, Yellow', 'Round, Green', 'Wrinkled, Yellow', 'Wrinkled, Green')
+#'
+#' col <- c('darkgoldenrod', 'darkgreen', 'darkgoldenrod1', 'darkolivegreen')
+#'
+#' peas.conf <- multinomial.conf(N, col = col)
+#'
+#' # Confidence intervals without and with correction for multiple comparisons:
+#' peas.conf$singlecomp$`Round, Yellow`$qconf(c(0.025, 0.975))
+#' peas.conf$multicomp$`Round, Yellow`$qconf(c(0.025, 0.975))
+#'
 #' @export multinomial.conf
 multinomial.conf <- function(N, plot = TRUE, conf.level = 0.95, B = 2000, col = NULL){
   nam <- names(N)
@@ -66,12 +108,12 @@ multinomial.conf <- function(N, plot = TRUE, conf.level = 0.95, B = 2000, col = 
 
   Kinv <- function(p) quantile(Vmax, p)
 
-  conf.singlecomp <- list()
-  conf.multicomp <- list()
+  singlecomp <- list()
+  multicomp <- list()
 
   for (j in 1:length(N)){
-    conf.singlecomp[[j]] <- prop.conf(N[j], n, plot = FALSE)
-    conf.multicomp[[j]] <- make.multinomial.multicomp.obj(N[j], n, K, Kinv)
+    singlecomp[[nam[j]]] <- prop.conf(N[j], n, plot = FALSE)
+    multicomp[[nam[j]]] <- make.multinomial.multicomp.obj(N[j], n, K, Kinv)
   }
 
   n.plot <- 2001
@@ -84,24 +126,24 @@ multinomial.conf <- function(N, plot = TRUE, conf.level = 0.95, B = 2000, col = 
     for (j in 1:length(N)){
       xlab <- sprintf('Proportion, Category %s', nam[j])
 
-      plot.cconf(conf.multicomp[[j]], xlab = xlab, col = col[j])
-      curve(conf.singlecomp[[j]]$cconf(x), lty = 2, add = TRUE, n = n.plot, col = col[j])
+      plot.cconf(multicomp[[j]], xlab = xlab, col = col[j])
+      curve(singlecomp[[j]]$cconf(x), lty = 2, add = TRUE, n = n.plot, col = col[j])
     }
 
     plot(0, 0, cex = 0, xlim = c(0, 1), ylim = c(0, 1.5), xlab = 'Proportions', ylab = 'Confidence Curve', yaxt = 'n')
     for (j in 1:length(N)){
-      curve(conf.multicomp[[j]]$cconf(x), add = TRUE, col = col[j], n = n.plot)
+      curve(multicomp[[j]]$cconf(x), add = TRUE, col = col[j], n = n.plot)
     }
     legend('topleft', legend = nam, lty = 1, col = col)
     axis(2, seq(0, 1, 0.25))
   }
 
-  return(list(conf.singlecomp = conf.singlecomp, conf.multicomp = conf.multicomp))
+  return(list(singlecomp = singlecomp, multicomp = multicomp))
 }
 
 #' @export p.multinomial
 p.multinomial <- function(obj, theta){
-  mod <- obj$conf.multicomp
+  mod <- obj$multicomp
 
   pvals <- rep(NA, length(mod))
 
