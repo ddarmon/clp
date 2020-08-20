@@ -1,6 +1,31 @@
+#' Confidence Functions for the Median via the Sign Test
+#'
+#' Confidence functions for the median of a continuous distribution based on the
+#' sign test.
+#'
+#' @param x a vector of observations
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the median, as well as the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Myles Hollander, Douglas A. Wolfe, and Eric Chicken. Nonparametric Statistical Methods. Vol. 751. John Wiley & Sons, 2013.
+#'
+#' @examples
+#' data(dietstudy)
+#'
+#' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
+#' y <- dietstudy$weightchange[dietstudy$diet == 'Low Fat']
+#'
+#' lc.sign.conf <- sign.conf(x)
+#' lf.sign.conf <- sign.conf(y)
+#'
 #' @export sign.conf
 sign.conf <- function(x, plot = TRUE, conf.level = 0.95){
-  # NOTE: Not currently set up for handling tied values.
+  # DMD: NOTE: Not currently set up for handling tied values.
   #
   # NOTE: This is taking a success as a negative score,
   # whereas it is more standard to take a success as a
@@ -47,16 +72,6 @@ sign.conf <- function(x, plot = TRUE, conf.level = 0.95){
 
   cconf <- Vectorize(cconf)
 
-  # pconf <- function(mu){
-  #   if (mu <= x.median){
-  #     return(0.5*(1 - cconf(mu)))
-  #   }else{
-  #     return(0.5*(1 + cconf(mu)))
-  #   }
-  # }
-  #
-  # pconf <- Vectorize(pconf)
-
   # Using procedure from page 80 of Hollander, Wolfe, and Chicken:
 
   qconf <- function(p) {
@@ -85,6 +100,35 @@ sign.conf <- function(x, plot = TRUE, conf.level = 0.95){
   return(out)
 }
 
+#' Confidence Functions for the (Pseudo)Median or Shift via Wilcoxon Tests
+#'
+#' Confidence functions for the (pseudo)median of a continuous distribution
+#' via the Wilcoxon signed-rank test (for one sample) or shift between
+#' two continuous distributions via the Wilcoxon rank-sum test (for two samples).
+#'
+#' @param x a vector of observations for the first sample
+#' @param y a vector of observations for the second sample, if applicable
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the median, as well as the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Myles Hollander, Douglas A. Wolfe, and Eric Chicken. Nonparametric Statistical Methods. Vol. 751. John Wiley & Sons, 2013.
+#'
+#' @examples
+#' data(dietstudy)
+#'
+#' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
+#' y <- dietstudy$weightchange[dietstudy$diet == 'Low Fat']
+#'
+#' lc.wc.conf <- wilcox.conf(x)
+#' lf.wc.conf <- wilcox.conf(y)
+#'
+#' comp.wc.conf <- wilcox.conf(x, y)
+#'
 #' @export wilcox.conf
 wilcox.conf <- function(x, y = NULL, plot = TRUE, conf.level = 0.95){
   if (is.null(y)){

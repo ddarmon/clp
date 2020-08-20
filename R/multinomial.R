@@ -181,6 +181,9 @@ p.multinomial <- function(obj, theta){
 
 # <--------------------------------------------------------------->
 
+# The negative log-likelihood function for a multinomial,
+# treating the last probability as fixed by the
+# sum-to-one constraint.
 ll.multinomial <- function(eta, gamma = NULL, N.flat){
   theta <- c(eta, 1 - sum(eta))
 
@@ -188,6 +191,9 @@ ll.multinomial <- function(eta, gamma = NULL, N.flat){
   return(-sum(N.flat*log(theta)))
 }
 
+# The negative gradient of the log-likelihood function
+# for a multinomial, treating the last probability as fixed by the
+# sum-to-one constraint.
 grad.multinomial <- function(eta, gamma, N.flat){
   theta <- c(eta, 1 - sum(eta))
 
@@ -236,6 +242,12 @@ constraint.fun <- function(eta, gamma, N.flat){
   return(gamma.prof - gamma)
 }
 
+# <--------------------------------------------------------------->
+
+# Hard-code inequality constraints of the probabilities,
+# for use with alabama. This makes the code run slower,
+# so no real advantage to the hard-coding.
+
 ineq.constraint.fun <- function(eta, gamma, N.flat){
   con <- c(eta, # ps > 0
            1 - eta) # ps < 1
@@ -250,6 +262,36 @@ ineq.constraint.jac <- function(eta, gamma, N.flat){
   return(jac)
 }
 
+# <--------------------------------------------------------------->
+
+#' Confidence Functions for Pearson's Chi-squared Parameter
+#'
+#' Confidence functions for Pearson's chi-squared parameter for an I x J
+#' contingency table using the profile likelihood.
+#'
+#' @param N an I x J matrix of counts
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for Pearson's chi-squared parameter, as well as
+#'         the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#' @examples
+#' # Galton's data on assortative mating according to temper.
+#'
+#' # Columns: wife (good / bad) temper
+#' # Rows:    husband (good / bad) temper
+#'
+#' # reported on page 78 of *Confidence, Likelihood, Probability*.
+#'
+#' N <- matrix(c(24, 27,
+#'              34, 26), nrow = 2, byrow = TRUE)
+#'
+#' chisq.conf(N)
+#'
 #' @export chisq.conf
 chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
   # Flatten matrix for easier computes.

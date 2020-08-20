@@ -1,5 +1,34 @@
+#' A Wrapper Function for Plotting Confidence Curves
+#'
+#' A wrapper for plotting confidence curves using confidence objects
+#' returned by *.conf() functions from clp.
+#'
+#'
+#' @param obj a list of confidence functions returned by a *.conf() function
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#' @param xlim the horizontal limits for the plot. If NULL, taken as the larger of
+#'             a conf.level confidence interval or a 1 - (1 - conf.level)/2 confidence interval.
+#' @param xlab the label for the horizontal axis
+#' @param log switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
+#'            log-scaling
+#' @param col the color to plot the confidence curve
+#' @param n.points the number of points to plot for the confidence curve
+#'
+#' @return a plot of the confidence curve from obj
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#' @examples
+#' data(dietstudy)
+#'
+#' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
+#'
+#' out <- t.conf(x, plot = FALSE)
+#'
+#' plot.cconf(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
+#'
 #' @export plot.cconf
-plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', which = 1, col = 'black', n.points = 2001){
+plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
   alpha <- 1-conf.level
 
   if (is.null(xlim)) {
@@ -34,6 +63,34 @@ plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '
   segments(x0 = ci[1], x1 = ci[2], y0 = -0.025, col = 'red', lwd = 4)
 }
 
+#' A Wrapper Function for Plotting P-Curves
+#'
+#' A wrapper for plotting P-curves using confidence objects
+#' returned by *.conf() functions from clp.
+#'
+#'
+#' @param obj a list of confidence functions returned by a *.conf() function
+#' @param conf.level the confidence level for the confidence interval indicated on the P-curve
+#' @param xlim the horizontal limits for the plot. If NULL, taken as the larger of
+#'             a conf.level confidence interval or a 1 - (1 - conf.level)/2 confidence interval.
+#' @param xlab the label for the horizontal axis
+#' @param log switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
+#'            log-scaling
+#' @param col the color to plot the confidence curve
+#' @param n.points the number of points to plot for the confidence curve
+#'
+#' @return a plot of the P-curve from obj
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#' @examples
+#' data(dietstudy)
+#'
+#' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
+#'
+#' out <- t.conf(x, plot = FALSE)
+#'
+#' plot.pcurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #' @export plot.pcurve
 plot.pcurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
   alpha <- 1-conf.level
@@ -70,6 +127,35 @@ plot.pcurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = 
   segments(x0 = ci[1], x1 = ci[2], y0 = -0.025, col = 'red', lwd = 4)
 }
 
+#' A Wrapper Function for Plotting S-Curves
+#'
+#' A wrapper for plotting S-curves using confidence objects
+#' returned by *.conf() functions from clp.
+#'
+#'
+#' @param obj a list of confidence functions returned by a *.conf() function
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#' @param xlim the horizontal limits for the plot. If NULL, taken as the larger of
+#'             a conf.level confidence interval or a 1 - (1 - conf.level)/2 confidence interval.
+#' @param xlab the label for the horizontal axis
+#' @param log switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
+#'            log-scaling
+#' @param col the color to plot the confidence curve
+#' @param n.points the number of points to plot for the confidence curve
+#'
+#' @return a plot of the S-curve from obj
+#'
+#' @references  Zad R. Chow and Sander Greenland. "Semantic and Cognitive Tools to Aid Statistical Inference: Replace Confidence and Significance by Compatibility and Surprise." arXiv preprint arXiv:1909.08579 (2019).
+#'
+#' @examples
+#' data(dietstudy)
+#'
+#' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
+#'
+#' out <- t.conf(x, plot = FALSE)
+#'
+#' plot.scurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
+#'
 #' @export plot.scurve
 plot.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
   alpha <- 1-conf.level
@@ -106,10 +192,73 @@ plot.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = 
   segments(x0 = ci[1], x1 = ci[2], y0 = -0.025, col = 'red', lwd = 4)
 }
 
+#' A Wrapper Function for Plotting Confidence Densities
+#'
+#' A wrapper for plotting confidence densities using confidence objects
+#' returned by *.conf() functions from clp.
+#'
+#'
+#' @param obj a list of confidence functions returned by a *.conf() function
+#' @param xlim the horizontal limits for the plot. If NULL, taken as a 99.8\%
+#'             confidence interval.
+#' @param xlab the label for the horizontal axis
+#' @param log switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
+#'            log-scaling
+#' @param col the color to plot the confidence curve
+#' @param n.points the number of points to plot for the confidence curve
+#'
+#' @return a plot of the confidence curve from obj
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#' @examples
+#' data(dietstudy)
+#'
+#' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
+#'
+#' out <- t.conf(x, plot = FALSE)
+#'
+#' plot.dconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #' @export plot.dconf
-plot.dconf <- function(obj, xlim = NULL, xlab = NULL, which = 1, col = 'black', n.points = 2001){
+plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
   curve(obj$dconf(x), xlim = xlim, xlab = xlab, ylab = 'Confidence Density', n = n.points, lwd = 3, col = col)
+}
+
+#' A Wrapper Function for Plotting Confidence Distributions
+#'
+#' A wrapper for plotting confidence distributions using confidence objects
+#' returned by *.conf() functions from clp.
+#'
+#'
+#' @param obj a list of confidence functions returned by a *.conf() function
+#' @param xlim the horizontal limits for the plot. If NULL, taken as a 99.8\%
+#'             confidence interval.
+#' @param xlab the label for the horizontal axis
+#' @param log switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
+#'            log-scaling
+#' @param col the color to plot the confidence curve
+#' @param n.points the number of points to plot for the confidence curve
+#'
+#' @return a plot of the confidence curve from obj
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#' @examples
+#' data(dietstudy)
+#'
+#' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
+#'
+#' out <- t.conf(x, plot = FALSE)
+#'
+#' plot.pconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
+#'
+#' @export plot.pconf
+plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
+  if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
+  if (is.null(xlab)) xlab <- 'Parameter'
+
+  curve(obj$pconf(x), xlim = xlim, xlab = xlab, ylab = 'Confidence Density', n = n.points, lwd = 3, col = col)
 }
