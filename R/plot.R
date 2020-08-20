@@ -256,7 +256,7 @@ plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 
 #' plot.pconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'
 #' @export plot.pconf
-plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
+plot.pconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
