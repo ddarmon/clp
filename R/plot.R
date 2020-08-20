@@ -260,5 +260,5 @@ plot.pconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
-  curve(obj$pconf(x), xlim = xlim, xlab = xlab, ylab = 'Confidence Density', n = n.points, lwd = 3, col = col)
+  curve(obj$pconf(x), xlim = xlim, xlab = xlab, ylab = 'Confidence Distribution', n = n.points, lwd = 3, col = col)
 }
