@@ -1,12 +1,16 @@
-#' Confidence functions for t-Test
+#' Confidence Functions for Means via Gaussian Models from Data
 #'
-#' Computes confidence functions for one and two sample t-tests on vectors of data.
+#' Confidence functions for a single mean, the difference of means from matched
+#' observations, or the difference of means from independent samples.
 #'
 #' @param x a (non-empty) numeric vector of data values.
 #' @param y an optional (non-empty) numeric vector of data values.
 #' @param paired a logical indicating whether you want a paired t-test.
 #' @param plot a logical indicating whether you want the plots to be generated.
-#' @return A list containing the confidence functions.
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the mean or difference of means, as well as the P-curve and S-curve.
+#'
 #' @examples
 #' t.confdist(x = 1:10, y = 7:20)
 #'
@@ -111,17 +115,22 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
   }
 }
 
-#' Confidence functions for t-Test with summary data
+#' Confidence Functions for Means via Gaussian Models from Summary Statistics
 #'
-#' Computes confidence functions for one and two sample t-tests on summary data.
+#' Confidence functions for a single mean, the difference of means from matched
+#' observations, or the difference of means from independent samples.
 #'
 #' @param mean a (non-empty) numeric vector of data values.
 #' @param sd a (non-empty) numeric vector of data values.
 #' @param n a (non-empty) numeric vector of data values.
 #' @param plot a logical indicating whether you want the plots to be generated.
-#' @return A list containing the confidence functions.
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the mean or difference of means, as well as the P-curve and S-curve.
+#'
 #' @examples
-#' t.confdist(c(3,5), c(1,.5), c(10, 12))
+#'
+#' t.confdist(mean = c(3,5), sd = c(1,.5), n = c(10, 12))
 #'
 #' @export t.conf.summary
 t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){

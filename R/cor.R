@@ -1,3 +1,14 @@
+#' Density of the Sample Pearson Correlation for a Bivariate Gaussian
+#'
+#' The density of the sample Pearson correlation for a bivariate Gaussian.
+#'
+#' @param x vector of quantiles
+#' @param rho the population correlation coefficient
+#' @param n the sample size
+#'
+#' @return A vector containing the density function evaluated at x.
+#'
+#' @references  Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 dcorr <- function(x, rho, n){
   prefactor <- function(r, rho, n){
     (n - 2)*(1 - rho^2)^((n-1)/2)*(1 - r^2)^((n-4)/2)/pi
@@ -21,6 +32,17 @@ dcorr <- function(x, rho, n){
 
 dcorr <- Vectorize(dcorr)
 
+#' Distribution Function of the Sample Pearson Correlation for a Bivariate Gaussian
+#'
+#' The distribution function of the sample Pearson correlation for a bivariate Gaussian.
+#'
+#' @param x vector of quantiles
+#' @param rho the population correlation coefficient
+#' @param n the sample size
+#'
+#' @return A vector containing the distribution function evaluated at x.
+#'
+#' @references  Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 pcorr <- function(q, rho, n, lower.tail = TRUE){
   if (lower.tail){
     integrate(dcorr, lower = -1, upper = q, rho = rho, n = n)$value
