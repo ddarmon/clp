@@ -155,11 +155,11 @@ lm.sigma.conf <- function(mod, plot = TRUE, conf.level = 0.95){
 
   var.hat <- sigma.hat^2
 
-  pconf <- function(sigma) pchisq(df*var.hat/sigma^2, df = df)
+  pconf <- function(sigma) pchisq(df*var.hat/sigma^2, df = df, lower.tail = FALSE)
 
   dconf <- function(sigma) dchisq(df*var.hat/sigma^2, df = df)*(2*df*var.hat)/(sigma^3)
 
-  qconf <- function(p) sqrt(df*var.hat/qchisq(p, df))
+  qconf <- function(p) sqrt(df*var.hat/qchisq(1-p, df))
 
   cconf <- function(sigma) abs(2*pconf(sigma) - 1)
 
