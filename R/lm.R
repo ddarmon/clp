@@ -121,3 +121,58 @@ lm.beta.conf <- function(mod){
 
   return(out)
 }
+
+#' Confidence Functions for the Noise Standard Deviation of a Linear Model
+#'
+#' Confidence functions for the noise standard deviation of a linear model under
+#' Gaussian noise assumptions.
+#'
+#' @param mod an output from lm
+#' @param plot whether to plot the confidence density and curve
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the noise standard deviation, as well as the P-curve and S-curve.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#' @examples
+#' # Prediction of body fat percentage from other body measurements.
+#'
+#' data(fat)
+#'
+#' mod <- lm(body.fat ~ age + weight + height, data = fat)
+#'
+#' sigma.conf <- lm.sigma.conf(mod)
+#'
+#' plot.cconf(sigma.conf)
+#'
+#' @export lm.sigma.conf
+lm.sigma.conf <- function(mod, plot = TRUE, conf.level = 0.95){
+  df <- mod$df.residual
+
+  sigma.hat <- summary(mod)$sigma
+
+  var.hat <- sigma.hat^2
+
+  pconf <- function(sigma) pchisq(df*var.hat/sigma^2, df = df)
+
+  dconf <- function(sigma) dchisq(df*var.hat/sigma^2, df = df)*(2*df*var.hat)/(sigma^3)
+
+  qconf <- function(p) sqrt(df*var.hat/qchisq(p, df))
+
+  cconf <- function(sigma) abs(2*pconf(sigma) - 1)
+
+  pcurve <- function(sigma) 1 - cconf(sigma)
+
+  scurve <- function(sigma) -log2(pcurve(sigma))
+
+  out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+
+  if (plot){
+    plot.dconf(out, xlab = 'Noise Standard Deviation')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Noise Standard Deviation')
+  }
+
+  return(out)
+}

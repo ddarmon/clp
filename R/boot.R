@@ -367,6 +367,31 @@ lm.beta.boot.conf <- function(formula, data, B = 2000){
   return(out)
 }
 
+lm.sigma.for.boot <- function(data, id = 1:nrow(data), formula){
+  dat <- data[id, ]
+
+  mod <- lm(formula, data = dat)
+
+  df <- mod$df.residual
+
+  sig <- sqrt(df*(summary(mod)$sigma)^2/nrow(mod$model))
+
+  return(sig)
+}
+
+lm.sigma.boot.conf <- function(formula, data, B = 2000, plot = TRUE, conf.level = 0.95){
+  bc <- bcaboot(data = data, statistic = lm.sigma.for.boot, B = B, formula = formula)
+
+  out <- conffuns.from.bcaboot(bc)
+
+  if (plot){
+    plot.dconf(out, xlab = 'Noise Standard Deviation')
+    plot.cconf(out, conf.level = conf.level, xlab = 'Noise Standard Deviation')
+  }
+
+  return(out)
+}
+
 #' @export conffuns.from.bcaboot.single
 conffuns.from.bcaboot.single <- function(bc, ind){
   ind
