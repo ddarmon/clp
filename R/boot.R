@@ -101,9 +101,16 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
 
   n1 <- sqrt(n * (n - 1))
 
-  for (i in seq_len(n)) {
-    u[i, ] <- statistic(data[-i, ], seq_len(n-1), formula = formula)
+  if (is.null(formula)){
+    for (i in seq_len(n)) {
+      u[i, ] <- statistic(data[-i, ], seq_len(n-1))
+    }
+  }else{
+    for (i in seq_len(n)) {
+      u[i, ] <- statistic(data[-i, ], seq_len(n-1), formula = formula)
+    }
   }
+
   t. <- sweep(-u, 2, colMeans(u), "+") * (n - 1)
   a <- (1 / 6) * colSums(t.^3) / (colSums(t.^2))^1.5
 
