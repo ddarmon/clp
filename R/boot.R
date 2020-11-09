@@ -67,9 +67,18 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
   if (stratified){
     strata <- data[, ncol(data)]
 
-    boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+    if (is.null(formula)){
+      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+    }else{
+      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+    }
+
   }else{
-    boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+    if (is.null(formula)){
+      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+    }else{
+      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+    }
   }
 
 
