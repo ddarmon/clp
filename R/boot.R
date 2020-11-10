@@ -150,10 +150,26 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
 confdist = function(bc, theta, param){
   Gn = bc$Gn[[param]]
   Phi.invs = qnorm(Gn(theta))
-
+  
   # The BCa confidence distribution
   Hn = pnorm((Phi.invs - bc$z0[param])/(1 + bc$a[param]*(Phi.invs - bc$z0[param])) - bc$z0[param])
-
+  
+  # Handle when Gn(theta) is 0 or 1.
+  
+  which.pinf <- which(Phi.invs == Inf)
+  
+  if (length(which.pinf) > 0){
+    Hn[which.pinf] <- 1
+    warning("Warning: Evaluating BCa confidence distribution at a parameter value greater than the largest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
+  }
+  
+  which.ninf <- which(Phi.invs == -Inf)
+  
+  if (length(which.ninf) > 0){
+    Hn[which.ninf] <- 0
+    warning("Warning: Evaluating BCa confidence distribution at a parameter value less than the smallest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
+  }
+  
   return(Hn)
 }
 
