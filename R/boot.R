@@ -170,7 +170,7 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
 #'         B = 2000)
 #'
 #'
-#' @export
+#' @export percboot
 percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
   if (stratified){
     strata <- data[, ncol(data)]
