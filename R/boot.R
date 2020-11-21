@@ -345,7 +345,7 @@ confquant <- function(bc, p, param){
 confdist.perc = function(bc, theta, param){
   Gn = bc$Gn[[param]]
 
-  return(Gn)
+  return(Gn(theta))
 }
 
 #' Construct the Confidence Density from a Percentile Bootstrap for a Given Statistic
