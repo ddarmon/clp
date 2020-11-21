@@ -132,6 +132,74 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
   return(list(t0 = boot.out$t0, t = boot.out$t, Gn = Gn, z0 = z0, a = a))
 }
 
+#' Perform Percentile Bootstrap for a Given Statistic
+#'
+#' Approximate the bootstrap distribution for the percentile bootstrap, given a statistic as would be supplied to
+#' boot from the boot package.
+#'
+#' @param data the dataframe or data matrix
+#' @param statistic a function that computes the statistic from data
+#' @param B the number of bootstrap replicates
+#' @param sim either "ordinary" (for case resampling bootstrap) or "parametric" (for parametric bootstrap)
+#' @param stratified whether or not (default) to use the use stratified
+#'                   sampling for the bootstrapping.
+#' @param ran.gen a function returning a random sample, for the parametric bootstrap
+#' @param mle the maximum likelihood estimate from the original sample, for the parametric bootstrap
+#' @param formula for use with interfacing to lm, glm, etc.
+#'
+#' @return A list containing the sample estimate, bootstrap estimates,
+#'         and bootstrap CDF for the percentile bootstrap.
+#'
+#' @references  Thomas J. DiCiccio and Bradley Efron. "Bootstrap confidence intervals." Statistical Science (1996): 189-212.
+#'
+#' @examples
+#' # Bootstrap confidence functions for a single mean.
+#'
+#' t.one.sample <- function(data, id = 1:length(data), ...){
+#'   dat <- data[id]
+#'
+#'   d <- mean(dat)
+#'
+#'   return(d)
+#' }
+#'
+#' data(dietstudy)
+#'
+#' percboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+#'         statistic = t.one.sample,
+#'         B = 2000)
+#'
+#'
+#' @export
+percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
+  if (stratified){
+    strata <- data[, ncol(data)]
+
+    if (is.null(formula)){
+      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+    }else{
+      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+    }
+
+  }else{
+    if (is.null(formula)){
+      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+    }else{
+      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+    }
+  }
+
+  p <- length(boot.out$t0) # Dimension of the parameter vector
+
+  Gn <- list()
+
+  for (i in 1:p){
+    Gn[[i]] = stats::ecdf(boot.out$t[, i])
+  }
+
+  return(list(t0 = boot.out$t0, t = boot.out$t, Gn = Gn))
+}
+
 #' Construct the Confidence Distribution from a BCa Bootstrap for a Given Statistic
 #'
 #' Construct the BCa confidence distribution from a bootstrap sample constructed using
@@ -150,26 +218,26 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
 confdist = function(bc, theta, param){
   Gn = bc$Gn[[param]]
   Phi.invs = qnorm(Gn(theta))
-  
+
   # The BCa confidence distribution
   Hn = pnorm((Phi.invs - bc$z0[param])/(1 + bc$a[param]*(Phi.invs - bc$z0[param])) - bc$z0[param])
-  
+
   # Handle when Gn(theta) is 0 or 1.
-  
+
   which.pinf <- which(Phi.invs == Inf)
-  
+
   if (length(which.pinf) > 0){
     Hn[which.pinf] <- 1
     warning("Warning: Evaluating BCa confidence distribution at a parameter value greater than the largest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
   }
-  
+
   which.ninf <- which(Phi.invs == -Inf)
-  
+
   if (length(which.ninf) > 0){
     Hn[which.ninf] <- 0
     warning("Warning: Evaluating BCa confidence distribution at a parameter value less than the smallest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
   }
-  
+
   return(Hn)
 }
 
@@ -255,6 +323,81 @@ confquant <- function(bc, p, param){
   zp <- z0 + (z0 + z)/(1 - a*(z0 + z))
 
   Qn <- quantile(bc$t[, param], pnorm(zp))
+
+  return(Qn)
+}
+
+#' Construct the Confidence Distribution from a Percentile Bootstrap for a Given Statistic
+#'
+#' Construct the percentile confidence distribution from a bootstrap sample constructed using
+#' bcaboot.
+#'
+#' @param bc an object returned by percboot
+#' @param theta the parameter value at which to evaluate the percentile confidence distribution
+#' @param param which parameter value to construct the percentile confidence distribution for
+#'
+#' @return The percentile confidence distribution for param evaluated at theta.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
+confdist.perc = function(bc, theta, param){
+  Gn = bc$Gn[[param]]
+
+  return(Gn)
+}
+
+#' Construct the Confidence Density from a Percentile Bootstrap for a Given Statistic
+#'
+#' Construct the percentile confidence density from a bootstrap sample constructed using
+#' percboot.
+#'
+#' @param bc an object returned by percboot
+#' @param param which parameter value to construct the percentile confidence density for
+#'
+#' @return A spline approximation the percentile confidence density.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
+confdens.perc = function(bc, param){
+  density.out <- density(bc$t[, param], bw = "SJ", n = 1024) # Seems to undersmooth
+
+  gn.perc <- density.out$y
+  thetas <- density.out$x
+
+  gn.approx <- approxfun(thetas, gn.perc)
+
+  dconf <- function(thetas){
+    g <- gn.approx(thetas)
+
+    g[is.na(g)] <- 0
+
+    return(g)
+  }
+
+  return(dconf)
+}
+
+#' Construct the Confidence Quantile Function from a Percentile Bootstrap for a Given Statistic
+#'
+#' Construct the percentile confidence quantile function from a bootstrap sample constructed using
+#' bcaboot.
+#'
+#' @param bc an object returned by percboot
+#' @param p the desired probability value at which to evaluate the confidence quantile function
+#' @param param which parameter value to construct the percentile confidence quantile function for
+#'
+#' @return The percentile confidence quantile function for param evaluated at p.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
+confquant.perc <- function(bc, p, param){
+  Qn <- quantile(bc$t[, param], p)
 
   return(Qn)
 }
@@ -424,7 +567,6 @@ lm.sigma.boot.conf <- function(formula, data, B = 2000, plot = TRUE, conf.level 
   return(out)
 }
 
-#' @export conffuns.from.bcaboot.single
 conffuns.from.bcaboot.single <- function(bc, ind){
   ind
 
@@ -435,6 +577,25 @@ conffuns.from.bcaboot.single <- function(bc, ind){
   dconf <- function(x) confdens(bc, ind)(x)
 
   qconf <- function(p) confquant(bc, p, ind)
+
+  pcurve <- function(x) 1 - cconf(x)
+  scurve <- function(x) -log2(pcurve(x))
+
+  out <- list(pconf = pconf, cconf = cconf, dconf = dconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+
+  return(out)
+}
+
+conffuns.from.percboot.single <- function(bc, ind){
+  ind
+
+  pconf <- function(x) confdist.perc(bc, x, ind)
+  cconf <- function(x) abs(2*pconf(x) - 1)
+
+  # Only valid within the approximate range of the data!
+  dconf <- function(x) confdens.perc(bc, ind)(x)
+
+  qconf <- function(p) confquant.perc(bc, p, ind)
 
   pcurve <- function(x) 1 - cconf(x)
   scurve <- function(x) -log2(pcurve(x))
@@ -511,6 +672,77 @@ conffuns.from.bcaboot <- function(bc){
   }else{ # Single parameter
 
     out <- conffuns.from.bcaboot.single(bc, 1)
+
+    return(out)
+  }
+}
+
+#' Construct Confidence Functions from an Output of percboot
+#'
+#' Construct confidence functions from the output of percboot.
+#' This is a helper function to make constructing ones own
+#' bootstrap confidence functions straightforward.
+#'
+#' @param bc an output from percboot
+#'
+#' @return A list or list of lists containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for the parameter associated with the statistic(s) used with percboot.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
+#'
+#' @examples
+#' # Reproduce percentile confidence density from Figure 11.7
+#' # of *Computer Age Statistical Inference*.
+#'
+#' scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
+#'
+#' statistic <- function(data, id = 1:nrow(data), ...){
+#'   dat <- data[id, ]
+#'
+#'   Sigma <- cov(dat)*((nrow(dat)-1)/nrow(dat))
+#'
+#'   lams <- eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values
+#'
+#'   return(lams[1])
+#' }
+#'
+#' ran.gen <- function(data, mle){
+#'   mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
+#' }
+#'
+#' bc <- percboot(data = scor, statistic = statistic, B = 8000, sim = "parametric", ran.gen = ran.gen,
+#'               mle = list(mu = colMeans(scor),
+#'                          Sigma = cov(scor)*((nrow(scor)-1)/nrow(scor))))
+#'
+#' lam.conf <- conffuns.from.percboot(bc)
+#'
+#' plot.cconf(lam.conf, xlab = 'Largest Eigenvalue')
+#' plot.dconf(lam.conf, xlab = 'Largest Eigenvalue')
+#'
+#' lam.conf$qconf(c(0.025, 0.975))
+#'
+#' @export conffuns.from.percboot
+conffuns.from.percboot <- function(bc){
+  if (length(bc$t0) > 1){ # Parameter vector
+
+    out <- list()
+
+    if (is.null(names(bc$t0))){
+      theta.names <- paste0('theta', 1:length(bc$t0))
+    }else{
+      theta.names <- names(bc$t0)
+    }
+
+    for (ind in 1:length(theta.names)){
+      out[[theta.names[ind]]] <- conffuns.from.percboot.single(bc, ind)
+    }
+
+    return(out)
+  }else{ # Single parameter
+
+    out <- conffuns.from.percboot.single(bc, 1)
 
     return(out)
   }
