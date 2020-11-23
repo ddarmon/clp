@@ -97,3 +97,27 @@ for (nam in names(beta.boot.conf)){
 }
 ```
 
+# Bootstrap for Coefficients of Linear Model with Multiple Corrections via Beran
+
+```{r}
+data(fat)
+
+formula <- body.fat ~ age + weight + height
+
+statistic <- function(data, id = 1:nrow(data)){
+  mod <- lm(formula, data = data[id, ])
+  
+  return(coef(mod))
+}
+
+bc <- bcaboot(fat, statistic, B = 2000)
+
+beta.conf.simul <- bootstrap.beran.conf(bc, which = 2:4)
+beta.boot.conf <- conffuns.from.percboot(bc)
+
+for (nam in names(beta.conf.simul)){
+  xlim <- beta.conf.simul[[nam]]$qconf(c(0.001, 0.999))
+  curve(beta.conf.simul[[nam]]$cconf(x), xlim = xlim, col = 'red', n = 2000, xlab = nam)
+  curve(beta.boot.conf[[nam]]$cconf(x), add = TRUE, col = 'blue', n = 2000)
+}
+```

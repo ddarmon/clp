@@ -808,7 +808,23 @@ make.beran.multicomp.obj <- function(theta.boot, K, Kinv){
 #'              Rudolf Beran. "Balanced simultaneous confidence sets." Journal of the American Statistical Association 83.403 (1988): 679-686.
 #'
 #' @examples
-#' # Lorem ipsum.
+#' data(fat)
+#'
+#' formula <- body.fat ~ age + weight + height
+#'
+#' statistic <- function(data, id = 1:nrow(data)){
+#'  mod <- lm(formula, data = data[id, ])
+#'
+#'  return(coef(mod))
+#' }
+#'
+#' bc <- bcaboot(fat, statistic, B = 2000)
+#'
+#' beta.conf.simul <- bootstrap.beran.conf(bc, which = 2:4)
+#'
+#' for (nam in names(beta.conf.simul)){
+#'  plot.cconf(beta.conf.simul[[nam]], xlab = nam)
+#' }
 #'
 #' @export bootstrap.beran.conf
 bootstrap.beran.conf <- function(bc, which = NULL){
