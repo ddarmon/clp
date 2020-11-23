@@ -747,3 +747,102 @@ conffuns.from.percboot <- function(bc){
     return(out)
   }
 }
+
+# Function to generate confidence functions via bootstrapping
+# adjusted for multiple comparisons using the method of Rudolf Beran (1988):
+#
+# Rudolf Beran. "Balanced simultaneous confidence sets." Journal of the American Statistical Association 83.403 (1988): 679-686.
+make.beran.multicomp.obj <- function(theta.boot, K, Kinv){
+  Hn <- ecdf(theta.boot)
+
+  cconf <- function(theta) K(abs(2*Hn(theta) - 1))
+
+  theta.med <- median(theta.boot)
+  theta.min <- min(theta.boot) - 1 # Need - 1 since Fhat(theta.min) = 1/n, and not 0.
+  theta.max <- max(theta.boot)
+
+  pconf <- function(theta){
+    if (theta <= theta.med){
+      return(0.5 - 0.5*cconf(theta))
+    }else{
+      return(0.5 + 0.5*cconf(theta))
+    }
+  }
+
+  pconf <- Vectorize(pconf)
+
+  qconf <- function(p){
+    fun.root <- function(x) pconf(x) - p
+
+    uniroot(fun.root, interval = c(theta.min, theta.max))$root
+  }
+
+  qconf <- Vectorize(qconf)
+
+  pcurve <- function(theta) 1 - cconf(theta)
+
+  scurve <- function(theta) -log2(pcurve(theta))
+
+  out <- list(pconf = pconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+
+  return(out)
+}
+
+#' Simultaneous Confidence Functions via Bootstrapping.
+#'
+#' Confidence functions via bootstrapping based on the
+#' percentile confidence interval, with balancing across
+#' parameters with Beran's method for simultaneous confidence sets.
+#'
+#' @param bc an object returned by either bcaboot or percboot
+#' @param which the indices for the parameters to include
+#' @param plot whether to plot the confidence density and curve
+#'
+#' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
+#'         for each parameter with balanced correction for multiple comparisons.
+#'
+#' @references  Tore Schweder and Nils Lid Hjort. Confidence, Likelihood, Probability. Vol. 41. Cambridge University Press, 2016.
+#'
+#'              Tore Schweder. "Confidence nets for curves." Advances In Statistical Modeling And Inference: Essays in Honor of Kjell A Doksum. 2007. 593-609.
+#'
+#'              Rudolf Beran. "Balanced simultaneous confidence sets." Journal of the American Statistical Association 83.403 (1988): 679-686.
+#'
+#' @examples
+#' # Lorem ipsum.
+#'
+#' @export bootstrap.beran.conf
+bootstrap.beran.conf <- function(bc, which = NULL){
+  if (is.null(which)){
+    which <- 1:ncol(bc$t)
+  }
+
+  theta.hat  <- bc$t0[which]
+  theta.boot <- bc$t[, which]
+
+  nam <- names(theta.hat)
+
+  if (is.null(nam)){
+    nam <- as.character(which)
+  }
+
+  V <- matrix(nrow = nrow(theta.boot), ncol = ncol(theta.boot))
+
+  for (j in 1:ncol(theta.boot)){
+    Hn <- ecdf(theta.boot[, j])
+
+    V[, j] <- abs(2*Hn(theta.boot[, j]) - 1)
+  }
+
+  Vmax <- apply(V, 1, max)
+  K <- ecdf(Vmax)
+
+  Kinv <- function(p) quantile(Vmax, p)
+
+  out <- list()
+
+  for (j in 1:ncol(theta.boot)){
+    out[[nam[j]]] <- make.beran.multicomp.obj(theta.boot[, j], K, Kinv)
+  }
+
+  return(out)
+}
