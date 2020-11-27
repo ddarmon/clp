@@ -68,16 +68,16 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
     strata <- data[, ncol(data)]
 
     if (is.null(formula)){
-      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = parallel::detectCores())
     }else{
-      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = parallel::detectCores())
     }
 
   }else{
     if (is.null(formula)){
-      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = parallel::detectCores())
     }else{
-      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = parallel::detectCores())
     }
   }
 
@@ -176,16 +176,16 @@ percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = F
     strata <- data[, ncol(data)]
 
     if (is.null(formula)){
-      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = parallel::detectCores())
     }else{
-      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = parallel::detectCores())
     }
 
   }else{
     if (is.null(formula)){
-      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle)
+      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = parallel::detectCores())
     }else{
-      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula)
+      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = parallel::detectCores())
     }
   }
 
