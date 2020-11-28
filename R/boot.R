@@ -752,12 +752,51 @@ conffuns.from.percboot <- function(bc){
 # adjusted for multiple comparisons using the method of Rudolf Beran (1988):
 #
 # Rudolf Beran. "Balanced simultaneous confidence sets." Journal of the American Statistical Association 83.403 (1988): 679-686.
-make.beran.multicomp.obj <- function(theta.boot, K, Kinv){
-  Hn <- ecdf(theta.boot)
+make.beran.multicomp.obj <- function(theta.boot, K, bca.params = NULL){
+  Gn <- ecdf(theta.boot)
 
-  cconf <- function(theta) K(abs(2*Hn(theta) - 1))
+  if (is.null(bca.params)){
+    cconf <- function(theta) K(abs(2*Gn(theta) - 1))
 
-  theta.med <- median(theta.boot)
+    # Median of the confidence distribution is the median of the
+    # bootstrap estimates.
+
+    theta.med <- median(theta.boot)
+  }else{
+    cconf <- function(theta) {
+      Phi.invs = qnorm(Gn(theta))
+
+      # The BCa confidence distribution
+      Hn = pnorm((Phi.invs - bca.params$z0)/(1 + bca.params$a*(Phi.invs - bca.params$z0)) - bca.params$z0)
+
+      # Handle when Gn(theta) is 0 or 1.
+
+      which.pinf <- which(Phi.invs == Inf)
+
+      if (length(which.pinf) > 0){
+        Hn[which.pinf] <- 1
+        #warning("Warning: Evaluating BCa confidence distribution at a parameter value greater than the largest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
+      }
+
+      which.ninf <- which(Phi.invs == -Inf)
+
+      if (length(which.ninf) > 0){
+        Hn[which.ninf] <- 0
+        #warning("Warning: Evaluating BCa confidence distribution at a parameter value less than the smallest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
+      }
+      return(K(abs(2*Hn - 1)))
+    }
+
+    # Median of the BCa confidence distribution is
+    #   \psi_{1/2} =  \hat{G}^{-1}\left( \Phi\left( \frac{z_{0}(2 - az_{0})}{1 - a z_{0}} \right) \right)
+
+    inner <- pnorm(bca.params$z0*(2-bca.params$a*bca.params$z0)/(1 - bca.params$a*bca.params$z0))
+
+    theta.med <- as.numeric(quantile(theta.boot, probs = inner))
+  }
+
+  # Might want to adjust this too, for when z0 is large.
+
   theta.min <- min(theta.boot) - 1 # Need - 1 since Fhat(theta.min) = 1/n, and not 0.
   theta.max <- max(theta.boot)
 
@@ -796,7 +835,7 @@ make.beran.multicomp.obj <- function(theta.boot, K, Kinv){
 #'
 #' @param bc an object returned by either bcaboot or percboot
 #' @param which the indices for the parameters to include
-#' @param plot whether to plot the confidence density and curve
+#' @param interval.type which interval to use in constructing the confidence curve, one of 'percentile' or 'bca'
 #'
 #' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
 #'         for each parameter with balanced correction for multiple comparisons.
@@ -827,13 +866,23 @@ make.beran.multicomp.obj <- function(theta.boot, K, Kinv){
 #' }
 #'
 #' @export bootstrap.beran.conf
-bootstrap.beran.conf <- function(bc, which = NULL){
+bootstrap.beran.conf <- function(bc, which = NULL, interval.type = 'bca'){
   if (is.null(which)){
     which <- 1:ncol(bc$t)
   }
 
   theta.hat  <- bc$t0[which]
   theta.boot <- bc$t[, which]
+
+  if (interval.type == 'bca'){
+    if (is.null(bc$z0) || is.null(bc$a)){
+      warning('The boot object does not have the necessary BCa parameters. Using the percentile interval confidence distribution instead.')
+      interval.type <- 'percentile'
+    }else{
+      z0.sub <- bc$z0[which]
+      a.sub <- bc$a[which]
+    }
+  }
 
   nam <- names(theta.hat)
 
@@ -852,12 +901,16 @@ bootstrap.beran.conf <- function(bc, which = NULL){
   Vmax <- apply(V, 1, max)
   K <- ecdf(Vmax)
 
-  Kinv <- function(p) quantile(Vmax, p)
-
   out <- list()
 
-  for (j in 1:ncol(theta.boot)){
-    out[[nam[j]]] <- make.beran.multicomp.obj(theta.boot[, j], K, Kinv)
+  if (interval.type == 'bca'){
+    for (j in 1:ncol(theta.boot)){
+      out[[nam[j]]] <- make.beran.multicomp.obj(theta.boot[, j], K, list(z0 = z0.sub[j], a = a.sub[j]))
+    }
+  }else{
+    for (j in 1:ncol(theta.boot)){
+      out[[nam[j]]] <- make.beran.multicomp.obj(theta.boot[, j], K)
+    }
   }
 
   return(out)

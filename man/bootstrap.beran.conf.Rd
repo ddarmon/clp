@@ -4,14 +4,14 @@
 \alias{bootstrap.beran.conf}
 \title{Simultaneous Confidence Functions via Bootstrapping.}
 \usage{
-bootstrap.beran.conf(bc, which = NULL)
+bootstrap.beran.conf(bc, which = NULL, interval.type = "bca")
 }
 \arguments{
 \item{bc}{an object returned by either bcaboot or percboot}
 
 \item{which}{the indices for the parameters to include}
 
-\item{plot}{whether to plot the confidence density and curve}
+\item{interval.type}{which interval to use in constructing the confidence curve, one of 'percentile' or 'bca'}
 }
 \value{
 A list containing the confidence functions pconf, dconf, cconf, and qconf
