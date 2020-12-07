@@ -25,14 +25,14 @@
 #'
 #' @export
 arima.conf <- function(mod){
-  if ("degrees_of_freedom" %in% names(mod)){
+  if ("degrees_of_freedom" %in% names(mod)){ # mod is an output from astsa::sarima
     vnames <- rownames(mod$ttable)
 
     b <- mod$ttable[, 1]
     s.b <- mod$ttable[, 2]
 
     df <- mod$degrees_of_freedom
-  }else{
+  }else{ # Assume mod is an output from stats::arima
     b <- mod$coef
 
     vnames <- names(b)
