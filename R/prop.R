@@ -331,8 +331,6 @@ riskratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
 
-
-
   if ((x0 == 0) && (x1 == 0)){
     warning("Confidence functions not defined when no successes in either group.")
     return(FALSE)
@@ -413,8 +411,10 @@ riskratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   qconf.score <- Vectorize(qconf.score)
 
   pcurve.score <- function(rho) 1 - cconf.score(rho)
+  
+  scurve.score <- function(rho) -log2(pcurve.score(rho))
 
-  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve = pcurve.score)
+  out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve = pcurve.score, scurve = scurve.score)
 
   if (plot){
     xlim <- qconf.score(c(0.001, 0.999))
