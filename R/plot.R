@@ -220,7 +220,7 @@ plot.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = 
 #'
 #' plot.dconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #' @export plot.dconf
-plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
+plot.dconf <- function(obj, compl = FALSE, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
@@ -234,6 +234,9 @@ plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 
 #'
 #'
 #' @param obj a list of confidence functions returned by a *.conf() function
+#' @param compl whether to plot the complementary
+#'                      confidence distribution (TRUE) or
+#'                      confidence distribution (FALSE, default).
 #' @param xlim the horizontal limits for the plot. If NULL, taken as a 99.8\%
 #'             confidence interval.
 #' @param xlab the label for the horizontal axis
@@ -260,5 +263,9 @@ plot.pconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
-  curve(obj$pconf(x), xlim = xlim, xlab = xlab, ylab = 'Confidence Distribution', n = n.points, lwd = 3, col = col)
+  if (compl){
+    curve(1 - obj$pconf(x), xlim = xlim, xlab = xlab, ylab = 'Complementary Confidence Distribution', n = n.points, lwd = 3, col = col)
+  }else{
+    curve(obj$pconf(x), xlim = xlim, xlab = xlab, ylab = 'Confidence Distribution', n = n.points, lwd = 3, col = col)
+  }
 }
