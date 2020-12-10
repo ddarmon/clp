@@ -1,0 +1,360 @@
+---
+title: Draft Vignette for `clp`
+date: 10 December 2020
+author: David Darmon
+---
+
+# Overview of the `clp` Package
+
+The `clp` package constructs confidence functions for the most of the parameters covered in a typical introductory statistics or research methods course, including:
+
+  - a single population mean
+  - the difference between two population means
+  - a single population median
+  - the distributional shift between two populations
+  - a single proportion
+  - the difference, risk ratio, and odds ratio for two proportions
+  - proportions for a multinomial
+  - the \(\chi^{2}\) parameter for association
+  - Pearson's product-moment correlation
+  - the coefficients of single and multiple linear regression models under Gaussian noise
+
+More advanced functionality includes:
+
+  - the coefficients of Generalized Linear Models (GLMs)
+  - the expected response of GLMs
+  - Beran's balanced simultaneous confidence intervals
+  - general purpose bootstrapping functions to construct confidence distributions via the BCa bootstrap
+
+This package is under active development, and requests for additional parameters and models should be sent to David Darmon at `ddarmon@monmouth.edu`.
+
+## The Naming Convention for Confidence Functions in `clp`
+
+`clp` uses the same naming convention as Base R's `p*()`, `d*()`, `q*()`, etc., functions for the confidence functions, i.e. `pconf()` evaluates the confidence distribution, `dconf()` evaluates the confidence density, `qconf()` evaluates the confidence quantile, etc. We next define the confidence distribution, confidence density, and confidence curve, as well as some derived functions.
+
+## Confidence Distribution
+
+The confidence distribution \(C\) for a parameter \(\theta\) is a cumulative distribution function with respect to the parameter \(\theta\). Confidence functions can be constructed in several ways. Two of the simplest are via a probability transform of a pivot \(T\) for the parameter \(\theta\), or, equivalently, by the right-sided \(P\)-value from the pivot for the null hypothesis in 
+\begin{align}    
+H_{0} &: \theta \leq \theta_{0}  \\ H_{1} &: \theta > \theta_{0}.
+\end{align}
+
+If \(T = t(\mathbf{X}; \theta)\) is a pivot for \(\theta\) with distribution function \(F_{T}\), then the confidence distribution from the pivot is
+$$C(\theta) = \begin{cases} F_{T}(\theta) &: t(\mathbf{X}; \theta) \text{ is increasing in } \theta \\ 1 - F_{T}(\theta) &: t(\mathbf{X}; \theta) \text{ is decreasing in } \theta \end{cases}.$$
+
+The confidence function is stored in the `pconf()` function in the list returned by a `clp` function.
+
+## Confidence Density
+
+The confidence density \(c\), if it exists, is defined as the derivative of the confidence distribution,
+$$c(\theta) = \frac{d}{d\theta} C(\theta).$$
+Equivalently, we can recover the confidence distribution by integrating the confidence density,
+$$C(\theta) = \int_{-\infty}^{\theta} c(\theta') \, d\theta'.$$
+
+The confidence density is stored in the `dconf()` function in the list returned by a `clp` function.
+
+## Confidence Quantile Function
+
+The confidence quantile function \(Q\) corresponds to the quantile function of the confidence distribution \(C\),
+$$Q(p) = \inf_{\theta} \{ \theta : C(\theta) \geq p\}.$$
+In the case that \(C\) is invertible, the quantile function is simply the inverse of the confidence distribution, $Q(p) = C^{-1}(p).$
+
+In terms of inference, the confidence quantile function \(Q(p)\) corresponds to the coverage probability \(p\) confidence upper bound for the parameter \(\theta\). Thus, the coverage probability \(p\) confidence lower bound is given by \(Q(1-p)\), and the equitailed confidence interval with coverage probability \(p = 1 - \alpha\) is given by \((Q(\alpha/2), Q(1 - \alpha/2))\).
+
+The confidence quantile function is stored in the `qconf()` function in the list returned by a `clp` function.
+
+## Confidence Curve
+
+The confidence curve \(\operatorname{cc}\) corresponds to the curve traced out by the left- and right-endpoints of the equitailed confidence intervals for \(\theta\) as the confidence level \(p\) varies from 0 to 1. The confidence curve can be directly computed via the confidence function as
+$$\begin{aligned} \operatorname{cc}(\theta) &= 1 - 2 \min \{ C(\theta), 1 - C(\theta)\} \\ &= |2 C(\theta) - 1|. \end{aligned}$$
+The sub-level sets \(\{ \theta : \operatorname{cc}(\theta) \leq p \} \) of the confidence curve correspond to coverage level \(p\) confidence intervals for \(\theta\)
+
+The confidence curve also provides a way to construct the confidence distribution, since
+$$ C(\theta) = \begin{cases} \frac{1 - \text{cc}(\theta)}{2} &: \theta \leq \tilde{\theta} \\  \frac{1 + \text{cc}(\theta)}{2} &: \theta > \tilde{\theta} \end{cases}$$
+where \(\tilde{\theta}\) is the median of the confidence distribution.
+
+The confidence curve is stored in the `cconf()` function in the list returned by a `clp` function.
+
+## \(P\)-curve
+
+The \(P\)-curve is the two-sided \(P\)-value for the point hypothesis \(H_{0} : \theta = \theta_{0}\), and is given by
+\begin{align}
+  P(\theta) &= 2 \min\{C(\theta), 1 - C(\theta) \}\\
+  &= 1 - \operatorname{cc}(\theta).
+\end{align}
+
+The \(P\)-curve is stored in the `pcurve()` function in the list returned by a `clp` function.
+
+## \(S\)-curve
+
+The \(S\)-curve transforms the \(P\)-curve, and thus two-sided \(P\)-values, into surprisals,
+$$S(\theta) = -\log_{2} P(\theta).$$
+
+The surprisal \(S(\theta)\) for a particular parameter value \(\theta\) upon seeing the data can be interpreted via a coin-flipping experiment. An integer surprisal \(k\) (in bits) corresponds to how "surprised" we would be to require \(k\) total coin flips before seeing the first tails for a fair coin. That is, for a geometric random variable \(K \sim \text{Geom}(1/2)\), \(p(k) = \left(\frac{1}{2}\right)^{k-1} \frac{1}{2}\), and taking the negative of the base-2 logarithm recovers the surprisal. As an example, the common significance threshold of 5% corresponds to a surprisal of \(\sim\) 4.32 bits.
+
+The \(S\)-curve is stored in the `scurve()` function in the list returned by a `clp` function.
+
+## Summary of Correspondence Between Confidence Functions and Frequentist Inference
+
+- **Confidence Function \(C(\theta_{0})\):** \(P\)-value for the right-sided test of \(H_{0} : \theta \leq \theta_{0}\) vs. \(H_{1} : \theta > \theta_{0}\).
+- **Complementary Confidence Function \(1-C(\theta_{0})\):** \(P\)-value for the left-sided test of \(H_{0} : \theta \geq \theta_{0}\) vs. \(H_{1} : \theta < \theta_{0}\).
+- **\(P\)-curve \(P(\theta_{0})\):** \(P\)-value for the two-sided test of \(H_{0} : \theta = \theta_{0}\) vs. \(H_{1} : \theta \neq \theta_{0}\).
+- **Confidence Quantile Function \(Q\):** the confidence lower bound, upper bound, and equi-tailed confidence interval with coverage \(c = 1 - \alpha\) are given by \(Q(1-p)\), \(Q(p)\), and \((Q(\alpha/2), Q(1 - \alpha/2))\), respectively.
+- **Confidence Curve \(cc\):** the sub-level sets \(\{ \theta : \operatorname{cc}(\theta) \leq p \} \) of \(\operatorname{cc}\) correspond to coverage level \(p\) confidence intervals for \(\theta\).
+
+<!--
+
+As LaTeX:
+
+\begin{itemize}
+	\item \textbf{Confidence Function \(C(\theta_{0})\):} \(P\)-value for the right-sided test of \(H_{0} : \theta \leq \theta_{0}\) vs. \(H_{1} : \theta > \theta_{0}\).
+	\item \textbf{Complementary Confidence Function \(1-C(\theta_{0})\):} \(P\)-value for the left-sided test of \(H_{0} : \theta \geq \theta_{0}\) vs. \(H_{1} : \theta < \theta_{0}\).
+	\item \textbf{\(P\)-curve \(P(\theta_{0})\):} \(P\)-value for the two-sided test of \(H_{0} : \theta = \theta_{0}\) vs. \(H_{1} : \theta \neq \theta_{0}\).
+	\item \textbf{Confidence Quantile Function \(Q\):} the confidence lower bound, upper bound, and equi-tailed confidenct interval with coverage \(c = 1 - \alpha\) are given by \(Q(1-p)\), \(Q(p)\), and \((Q(\alpha/2), Q(1 - \alpha/2))\), respectively.
+	\item {Confidence Curve \(cc\):} the sub-level sets \(\{ \theta : \operatorname{cc}(\theta) \leq p \} \) of \(\operatorname{cc}\) correspond to coverage level \(p\) confidence intervals for \(theta\).
+\end{itemize}
+
+-->
+
+# Examples
+
+## A Means to Weight Loss
+
+We first demonstrate `clp` in a setting where one- and two-sample \(t\)-tests would typically be used. The 
+[DIETFITS trial](https://jamanetwork.com/journals/jama/article-abstract/2673150?redirect=true), published in the Journal of the American Medical Association in 2018, sought to quantify the impact of healthy low-fat versus healthy low-carbohydrate diets on weight loss over a one year period. 609 individuals with Body Mass Indices (BMIs) ranging from 28 to 40 were randomized to receive a behavior modification intervention focusing on either implementing a healthy low-fat diet (\(n = 305\)) or a healthy low-carb diet \(n = 304\). Their weight change in kilograms was recorded one year after the behavior modification intervention. We report the weights in pounds, for the sake of an American audience.
+
+From Table 3 of the paper, the following sample statistics for each group can be derived:
+
+```{r, eval = FALSE, echo = FALSE}
+aggregate(weightchange ~ diet, clp::dietstudy, mean)
+aggregate(weightchange ~ diet, clp::dietstudy, sd)
+aggregate(weightchange ~ diet, clp::dietstudy, length)
+```
+
+
+| Group | n | Average Weight Change (lb) | SD Across Weight Changes (lb) |
+| ------|----|------------------------|--------------------|
+| Low Carb | 304 | -13.21 | 12.50 |
+| Low Fat | 305 | -11.67 | 12.52 |
+
+The `dietstudy` data frame provided with `clp` contains simulated weight changes with these sample characteristics.
+
+```{r, echo = FALSE}
+set.seed(1)
+```
+
+```{r, message = FALSE}
+library(clp)
+
+data(dietstudy)
+
+head(dietstudy[sample(1:nrow(dietstudy)), ])
+```
+
+Based on the histograms of the weight changes
+
+```{r}
+hist(dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+     breaks = 'FD', col = 'blue', freq = FALSE,
+     xlab = 'Weight Change (lb)', main = '')
+hist(dietstudy$weightchange[dietstudy$diet == 'Low Fat'],
+     breaks = 'FD', col = rgb(1, 0, 0, alpha = 0.5),
+     freq = FALSE, add = TRUE)
+
+```
+
+there appears to be evidence that the healthy low carb diet leads to greater weight loss.
+
+Due to the large sample size, we use a one-sample \(t\)-statistic to make inferences about the average weight loss in a population of individuals prescribed to follow a healthy low-fat or healthy low-carb diet. Let \(\mu\) be one of the population means. Then the standard \(t\)-statistic \(T = \frac{\bar{x} - \mu}{s_{X} / \sqrt{n}}\) is a pivot for \(\mu\), and thus the confidence distribution for \(\mu\) is
+$$C(\mu) = F_{T} \left(\frac{\mu - \bar{x}}{s_{X}/\sqrt{n}}; \nu = n - 1\right),$$
+where \(F_{T}\) is the cumulative distribution function for a \(t\)-distributed random variable with \(n - 1\) degrees of freedom. Differentiating with respect to \(\mu\), we recover the confidence density
+$$c(\mu) = \frac{1}{s_{X}/\sqrt{n}} f_{T} \left(\frac{\mu - \bar{x}}{s_{X}/\sqrt{n}}; \nu = n - 1\right).$$
+Inverting the confidence distribution, we recover the confidence quantile function
+\begin{align}
+  Q(p) &= \bar{x} + \frac{s_{X}}{\sqrt{n}} Q_{T}(p; \nu = n - 1) \\
+  &= \bar{x} + \frac{s_{X}}{\sqrt{n}} t_{1-p, n-1}
+\end{align}
+where \(t_{1-p, n-1}\) is the \(1 - p\) critical value for a \(t\)-distributed random variable with \(n - 1\) degrees of freedom.
+
+The function `t.conf()` computes confidence functions from one-, two-, and paired-sample \(t\)-tests. We first compute the confidence functions for the average weight change in the healthy low carb population:
+
+```{r}
+conf.mu.lowcarb <- t.conf(dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
+```
+
+By default, `t.conf()` plots the confidence density \(c(\mu)\) and confidence curve \(\text{cc}(\mu)\) for \(\mu\), with the latter showing the 95% confidence interval by default.
+
+The output of `t.conf()` is a list containing each of the confidence functions and their derived functions:
+
+```{r}
+names(conf.mu.lowcarb)
+```
+
+There are helper functions to plot the confidence distribution, density, curve, etc., from an output of a `clp` function. These helper functions have the names `plot.*()`. For example, to plot the \(P\)-curve giving the two-sided \(P\)-values, we use:
+
+```{r}
+plot.pcurve(conf.mu.lowcarb, xlab = 'Mean Weight Change (lb)')
+```
+
+To plot the \(S\)-curve, we use:
+
+```{r}
+plot.scurve(conf.mu.lowcarb, xlab = 'Mean Weight Change (lb)')
+```
+
+We recover the numerical values for the 95% confidence interval for the average weight change using the confidence quantile function:
+
+```{r}
+conf.mu.lowcarb$qconf(c(0.025, 0.975))
+```
+
+Next, we show the confidence curves for the average weight change in the low carb and low fat diets in a single plot:
+
+```{r}
+conf.mu.lowfat <- t.conf(dietstudy$weightchange[dietstudy$diet == 'Low Fat'], plot = FALSE)
+
+
+curve(conf.mu.lowcarb$cconf(x),
+      xlab = 'Mean Weight Change (lb)', ylab = 'Confidence Curve',
+      xlim = c(-17, 0), n = 2001, col = 'blue')
+curve(conf.mu.lowfat$cconf(x),
+      xlim = c(-17, 0), n = 2001, col = 'red',
+      add = TRUE)
+```
+
+`t.conf()` computes the approximate confidence functions for the difference between two population means from independent samples using Welch's two-sample \(t\)-test:
+
+```{r}
+conf.diff <- t.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Fat'], y = dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
+```
+
+Again, the confidence density and confidence curve are plotted by default. We recover a 95% confidence interval for the difference between the mean weight changes using the confidence quantile function:
+
+```{r}
+conf.diff$qconf(c(0.025, 0.975))
+```
+
+The two-sided \(P\)-value for the hypothesis that \(\mu_{\text{LF}} - \mu_{\text{LC}} = \delta\) is generated using `plot.pcurve()`:
+
+```{r}
+plot.pcurve(conf.diff, 
+            xlab = expression(mu[LF] - mu[LC] * ' (lb)'))
+abline(v = 0, lty = 3)
+```
+
+and we obtain the two-sided \(P\)-value for the point null hypothesis \(\mu_{\text{LF}} - \mu_{\text{LC}} = 0\) using `pcurve()`:
+
+```{r}
+conf.diff$pcurve(0)
+```
+
+Finally, we can show the \(S\)-curve for various values of \(\delta\)
+
+```{r}
+plot.scurve(conf.diff,
+            xlab = expression(mu[LF] - mu[LC] * ' (lb)'))
+abline(v = 0, lty = 3)
+```
+
+and see that on seeing the data, the surprisal for \(\delta = 0\):
+
+```{r}
+conf.diff$scurve(0)
+```
+is a little less than 3 bits.
+
+## Proportions and the DANMASK-19 Study
+
+[DANMASK-19 trial](https://www.acpjournals.org/doi/10.7326/M20-6817) out of Denmark. This study randomized individuals to recieve a mask recommendation and a supply of 50 surgical masks (or not):
+
+> Encouragement to follow social distancing measures for coronavirus disease 2019, plus either no mask recommendation or a recommendation to wear a mask when outside the home among other persons together with a supply of 50 surgical masks and instructions for proper use.
+
+From that study's results synopsis:
+
+```{r}
+# p[1] = rate of SARS-CoV-2 in control arm
+# p[2] = rate of SARS-CoV-2 in intervention arm
+
+x <- c(53, 42)
+n <- c(2470, 2392)
+```
+
+The confidence distributions for the individual population risks \(p_{C}\) and \(p_{T}\) using the mid \(P\)-value for the right-sided test,
+$$\begin{aligned} C(p) &= P_{p}(X \geq x_{\text{obs}}) - \frac{1}{2} P_{p}(X = x_{\text{obs}}) \\ &= \sum_{k = x_{\text{obs}}}^{n} \binom{n}{k} p^{k} (1-p)^{n -k} - \frac{1}{2} \binom{n}{x_{\text{obs}}} p^{x_{\text{obs}}} (1-p)^{n -x_{\text{obs}}} \end{aligned}$$
+via the function `prop.conf()`:
+
+```{r}
+conf.risk.contr <- prop.conf(x[1], n[1], plot = FALSE)
+conf.risk.treat <- prop.conf(x[2], n[2], plot = FALSE)
+```
+
+Plotting the confidence curves together, we see
+
+```{r}
+curve(conf.risk.contr$cconf(x), 
+      xlim = c(0, 0.05), col = 'red', n = 2001,
+      xlab = 'Risk of SARS-CoV-2 Infection',
+      ylab = 'Confidence Curve')
+curve(conf.risk.treat$cconf(x), 
+      add = TRUE, col = 'blue', n = 2001)
+```
+
+And we extract the marginal 95% confidence curves for each rate using their respective quantile functions:
+
+```{r}
+conf.risk.contr$qconf(c(0.025, 0.975))
+conf.risk.treat$qconf(c(0.025, 0.975))
+```
+
+
+We can also perform inferences for the difference between of rates of SARS-CoV-2 infection in the control (\(p_{C}\)) and treatment (\(p_{T}\)) groups using `prop.conf()`. Let \(\delta = p_{C} - p_{T}\). The confidence distribution for \(\delta\) is constructed using the right-sided \(P\)-value for the [score test](https://www.researchgate.net/publication/233397715_Confidence_intervals_for_the_ratio_and_difference_of_two_binomial_proportions) based on the Gaussian approximations of \(\hat{p}_{C}\) and \(\hat{p}_{T}\).
+
+```{r}
+conf.diff.props <- prop.conf(x = x, n = n, plot = FALSE)
+```
+
+We plot the confidence curve with a 99.9% confidence curve manually using `plot.cconf()`:
+
+```{r}
+plot.cconf(conf.diff.props, xlab = 'p[C] - p[R]', conf.level = 0.999)
+```
+
+We can recover the 99.9% confidence interval for \(\delta\) by taking the appropriate quantiles of the confidence distribution:
+
+```{r}
+conf.diff.props$qconf(c(.001/2, 1-0.001/2))
+```
+We get the two-sided \(P\)-value for the null hypothesis that \(\delta = 0\) using `pcurve()`.
+
+```{r}
+conf.diff.props$pcurve(0)
+```
+
+We can repeat the same analysis with the relative risk or the odds ratio, which are computed using the score statistics with `riskratio.conf()` and `oddsratio.conf()`. We demonstrate using the confidence functions for the relative risk based on the score statistic from the Normal approximations of the sample proportions. We take the relative risk to be \(\rho = p_{T}/p_{C}\).
+
+```{r}
+conf.rel.risk <- riskratio.conf(x, n)
+```
+Since we are interested in showing that the treatment is more effective than the control, and effectiveness corresponds to a \(\rho < 1\), it is natural to plot the complementary confidence curve for \(\rho\), which gives the \(P\)-value for the null hypothesis \(\rho \geq \rho_{0}\):
+
+```{r}
+plot.pconf(conf.rel.risk, compl = TRUE,
+           xlab = 'p[T]/p[C]')
+```
+
+Finally, we can compute a 90% confidence distribution for \(\rho\) using the confidence quantile function:
+
+```{r}
+conf.rel.risk$qconf(c(0.025, 0.975))
+```
+So the data are consistent with anywhere from a 45% reduction in risk for the treatment group to a 22% increase in risk for the treatment group at the 95% confidence level.
+
+The \(P\)-value for a two-sided test of \(\rho = 1\) is
+```{r}
+conf.rel.risk$pcurve(1)
+```
+and the surprisal for the two-sided test is
+```{r}
+conf.rel.risk$scurve(1)
+```
+

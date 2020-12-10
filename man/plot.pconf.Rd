@@ -4,10 +4,21 @@
 \alias{plot.pconf}
 \title{A Wrapper Function for Plotting Confidence Distributions}
 \usage{
-\method{plot}{pconf}(obj, xlim = NULL, xlab = NULL, col = "black", n.points = 2001)
+\method{plot}{pconf}(
+  obj,
+  compl = FALSE,
+  xlim = NULL,
+  xlab = NULL,
+  col = "black",
+  n.points = 2001
+)
 }
 \arguments{
 \item{obj}{a list of confidence functions returned by a *.conf() function}
+
+\item{compl}{whether to plot the complementary
+confidence distribution (TRUE) or
+confidence distribution (FALSE, default).}
 
 \item{xlim}{the horizontal limits for the plot. If NULL, taken as a 99.8\%
 confidence interval.}
