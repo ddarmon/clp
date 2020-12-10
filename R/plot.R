@@ -220,7 +220,7 @@ plot.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = 
 #'
 #' plot.dconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #' @export plot.dconf
-plot.dconf <- function(obj, compl = FALSE, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
+plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
@@ -259,7 +259,7 @@ plot.dconf <- function(obj, compl = FALSE, xlim = NULL, xlab = NULL, col = 'blac
 #' plot.pconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'
 #' @export plot.pconf
-plot.pconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
+plot.pconf <- function(obj, compl = FALSE, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
