@@ -6,7 +6,7 @@ author: David Darmon
 
 # Overview of the `clp` Package
 
-The `clp` package constructs confidence functions for the most of the parameters covered in a typical introductory statistics or research methods course, including:
+The `clp` package constructs confidence functions for most of the parameters covered in a typical introductory statistics or research methods course, including:
 
   - a single population mean
   - the difference between two population means
@@ -121,7 +121,7 @@ As LaTeX:
 ## A Means to Weight Loss
 
 We first demonstrate `clp` in a setting where one- and two-sample \(t\)-tests would typically be used. The 
-[DIETFITS trial](https://jamanetwork.com/journals/jama/article-abstract/2673150?redirect=true), published in the Journal of the American Medical Association in 2018, sought to quantify the impact of healthy low-fat versus healthy low-carbohydrate diets on weight loss over a one year period. 609 individuals with Body Mass Indices (BMIs) ranging from 28 to 40 were randomized to receive a behavior modification intervention focusing on either implementing a healthy low-fat diet (\(n = 305\)) or a healthy low-carb diet \(n = 304\). Their weight change in kilograms was recorded one year after the behavior modification intervention. We report the weights in pounds, for the sake of an American audience.
+[DIETFITS trial](https://jamanetwork.com/journals/jama/article-abstract/2673150?redirect=true), published in the Journal of the American Medical Association in 2018, sought to quantify the impact of healthy low-fat versus healthy low-carbohydrate diets on weight loss over a one year period. 609 individuals with Body Mass Indices (BMIs) ranging from 28 to 40 were randomized to receive a behavior modification intervention focusing on either implementing a healthy low-fat diet (\(n = 305\)) or a healthy low-carb diet (\(n = 304\)). Their weight change in kilograms was recorded one year after the behavior modification intervention. We report the weight changes in pounds, for the sake of an American audience.
 
 From Table 3 of the paper, the following sample statistics for each group can be derived:
 
@@ -222,7 +222,7 @@ curve(conf.mu.lowfat$cconf(x),
       add = TRUE)
 ```
 
-`t.conf()` computes the approximate confidence functions for the difference between two population means from independent samples using Welch's two-sample \(t\)-test:
+When provided with two samples, `t.conf()` computes the approximate confidence functions for the difference between two population means from independent samples using Welch's two-sample \(t\)-test. We construct confidence functions for the difference \(\delta = \mu_{\text{LF}} - \mu_{\text{LC}}\) via:
 
 ```{r}
 conf.diff <- t.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Fat'], y = dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
@@ -279,9 +279,8 @@ x <- c(53, 42)
 n <- c(2470, 2392)
 ```
 
-The confidence distributions for the individual population risks \(p_{C}\) and \(p_{T}\) using the mid \(P\)-value for the right-sided test,
+The function `prop.conf()` constructs confidence functions for a single proportion \(p\) from a binomial experiment using the mid \(P\)-value for the right-sided test,
 $$\begin{aligned} C(p) &= P_{p}(X \geq x_{\text{obs}}) - \frac{1}{2} P_{p}(X = x_{\text{obs}}) \\ &= \sum_{k = x_{\text{obs}}}^{n} \binom{n}{k} p^{k} (1-p)^{n -k} - \frac{1}{2} \binom{n}{x_{\text{obs}}} p^{x_{\text{obs}}} (1-p)^{n -x_{\text{obs}}} \end{aligned}$$
-via the function `prop.conf()`:
 
 ```{r}
 conf.risk.contr <- prop.conf(x[1], n[1], plot = FALSE)
@@ -299,7 +298,7 @@ curve(conf.risk.treat$cconf(x),
       add = TRUE, col = 'blue', n = 2001)
 ```
 
-And we extract the marginal 95% confidence curves for each rate using their respective quantile functions:
+And we extract the marginal 95% confidence curves for each risk using their respective quantile functions:
 
 ```{r}
 conf.risk.contr$qconf(c(0.025, 0.975))
@@ -335,6 +334,7 @@ We can repeat the same analysis with the relative risk or the odds ratio, which 
 ```{r}
 conf.rel.risk <- riskratio.conf(x, n)
 ```
+
 Since we are interested in showing that the treatment is more effective than the control, and effectiveness corresponds to a \(\rho < 1\), it is natural to plot the complementary confidence curve for \(\rho\), which gives the \(P\)-value for the null hypothesis \(\rho \geq \rho_{0}\):
 
 ```{r}
@@ -342,7 +342,7 @@ plot.pconf(conf.rel.risk, compl = TRUE,
            xlab = 'p[T]/p[C]')
 ```
 
-Finally, we can compute a 90% confidence distribution for \(\rho\) using the confidence quantile function:
+Finally, we can compute a 95% confidence distribution for \(\rho\) using the confidence quantile function:
 
 ```{r}
 conf.rel.risk$qconf(c(0.025, 0.975))
