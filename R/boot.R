@@ -725,6 +725,16 @@ conffuns.from.bcaboot <- function(bc){
 #'
 #' @export conffuns.from.percboot
 conffuns.from.percboot <- function(bc){
+  if (is.null(bc$Gn)){ # A boot object made directly by the boot package
+    Gn <- list()
+
+    for (i in 1:length(bc$t0)){
+      Gn[[i]] = stats::ecdf(bc$t[, i])
+    }
+
+    bc$Gn <- Gn
+  }
+
   if (length(bc$t0) > 1){ # Parameter vector
 
     out <- list()
