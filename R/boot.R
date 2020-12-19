@@ -397,7 +397,7 @@ confdens.perc = function(bc, param){
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
 confquant.perc <- function(bc, p, param){
-  num.na <- sum(is.na(bc$[t, param]))
+  num.na <- sum(is.na(bc$t[, param]))
 
   if (num.na > 0) {
     warning(sprintf('%g of %g bootstrap estimates are NA. Removing them when approximating estimating the bootstrap distribution.', num.na, nrow(bc$t)))
