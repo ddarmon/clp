@@ -2,6 +2,11 @@
 title: Draft Vignette for `clp`
 date: 10 December 2020
 author: David Darmon
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteIndexEntry{Draft Vignette for `clp`}
+  %\usepackage[UTF-8]{inputenc}
 ---
 
 # Overview of the `clp` Package

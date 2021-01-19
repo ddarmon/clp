@@ -16,9 +16,6 @@ A list of lists containing the confidence functions pconf, dconf, cconf, and qco
 \description{
 Confidence functions for the Coefficients of a (Generalized) Linear Mixed Model.
 }
-\examples{
-
-}
 \references{
 Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
 }

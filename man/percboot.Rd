@@ -44,7 +44,7 @@ boot from the boot package.
 \examples{
 # Bootstrap confidence functions for a single mean.
 
-t.one.sample <- function(data, id = 1:length(data), ...){
+t.one.sample <- function(data, id = 1:length(data)){
   dat <- data[id]
 
   d <- mean(dat)

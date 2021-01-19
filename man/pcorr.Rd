@@ -12,6 +12,9 @@ pcorr(q, rho, n, lower.tail = TRUE)
 \item{rho}{the population correlation coefficient}
 
 \item{n}{the sample size}
+
+\item{lower.tail}{compute the lower tail (default) or
+upper tail of the confidence distribution.}
 }
 \value{
 A vector containing the distribution function evaluated at x.

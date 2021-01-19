@@ -120,7 +120,7 @@ multinomial.conf <- function(N, plot = TRUE, conf.level = 0.95, B = 2000, col = 
 
   if (plot){
     if (is.null(col)){
-      col <- rainbow(length(N))
+      col <- grDevices::rainbow(length(N))
     }
 
     for (j in 1:length(N)){
@@ -303,9 +303,9 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
 
   cconf <- function(gamma){
     # Runs faster **without** constraining 0 <= pi <= 1.
-    #suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, hin = ineq.constraint.fun, hin.jac = ineq.constraint.jac, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
+    #suppressWarnings(opt.out <- alabama::auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, hin = ineq.constraint.fun, hin.jac = ineq.constraint.jac, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
 
-    suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
+    suppressWarnings(opt.out <- alabama::auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
 
     return(pchisq(2*(ll.multinomial(opt.out$par, N.flat = N.flat) - ll.multinomial(phat.flat[-length(phat.flat)], N.flat = N.flat)), df = 1))
   }
@@ -317,9 +317,9 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
       return(0)
     }else{
       # Runs faster **without** constraining 0 <= pi <= 1.
-      #suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, hin = ineq.constraint.fun, hin.jac = ineq.constraint.jac, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
+      #suppressWarnings(opt.out <- alabama::auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, hin = ineq.constraint.fun, hin.jac = ineq.constraint.jac, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
 
-      suppressWarnings(opt.out <- auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
+      suppressWarnings(opt.out <- alabama::auglag(par = phat.flat[-length(phat.flat)], fn = ll.multinomial, gr = grad.multinomial, heq = constraint.fun, control.outer = list(trace = FALSE, method = 'nlminb'), gamma = gamma, N.flat = N.flat))
 
       return(pnorm(sign(gamma - gamma.hat)*sqrt(2*(ll.multinomial(opt.out$par, N.flat = N.flat) - ll.multinomial(phat.flat[-length(phat.flat)], N.flat = N.flat)))))
     }

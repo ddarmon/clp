@@ -27,6 +27,7 @@
 #'
 #' plot.cconf(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'
+#' @import graphics
 #' @export plot.cconf
 plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
   alpha <- 1-conf.level

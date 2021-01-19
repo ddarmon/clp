@@ -25,7 +25,7 @@
 #' @examples
 #' # Bootstrap confidence functions for a single mean.
 #'
-#' t.one.sample <- function(data, id = 1:length(data), ...){
+#' t.one.sample <- function(data, id = 1:length(data)){
 #'   dat <- data[id]
 #'
 #'   d <- mean(dat)
@@ -66,20 +66,32 @@
 #'
 #' @export
 bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
+  # chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+  #
+  # if (nzchar(chk) && chk == "TRUE") {
+  #   # use 2 cores for CRAN
+  #   num_workers <- 2L
+  # } else {
+  #   # use all cores in devtools::test()
+  #   num_workers <- parallel::detectCores()
+  # }
+
+  num_workers <- parallel::detectCores()
+
   if (stratified){
     strata <- data[, ncol(data)]
 
     if (is.null(formula)){
-      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = parallel::detectCores())
+      boot.out <- boot::boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = num_workers)
     }else{
-      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = parallel::detectCores())
+      boot.out <- boot::boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = num_workers)
     }
 
   }else{
     if (is.null(formula)){
-      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = parallel::detectCores())
+      boot.out <- boot::boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = num_workers)
     }else{
-      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = parallel::detectCores())
+      boot.out <- boot::boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = num_workers)
     }
   }
 
@@ -157,7 +169,7 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
 #' @examples
 #' # Bootstrap confidence functions for a single mean.
 #'
-#' t.one.sample <- function(data, id = 1:length(data), ...){
+#' t.one.sample <- function(data, id = 1:length(data)){
 #'   dat <- data[id]
 #'
 #'   d <- mean(dat)
@@ -174,20 +186,32 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
 #'
 #' @export percboot
 percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
+  # chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+  #
+  # if (nzchar(chk) && chk == "TRUE") {
+  #   # use 2 cores for CRAN
+  #   num_workers <- 2L
+  # } else {
+  #   # use all cores in devtools::test()
+  #   num_workers <- parallel::detectCores()
+  # }
+
+  num_workers <- parallel::detectCores()
+
   if (stratified){
     strata <- data[, ncol(data)]
 
     if (is.null(formula)){
-      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = parallel::detectCores())
+      boot.out <- boot::boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = num_workers)
     }else{
-      boot.out <- boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = parallel::detectCores())
+      boot.out <- boot::boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = num_workers)
     }
 
   }else{
     if (is.null(formula)){
-      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = parallel::detectCores())
+      boot.out <- boot::boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = num_workers)
     }else{
-      boot.out <- boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = parallel::detectCores())
+      boot.out <- boot::boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = num_workers)
     }
   }
 
@@ -445,7 +469,7 @@ t.two.sample <- function(data, id = 1:nrow(data), ...){
 #'
 #' @return A single value of the bootstrapped sample mean.
 #'
-t.one.sample <- function(data, id = 1:length(data), ...){
+t.one.sample <- function(data, id = 1:length(data)){
   dat <- data[id]
 
   d <- mean(dat)

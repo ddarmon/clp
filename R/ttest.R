@@ -15,6 +15,7 @@
 #' @examples
 #' t.confdist(x = 1:10, y = 7:20)
 #'
+#' @import stats
 #' @export t.conf
 t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) {
 

@@ -25,13 +25,14 @@
 #'
 #' pred.black <- glm.lincom.conf(mod, x.black)
 #'
+#' @importFrom utils tail
 #' @export
 glm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   # PDF / PMF from GLM
-  dmod <- get_dmodel_function(mod)
+  dmod <- enrichwith::get_dmodel_function(mod)
 
   # Derivative of log-likelihood
-  score <- get_score_function(mod)
+  score <- enrichwith::get_score_function(mod)
 
   # Log-likelihood evaluated at beta
   ell.beta <- function(beta){
@@ -46,7 +47,7 @@ glm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   # Get out feasible direction for the
   # constraint x*beta = m via QR decomp.
 
-  qr.out <- householder(t(t(x)))
+  qr.out <- pracma::householder(t(t(x)))
 
   Fcon <- qr.out$Q[, 2:length(x)]
 
@@ -230,10 +231,10 @@ glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
   p <- length(mod$coefficients)
 
   # PDF / PMF from GLM
-  dmod <- get_dmodel_function(mod)
+  dmod <- enrichwith::get_dmodel_function(mod)
 
   # Derivative of log-likelihood
-  score <- get_score_function(mod)
+  score <- enrichwith::get_score_function(mod)
 
   # Log-likelihood evaluated at theta
   ell.theta <- function(theta){
@@ -245,7 +246,7 @@ glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
   }
 
   # MLE of Dispersion Parameter
-  phi.hat <- enrich(mod, with = "mle of dispersion")$dispersion_mle
+  phi.hat <- enrichwith::enrich(mod, with = "mle of dispersion")$dispersion_mle
 
   theta.mle <- c(coef(mod), phi.hat)
 
@@ -260,7 +261,7 @@ glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
 
   x.aug <- c(x, 0)
 
-  qr.out <- householder(t(t(x.aug)))
+  qr.out <- pracma::householder(t(t(x.aug)))
 
   Fcon <- qr.out$Q[, 2:length(x.aug)]
 

@@ -9,9 +9,6 @@
 #'
 #' @references  Tore Schweder and Nils Lid Hjort. Confidence, likelihood, probability. Vol. 41. Cambridge University Press, 2016.
 #'
-#'
-#' @examples
-#'
 #' @export
 glmer.beta.conf <- function(mod){
   alpha = 1e-8
@@ -21,7 +18,7 @@ glmer.beta.conf <- function(mod){
 
   fam <- family(mod)
 
-  Pnames <- names(B0 <- fixef(mod))
+  Pnames <- names(B0 <- lme4::fixef(mod))
 
   p <- length(Pnames)
 

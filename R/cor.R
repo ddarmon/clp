@@ -39,7 +39,7 @@ dcorr <- Vectorize(dcorr)
 #' @param q vector of quantiles
 #' @param rho the population correlation coefficient
 #' @param n the sample size
-#' @lower.tail compute the lower tail (default) or
+#' @param lower.tail compute the lower tail (default) or
 #'             upper tail of the confidence distribution.
 #'
 #' @return A vector containing the distribution function evaluated at x.
