@@ -81,6 +81,9 @@ Vectorize(pcorr, vectorize.args = 'rho')
 #' @examples
 #' data(fat)
 #'
+#' fat <- fat[1:50, ] # Smaller sub-sample, to show exact versus
+#'                    # Fisher's Z-transformation.
+#'
 #' # Using the exact sampling distribution of R
 #' cor.conf(x = fat$body.fat, y = fat$weight, exact = TRUE)
 #'
@@ -97,6 +100,19 @@ cor.conf <- function(x, y, plot = TRUE, conf.level = 0.95, exact = FALSE){
 
   if (n <= 3){
     stop("n must be >= 4.")
+  }
+
+  if (n > 100 && exact == TRUE){
+    warning("
+
+            WARNING: n > 100.
+
+            This can cause the integral needed for the sampling
+            distribution of the correlation coefficient to become
+            ill-behaved.
+
+            Using Fisher's transformation instead.")
+    exact <- FALSE
   }
 
   R <- cor(x, y)
