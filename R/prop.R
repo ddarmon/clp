@@ -299,6 +299,7 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
 #' @param n a vector of the number of trials in each independent sample
 #' @param plot whether to plot the confidence density and curve
 #' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#' @param log 'x' to plot risk ratio on log-scale
 #'
 #' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
 #'         for the relative risk between two proportions, as well as the P-curve and S-curve.
@@ -411,7 +412,7 @@ riskratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
   qconf.score <- Vectorize(qconf.score)
 
   pcurve.score <- function(rho) 1 - cconf.score(rho)
-  
+
   scurve.score <- function(rho) -log2(pcurve.score(rho))
 
   out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve = pcurve.score, scurve = scurve.score)
@@ -479,6 +480,7 @@ dncd <- Vectorize(dncd, vectorize.args = 'y2')
 #' @param n a vector of the number of trials in each independent sample
 #' @param plot whether to plot the confidence density and curve
 #' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
+#' @param log 'x' to plot odds ratio on log-scale
 #'
 #' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
 #'         for the relative risk between two proportions, as well as the P-curve and S-curve.

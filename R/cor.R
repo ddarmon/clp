@@ -36,9 +36,11 @@ dcorr <- Vectorize(dcorr)
 #'
 #' The distribution function of the sample Pearson correlation for a bivariate Gaussian.
 #'
-#' @param x vector of quantiles
+#' @param q vector of quantiles
 #' @param rho the population correlation coefficient
 #' @param n the sample size
+#' @lower.tail compute the lower tail (default) or
+#'             upper tail of the confidence distribution.
 #'
 #' @return A vector containing the distribution function evaluated at x.
 #'
@@ -59,7 +61,8 @@ Vectorize(pcorr, vectorize.args = 'rho')
 #' Confidence functions for Pearson's correlation coefficient
 #' for a bivariate Gaussian.
 #'
-#' @param "x, y" numeric vectors of data values. x and y must have the same length.
+#' @param x a numeric vector
+#' @param y a numeric vector
 #' @param plot whether to plot the confidence density and curve
 #' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #' @param exact whether the exact sampling distribution of the

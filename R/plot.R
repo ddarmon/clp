@@ -202,8 +202,6 @@ plot.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = 
 #' @param xlim the horizontal limits for the plot. If NULL, taken as a 99.8\%
 #'             confidence interval.
 #' @param xlab the label for the horizontal axis
-#' @param log switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
-#'            log-scaling
 #' @param col the color to plot the confidence curve
 #' @param n.points the number of points to plot for the confidence curve
 #'
@@ -240,8 +238,6 @@ plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 
 #' @param xlim the horizontal limits for the plot. If NULL, taken as a 99.8\%
 #'             confidence interval.
 #' @param xlab the label for the horizontal axis
-#' @param log switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
-#'            log-scaling
 #' @param col the color to plot the confidence curve
 #' @param n.points the number of points to plot for the confidence curve
 #'

@@ -7,6 +7,7 @@
 #' @param y an optional (non-empty) numeric vector of data values.
 #' @param paired a logical indicating whether you want a paired t-test.
 #' @param plot a logical indicating whether you want the plots to be generated.
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #'
 #' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
 #'         for the mean or difference of means, as well as the P-curve and S-curve.
@@ -124,6 +125,7 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
 #' @param sd a (non-empty) numeric vector of data values.
 #' @param n a (non-empty) numeric vector of data values.
 #' @param plot a logical indicating whether you want the plots to be generated.
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #'
 #' @return A list containing the confidence functions pconf, dconf, cconf, and qconf
 #'         for the mean or difference of means, as well as the P-curve and S-curve.

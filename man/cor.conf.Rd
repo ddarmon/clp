@@ -7,6 +7,10 @@
 cor.conf(x, y, plot = TRUE, conf.level = 0.95, exact = FALSE)
 }
 \arguments{
+\item{x}{a numeric vector}
+
+\item{y}{a numeric vector}
+
 \item{plot}{whether to plot the confidence density and curve}
 
 \item{conf.level}{the confidence level for the confidence interval indicated on the confidence curve}
@@ -15,8 +19,6 @@ cor.conf(x, y, plot = TRUE, conf.level = 0.95, exact = FALSE)
 sample correlation coefficient (TRUE) or
 Fisher's Z-transformation (FALSE) should be
 used in constructing the confidence functions.}
-
-\item{"x, }{y" numeric vectors of data values. x and y must have the same length.}
 }
 \value{
 A list containing the confidence functions pconf, dconf, cconf, and qconf

@@ -7,11 +7,11 @@
 pcorr(q, rho, n, lower.tail = TRUE)
 }
 \arguments{
+\item{q}{vector of quantiles}
+
 \item{rho}{the population correlation coefficient}
 
 \item{n}{the sample size}
-
-\item{x}{vector of quantiles}
 }
 \value{
 A vector containing the distribution function evaluated at x.

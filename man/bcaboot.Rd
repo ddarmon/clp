@@ -63,7 +63,9 @@ bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
 # Reproduce BCa confidence density from Figure 11.7
 # of *Computer Age Statistical Inference*.
 
-scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
+scor <-
+read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt',
+header = TRUE)
 
 statistic <- function(data, id = 1:nrow(data)){
   dat <- data[id, ]

@@ -9,7 +9,8 @@ Description: Currently in  alpha.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.5.0), enrichwith (>= 0.3.1), pracma (>= 2.2.9), MASS (>= 7.3), boot (>= 1.3.0), alabama (>= 2015.3-1)
+Depends: R (>= 3.5.0)
+Imports: enrichwith (>= 0.3.1), pracma (>= 2.2.9), MASS (>= 7.3), boot (>= 1.3.0), alabama (>= 2015.3-1)
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1

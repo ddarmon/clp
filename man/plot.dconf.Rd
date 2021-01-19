@@ -17,9 +17,6 @@ confidence interval.}
 \item{col}{the color to plot the confidence curve}
 
 \item{n.points}{the number of points to plot for the confidence curve}
-
-\item{log}{switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
-log-scaling}
 }
 \value{
 a plot of the confidence curve from obj

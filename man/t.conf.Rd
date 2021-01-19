@@ -14,6 +14,8 @@
 \item{paired}{a logical indicating whether you want a paired t-test.}
 
 \item{plot}{a logical indicating whether you want the plots to be generated.}
+
+\item{conf.level}{the confidence level for the confidence interval indicated on the confidence curve}
 }
 \value{
 A list containing the confidence functions pconf, dconf, cconf, and qconf

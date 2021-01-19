@@ -14,6 +14,8 @@ oddsratio.conf(x, n, plot = TRUE, conf.level = 0.95, log = "")
 \item{plot}{whether to plot the confidence density and curve}
 
 \item{conf.level}{the confidence level for the confidence interval indicated on the confidence curve}
+
+\item{log}{'x' to plot odds ratio on log-scale}
 }
 \value{
 A list containing the confidence functions pconf, dconf, cconf, and qconf

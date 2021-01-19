@@ -42,7 +42,9 @@
 #' # Reproduce BCa confidence density from Figure 11.7
 #' # of *Computer Age Statistical Inference*.
 #'
-#' scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
+#' scor <-
+#' read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt',
+#' header = TRUE)
 #'
 #' statistic <- function(data, id = 1:nrow(data)){
 #'   dat <- data[id, ]
@@ -420,6 +422,7 @@ confquant.perc <- function(bc, p, param){
 #'             column containing an indicator for which sample the data values
 #'             are from.
 #' @param id the id variable used by boot
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #'
 #' @return A single value of the difference of the two bootstrapped sample means.
 #'
@@ -438,6 +441,7 @@ t.two.sample <- function(data, id = 1:nrow(data), ...){
 #'
 #' @param data a vector containing the sample
 #' @param id the id variable used by boot
+#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #'
 #' @return A single value of the bootstrapped sample mean.
 #'
@@ -633,7 +637,9 @@ conffuns.from.percboot.single <- function(bc, ind){
 #' # Reproduce BCa confidence density from Figure 11.7
 #' # of *Computer Age Statistical Inference*.
 #'
-#' scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
+#' scor <-
+#' read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt',
+#' header = TRUE)
 #'
 #' statistic <- function(data, id = 1:nrow(data), ...){
 #'   dat <- data[id, ]
@@ -704,7 +710,9 @@ conffuns.from.bcaboot <- function(bc){
 #' # Reproduce percentile confidence density from Figure 11.7
 #' # of *Computer Age Statistical Inference*.
 #'
-#' scor <- read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt', header = TRUE)
+#' scor <-
+#' read.table('https://web.stanford.edu/~hastie/CASI_files/DATA/student_score.txt',
+#' header = TRUE)
 #'
 #' statistic <- function(data, id = 1:nrow(data), ...){
 #'   dat <- data[id, ]
