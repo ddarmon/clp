@@ -57,7 +57,7 @@
 #' }
 #'
 #' ran.gen <- function(data, mle){
-#'   mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
+#'   MASS::mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
 #' }
 #'
 #' bc <- bcaboot(data = scor, statistic = statistic, B = 8000, sim = "parametric", ran.gen = ran.gen,
