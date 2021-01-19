@@ -56,7 +56,7 @@ t.one.sample <- function(data, id = 1:length(data)){
 
 data(dietstudy)
 
-bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+bc <- bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
         statistic = t.one.sample,
         B = 2000)
 

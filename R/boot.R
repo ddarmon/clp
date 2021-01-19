@@ -35,7 +35,7 @@
 #'
 #' data(dietstudy)
 #'
-#' bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+#' bc <- bcaboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
 #'         statistic = t.one.sample,
 #'         B = 2000)
 #'
@@ -66,17 +66,17 @@
 #'
 #' @export
 bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
-  # chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-  #
-  # if (nzchar(chk) && chk == "TRUE") {
-  #   # use 2 cores for CRAN
-  #   num_workers <- 2L
-  # } else {
-  #   # use all cores in devtools::test()
-  #   num_workers <- parallel::detectCores()
-  # }
+  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
 
-  num_workers <- parallel::detectCores()
+  if (nzchar(chk) && chk == "TRUE") {
+    # use 2 cores for CRAN
+    num_workers <- 2L
+  } else {
+    # use all cores in devtools::test()
+    num_workers <- parallel::detectCores()
+  }
+
+  # num_workers <- parallel::detectCores()
 
   if (stratified){
     strata <- data[, ncol(data)]
@@ -179,24 +179,24 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
 #'
 #' data(dietstudy)
 #'
-#' percboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+#' bc <- percboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
 #'         statistic = t.one.sample,
 #'         B = 2000)
 #'
 #'
 #' @export percboot
 percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
-  # chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-  #
-  # if (nzchar(chk) && chk == "TRUE") {
-  #   # use 2 cores for CRAN
-  #   num_workers <- 2L
-  # } else {
-  #   # use all cores in devtools::test()
-  #   num_workers <- parallel::detectCores()
-  # }
+  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
 
-  num_workers <- parallel::detectCores()
+  if (nzchar(chk) && chk == "TRUE") {
+    # use 2 cores for CRAN
+    num_workers <- 2L
+  } else {
+    # use all cores in devtools::test()
+    num_workers <- parallel::detectCores()
+  }
+
+  # num_workers <- parallel::detectCores()
 
   if (stratified){
     strata <- data[, ncol(data)]
@@ -446,11 +446,10 @@ confquant.perc <- function(bc, p, param){
 #'             column containing an indicator for which sample the data values
 #'             are from.
 #' @param id the id variable used by boot
-#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #'
 #' @return A single value of the difference of the two bootstrapped sample means.
 #'
-t.two.sample <- function(data, id = 1:nrow(data), ...){
+t.two.sample <- function(data, id = 1:nrow(data)){
   dat <- data[id, ]
 
   d <- mean(dat[dat[, 2] == 1, 1]) - mean(dat[dat[, 2] == 2, 1])
@@ -465,7 +464,6 @@ t.two.sample <- function(data, id = 1:nrow(data), ...){
 #'
 #' @param data a vector containing the sample
 #' @param id the id variable used by boot
-#' @param conf.level the confidence level for the confidence interval indicated on the confidence curve
 #'
 #' @return A single value of the bootstrapped sample mean.
 #'
@@ -676,7 +674,7 @@ conffuns.from.percboot.single <- function(bc, ind){
 #' }
 #'
 #' ran.gen <- function(data, mle){
-#'   mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
+#'   MASS::mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
 #' }
 #'
 #' bc <- bcaboot(data = scor, statistic = statistic, B = 8000, sim = "parametric", ran.gen = ran.gen,
@@ -749,7 +747,7 @@ conffuns.from.bcaboot <- function(bc){
 #' }
 #'
 #' ran.gen <- function(data, mle){
-#'   mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
+#'   MASS::mvrnorm(n = nrow(data), mle$mu, mle$Sigma)
 #' }
 #'
 #' bc <- percboot(data = scor, statistic = statistic, B = 8000, sim = "parametric", ran.gen = ran.gen,

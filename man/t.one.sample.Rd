@@ -10,8 +10,6 @@
 \item{data}{a vector containing the sample}
 
 \item{id}{the id variable used by boot}
-
-\item{conf.level}{the confidence level for the confidence interval indicated on the confidence curve}
 }
 \value{
 A single value of the bootstrapped sample mean.

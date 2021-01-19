@@ -4,7 +4,7 @@
 \alias{t.two.sample}
 \title{Statistic for Bootstrapped Two-sample t-test.}
 \usage{
-\method{t}{two.sample}(data, id = 1:nrow(data), ...)
+\method{t}{two.sample}(data, id = 1:nrow(data))
 }
 \arguments{
 \item{data}{(m + n) x 2 matrix containing the first and second samples,
@@ -13,8 +13,6 @@ column containing an indicator for which sample the data values
 are from.}
 
 \item{id}{the id variable used by boot}
-
-\item{conf.level}{the confidence level for the confidence interval indicated on the confidence curve}
 }
 \value{
 A single value of the difference of the two bootstrapped sample means.

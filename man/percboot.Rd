@@ -54,7 +54,7 @@ t.one.sample <- function(data, id = 1:length(data)){
 
 data(dietstudy)
 
-percboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+bc <- percboot(data = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
         statistic = t.one.sample,
         B = 2000)
 
