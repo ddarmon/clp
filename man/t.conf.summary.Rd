@@ -27,6 +27,12 @@ observations, or the difference of means from independent samples.
 }
 \examples{
 
-t.confdist(mean = c(3,5), sd = c(1,.5), n = c(10, 12))
+# One mean:
+
+t.conf.summary(mean = 5, sd = 1, n = 20)
+
+# Two means:
+
+t.conf.summary(mean = c(3, 5), sd = c(1, 0.5), n = c(10, 12))
 
 }

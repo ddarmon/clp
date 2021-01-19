@@ -26,6 +26,13 @@ Confidence functions for a single mean, the difference of means from matched
 observations, or the difference of means from independent samples.
 }
 \examples{
-t.confdist(x = 1:10, y = 7:20)
+
+# One mean:
+
+t.conf(x = 1:10)
+
+# Two means:
+
+t.conf(x = 1:10, y = 7:20)
 
 }

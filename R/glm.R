@@ -459,6 +459,7 @@ glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
 #'
 #' plot.cconf(mod.conf$weight)
 #'
+#' @import MASS
 #' @export
 glm.beta.conf <- function(mod){
   alpha = 1e-8

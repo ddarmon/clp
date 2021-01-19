@@ -13,7 +13,14 @@
 #'         for the mean or difference of means, as well as the P-curve and S-curve.
 #'
 #' @examples
-#' t.confdist(x = 1:10, y = 7:20)
+#'
+#' # One mean:
+#'
+#' t.conf(x = 1:10)
+#'
+#' # Two means:
+#'
+#' t.conf(x = 1:10, y = 7:20)
 #'
 #' @import stats
 #' @export t.conf
@@ -133,7 +140,13 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
 #'
 #' @examples
 #'
-#' t.confdist(mean = c(3,5), sd = c(1,.5), n = c(10, 12))
+#' # One mean:
+#'
+#' t.conf.summary(mean = 5, sd = 1, n = 20)
+#'
+#' # Two means:
+#'
+#' t.conf.summary(mean = c(3, 5), sd = c(1, 0.5), n = c(10, 12))
 #'
 #' @export t.conf.summary
 t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){

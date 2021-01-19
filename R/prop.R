@@ -94,6 +94,7 @@ prop.conf <- function(x, n, plot = TRUE, conf.level = 0.95){
 #'             Jan Hannig. "On generalized fiducial inference." Statistica Sinica (2009): 491-544.
 #'
 #' @examples prop.conf.1s(x = 0, n = 10)
+#' @export prop.conf.1s
 prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
   pconf <- function(p){
     cd <- vector(length = length(p))
@@ -170,6 +171,7 @@ prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
 #'             Markku Nurminen. "Confidence intervals for the difference and ratio of two binomial proportions." Biometrics 42 (1986): 675-676.
 #'
 #' @examples prop.conf.2s(x = c(1, 2), n = c(10, 10))
+#' @export prop.conf.2s
 prop.conf.2s <- function(x, n, plot = TRUE, conf.level = 0.95){
   x0 <- x[1]; x1 <- x[2]
   n0 <- n[1]; n1 <- n[2]
@@ -622,7 +624,7 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
 #'
 #' @references Toshiro Tango. "Equivalence test and confidence interval for the difference in proportions for the paired‐sample design." Statistics in Medicine 17.8 (1998): 891-908.
 #'
-#' @examples matchedprop.conf(a = 5, b = 10, n = 100)
+#' @examples matchedprop.conf(b = 5, c = 10, n = 100)
 #'
 #' @export
 matchedprop.conf <- function(b, c, n, plot = TRUE, conf.level = 0.95){

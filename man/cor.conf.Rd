@@ -32,6 +32,9 @@ for a bivariate Gaussian.
 \examples{
 data(fat)
 
+fat <- fat[1:50, ] # Smaller sub-sample, to show exact versus
+                   # Fisher's Z-transformation.
+
 # Using the exact sampling distribution of R
 cor.conf(x = fat$body.fat, y = fat$weight, exact = TRUE)
 

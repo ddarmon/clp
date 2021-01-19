@@ -28,7 +28,7 @@ Confidence functions for the difference of two matched proportions
 based on the score statistic.
 }
 \examples{
-matchedprop.conf(a = 5, b = 10, n = 100)
+matchedprop.conf(b = 5, c = 10, n = 100)
 
 }
 \references{
