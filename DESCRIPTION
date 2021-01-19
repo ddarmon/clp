@@ -1,12 +1,12 @@
 Package: clp
 Type: Package
-Title: R Package to Accompany *Confidence, Likelihood, and Probability*.
-Version: 0.1.0
+Title: R Package for Computing Confidence Functions to Accompany *Confidence, Likelihood, and Probability*
+Version: 0.0.0.9000
 Author: David Darmon (for now)
-Maintainer: David Darmon <ddarmon@monmouth.edu>
-Description: Currently in **very** alpha.
-    Will implement the confidence distribution machinery for several models.
-License: What license is it under?
+Maintainer: David Darmon <david.m.darmon@gmail.com>
+Description: Currently in  alpha.
+    Implements confidence functions for means, proportions, lm, glm, and nonparametric tests, amongst others.
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0), enrichwith (>= 0.3.1), pracma (>= 2.2.9), MASS (>= 7.3), boot (>= 1.3.0), alabama (>= 2015.3-1)
