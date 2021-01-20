@@ -68,7 +68,7 @@
 #'   \item{wrist}{wrist circumference in cm.}
 #' }
 #' @source This data set comes from the collection of the Journal of Statistics
-#' Education at \url{http://www.amstat.org/publications/jse/datasets/fat.txt}.
+#' Education at \url{http://jse.amstat.org/datasets/fat.txt}.
 #' The data set was contributed by Roger W. Johnson.
 #' @references The source of the data is attributed to Dr. A. Garth Fisher,
 #' Human Performance Research Center, Brigham Young University,
