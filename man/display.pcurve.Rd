@@ -43,7 +43,7 @@ data(dietstudy)
 
 x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
 
-out <- t.conf(x, plot = FALSE)
+out <- t_test.conf(x, plot = FALSE)
 
 display.pcurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 }

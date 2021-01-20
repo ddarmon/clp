@@ -500,17 +500,17 @@ t.one.sample <- function(data, id = 1:length(data)){
 #'
 #' # One mean
 #'
-#' t.boot.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+#' t_test.boot.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
 #'             B = 2000)
 #'
 #' # Two means
 #'
-#' t.boot.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
+#' t_test.boot.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Carb'],
 #'             y = dietstudy$weightchange[dietstudy$diet == 'Low Fat'],
 #'             B = 2000)
 #'
-#' @export t.boot.conf
-t.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
+#' @export t_test.boot.conf
+t_test.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
 
   if (is.null(y)){
     dat <- x

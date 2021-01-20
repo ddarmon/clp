@@ -23,7 +23,7 @@
 #'
 #' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
 #'
-#' out <- t.conf(x, plot = FALSE)
+#' out <- t_test.conf(x, plot = FALSE)
 #'
 #' display.cconf(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'
@@ -89,7 +89,7 @@ display.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log 
 #'
 #' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
 #'
-#' out <- t.conf(x, plot = FALSE)
+#' out <- t_test.conf(x, plot = FALSE)
 #'
 #' display.pcurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #' @export display.pcurve
@@ -153,7 +153,7 @@ display.pcurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log
 #'
 #' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
 #'
-#' out <- t.conf(x, plot = FALSE)
+#' out <- t_test.conf(x, plot = FALSE)
 #'
 #' display.scurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'
@@ -215,7 +215,7 @@ display.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log
 #'
 #' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
 #'
-#' out <- t.conf(x, plot = FALSE)
+#' out <- t_test.conf(x, plot = FALSE)
 #'
 #' display.dconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #' @export display.dconf
@@ -251,7 +251,7 @@ display.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points
 #'
 #' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
 #'
-#' out <- t.conf(x, plot = FALSE)
+#' out <- t_test.conf(x, plot = FALSE)
 #'
 #' display.pconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'

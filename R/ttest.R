@@ -16,15 +16,15 @@
 #'
 #' # One mean:
 #'
-#' t.conf(x = 1:10)
+#' t_test.conf(x = 1:10)
 #'
 #' # Two means:
 #'
-#' t.conf(x = 1:10, y = 7:20)
+#' t_test.conf(x = 1:10, y = 7:20)
 #'
 #' @import stats
-#' @export t.conf
-t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) {
+#' @export t_test.conf
+t_test.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) {
 
   if(!is.null(y)){
     if(paired)
@@ -142,14 +142,14 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
 #'
 #' # One mean:
 #'
-#' t.conf.summary(mean = 5, sd = 1, n = 20)
+#' t_test.conf.summary(mean = 5, sd = 1, n = 20)
 #'
 #' # Two means:
 #'
-#' t.conf.summary(mean = c(3, 5), sd = c(1, 0.5), n = c(10, 12))
+#' t_test.conf.summary(mean = c(3, 5), sd = c(1, 0.5), n = c(10, 12))
 #'
-#' @export t.conf.summary
-t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
+#' @export t_test.conf.summary
+t_test.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
 
   stopifnot(length(mean)==length(sd) && length(mean)==length(n))
 

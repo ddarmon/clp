@@ -16,7 +16,7 @@ B <- 10000
 ```{r}
 par(mfrow = c(1, 2))
 
-conf.boot <- t.boot.conf(x, B = B, plot = TRUE)
+conf.boot <- t_test.boot.conf(x, B = B, plot = TRUE)
 conf.para <- t.conf(x)
 
 xlim <- conf.para$qconf(c(0.001, 0.999))
@@ -40,7 +40,7 @@ curve(conf.para$scurve(x), n = 2001, add = TRUE, col = 'blue')
 
 ```{r}
 par(mfrow = c(1, 2))
-conf.boot <- t.boot.conf(x, y, B = B, plot = TRUE)
+conf.boot <- t_test.boot.conf(x, y, B = B, plot = TRUE)
 
 conf.para <- t.conf(x, y)
 

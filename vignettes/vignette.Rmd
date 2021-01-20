@@ -181,15 +181,15 @@ Inverting the confidence distribution, we recover the confidence quantile functi
 \end{align}
 where \(t_{1-p, n-1}\) is the \(1 - p\) critical value for a \(t\)-distributed random variable with \(n - 1\) degrees of freedom.
 
-The function `t.conf()` computes confidence functions from one-, two-, and paired-sample \(t\)-tests. We first compute the confidence functions for the average weight change in the healthy low carb population:
+The function `t_test.conf()` computes confidence functions from one-, two-, and paired-sample \(t\)-tests. We first compute the confidence functions for the average weight change in the healthy low carb population:
 
 ```{r}
-conf.mu.lowcarb <- t.conf(dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
+conf.mu.lowcarb <- t_test.conf(dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
 ```
 
-By default, `t.conf()` plots the confidence density \(c(\mu)\) and confidence curve \(\text{cc}(\mu)\) for \(\mu\), with the latter showing the 95% confidence interval by default.
+By default, `t_test.conf()` plots the confidence density \(c(\mu)\) and confidence curve \(\text{cc}(\mu)\) for \(\mu\), with the latter showing the 95% confidence interval by default.
 
-The output of `t.conf()` is a list containing each of the confidence functions and their derived functions:
+The output of `t_test.conf()` is a list containing each of the confidence functions and their derived functions:
 
 ```{r}
 names(conf.mu.lowcarb)
@@ -216,7 +216,7 @@ conf.mu.lowcarb$qconf(c(0.025, 0.975))
 Next, we show the confidence curves for the average weight change in the low carb and low fat diets in a single plot:
 
 ```{r}
-conf.mu.lowfat <- t.conf(dietstudy$weightchange[dietstudy$diet == 'Low Fat'], plot = FALSE)
+conf.mu.lowfat <- t_test.conf(dietstudy$weightchange[dietstudy$diet == 'Low Fat'], plot = FALSE)
 
 
 curve(conf.mu.lowcarb$cconf(x),
@@ -227,10 +227,10 @@ curve(conf.mu.lowfat$cconf(x),
       add = TRUE)
 ```
 
-When provided with two samples, `t.conf()` computes the approximate confidence functions for the difference between two population means from independent samples using Welch's two-sample \(t\)-test. We construct confidence functions for the difference \(\delta = \mu_{\text{LF}} - \mu_{\text{LC}}\) via:
+When provided with two samples, `t_test.conf()` computes the approximate confidence functions for the difference between two population means from independent samples using Welch's two-sample \(t\)-test. We construct confidence functions for the difference \(\delta = \mu_{\text{LF}} - \mu_{\text{LC}}\) via:
 
 ```{r}
-conf.diff <- t.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Fat'], y = dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
+conf.diff <- t_test.conf(x = dietstudy$weightchange[dietstudy$diet == 'Low Fat'], y = dietstudy$weightchange[dietstudy$diet == 'Low Carb'])
 ```
 
 Again, the confidence density and confidence curve are plotted by default. We recover a 95% confidence interval for the difference between the mean weight changes using the confidence quantile function:
