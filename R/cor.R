@@ -170,8 +170,8 @@ cor.conf <- function(x, y, plot = TRUE, conf.level = 0.95, exact = FALSE){
   out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
   if (plot){
-    plot.dconf(out, xlab = 'cor', n = 201)
-    plot.cconf(out, conf.level = conf.level, xlab = 'cor', n = 201)
+    display.dconf(out, xlab = 'cor', n = 201)
+    display.cconf(out, conf.level = conf.level, xlab = 'cor', n = 201)
   }
 
   return(out)

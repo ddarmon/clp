@@ -52,8 +52,8 @@ lm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve)
 
   if (plot){
-    plot.dconf(out, xlab = 'Expected Response')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
+    display.dconf(out, xlab = 'Expected Response')
+    display.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
   }
 
   return(out)
@@ -98,7 +98,7 @@ make.lm.beta.conf.obj <- function(b, s.b, df){
 #'
 #' beta.conf <- lm.beta.conf(mod)
 #'
-#' plot.cconf(beta.conf$weight)
+#' display.cconf(beta.conf$weight)
 #'
 #' @export
 lm.beta.conf <- function(mod){
@@ -145,7 +145,7 @@ lm.beta.conf <- function(mod){
 #'
 #' sigma.conf <- lm.sigma.conf(mod)
 #'
-#' plot.cconf(sigma.conf)
+#' display.cconf(sigma.conf)
 #'
 #' @export lm.sigma.conf
 lm.sigma.conf <- function(mod, plot = TRUE, conf.level = 0.95){
@@ -170,8 +170,8 @@ lm.sigma.conf <- function(mod, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
   if (plot){
-    plot.dconf(out, xlab = 'Noise Standard Deviation')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Noise Standard Deviation')
+    display.dconf(out, xlab = 'Noise Standard Deviation')
+    display.cconf(out, conf.level = conf.level, xlab = 'Noise Standard Deviation')
   }
 
   return(out)

@@ -146,8 +146,8 @@ prop.conf.1s <- function(x, n, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf, dconf = dconf, qconf = qconf, cconf = cconf, pcurve = pcurve, scurve = scurve)
 
   if (plot){
-    plot.dconf(out, xlab = 'Proportion p')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Proportion p')
+    display.dconf(out, xlab = 'Proportion p')
+    display.cconf(out, conf.level = conf.level, xlab = 'Proportion p')
   }
 
   return(out)
@@ -236,8 +236,8 @@ prop.conf.2s <- function(x, n, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf.score, dconf = dconf.score, qconf = qconf.score, cconf = cconf.score, pcurve = pcurve.score)
 
   if (plot){
-    plot.dconf(out, xlab = 'Difference (p[1] - p[2])')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Difference (p[1] - p[2])')
+    display.dconf(out, xlab = 'Difference (p[1] - p[2])')
+    display.cconf(out, conf.level = conf.level, xlab = 'Difference (p[1] - p[2])')
   }
 
   return(out)
@@ -285,8 +285,8 @@ prop.conf.agresti.caffo <- function(x, n, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf.ac, dconf = dconf.ac, qconf = qconf.ac, cconf = cconf.ac, pcurve = pcurve.ac)
 
   if (plot){
-    plot.dconf(out, xlab = 'Difference (p[1] - p[2])')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Difference (p[1] - p[2])')
+    display.dconf(out, xlab = 'Difference (p[1] - p[2])')
+    display.cconf(out, conf.level = conf.level, xlab = 'Difference (p[1] - p[2])')
   }
 
   return(out)
@@ -433,8 +433,8 @@ riskratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
       xlab.cconf <- 'Relative Risk (p[2]/p[1])'
     }
 
-    plot.dconf(out, xlab = 'Relative Risk (p[2]/p[1])', xlim = xlim)
-    plot.cconf(out, conf.level = conf.level, xlab = xlab.cconf, xlim = xlim, log = log)
+    display.dconf(out, xlab = 'Relative Risk (p[2]/p[1])', xlim = xlim)
+    display.cconf(out, conf.level = conf.level, xlab = xlab.cconf, xlim = xlim, log = log)
   }
 
   return(out)
@@ -599,8 +599,8 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
       xlab.cconf <- 'Odds Ratio (odds[2]/odds[1])'
     }
 
-    plot.dconf(out, xlab = 'Odds Ratio (odds[2]/odds[1])', xlim = xlim)
-    plot.cconf(out, conf.level = conf.level, xlab = xlab.cconf, xlim = xlim, log = log)
+    display.dconf(out, xlab = 'Odds Ratio (odds[2]/odds[1])', xlim = xlim)
+    display.cconf(out, conf.level = conf.level, xlab = xlab.cconf, xlim = xlim, log = log)
   }
 
   return(out)
@@ -675,8 +675,8 @@ matchedprop.conf <- function(b, c, n, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
   if (plot){
-    plot.dconf(out, xlab = 'p[2] - p[1]')
-    plot.cconf(out, conf.level = conf.level, xlab = 'p[2] - p[1]')
+    display.dconf(out, xlab = 'p[2] - p[1]')
+    display.cconf(out, conf.level = conf.level, xlab = 'p[2] - p[1]')
   }
 
   return(out)

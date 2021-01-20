@@ -30,7 +30,7 @@ mod <- lm(body.fat ~ age + weight + height, data = fat)
 
 sigma.conf <- lm.sigma.conf(mod)
 
-plot.cconf(sigma.conf)
+display.cconf(sigma.conf)
 
 }
 \references{

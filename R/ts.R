@@ -21,7 +21,7 @@
 #'
 #' beta.conf <- arima.conf(mod)
 #'
-#' plot.cconf(beta.conf$ar1)
+#' display.cconf(beta.conf$ar1)
 #'
 #' @export
 arima.conf <- function(mod){

@@ -38,7 +38,7 @@ bc <- bcaboot(fat, statistic, B = 2000)
 beta.conf.simul <- bootstrap.beran.conf(bc, which = 2:4)
 
 for (nam in names(beta.conf.simul)){
- plot.cconf(beta.conf.simul[[nam]], xlab = nam)
+ display.cconf(beta.conf.simul[[nam]], xlab = nam)
 }
 
 }

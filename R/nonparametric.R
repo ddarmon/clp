@@ -92,7 +92,7 @@ signtest.conf <- function(x, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
   if (plot){
-    plot.cconf(out, conf.level = conf.level, xlab = 'Median')
+    display.cconf(out, conf.level = conf.level, xlab = 'Median')
 
     cat(sprintf("Actual confidence level: %g\n\n", cconf(qconf((1 - conf.level)/2))))
   }
@@ -166,7 +166,7 @@ wilcox.conf <- function(x, y = NULL, plot = TRUE, conf.level = 0.95){
     out <- list(pconf = pconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
     if (plot){
-      plot.cconf(out, conf.level = conf.level, xlab = '(Psuedo)Median')
+      display.cconf(out, conf.level = conf.level, xlab = '(Psuedo)Median')
     }
   }  else{
       pconf <- Vectorize(function(mu) suppressWarnings(wilcox.test(x, y, mu = mu, alternative = 'greater')$p.value))
@@ -182,7 +182,7 @@ wilcox.conf <- function(x, y = NULL, plot = TRUE, conf.level = 0.95){
       out <- list(pconf = pconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
       if (plot){
-        plot.cconf(out, conf.level = conf.level, xlab = 'Shift')
+        display.cconf(out, conf.level = conf.level, xlab = 'Shift')
       }
   }
 

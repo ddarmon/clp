@@ -195,16 +195,16 @@ The output of `t.conf()` is a list containing each of the confidence functions a
 names(conf.mu.lowcarb)
 ```
 
-There are helper functions to plot the confidence distribution, density, curve, etc., from an output of a `clp` function. These helper functions have the names `plot.*()`. For example, to plot the \(P\)-curve giving the two-sided \(P\)-values, we use:
+There are helper functions to plot the confidence distribution, density, curve, etc., from an output of a `clp` function. These helper functions have the names `display.*()`. For example, to plot the \(P\)-curve giving the two-sided \(P\)-values, we use:
 
 ```{r}
-plot.pcurve(conf.mu.lowcarb, xlab = 'Mean Weight Change (lb)')
+display.pcurve(conf.mu.lowcarb, xlab = 'Mean Weight Change (lb)')
 ```
 
 To plot the \(S\)-curve, we use:
 
 ```{r}
-plot.scurve(conf.mu.lowcarb, xlab = 'Mean Weight Change (lb)')
+display.scurve(conf.mu.lowcarb, xlab = 'Mean Weight Change (lb)')
 ```
 
 We recover the numerical values for the 95% confidence interval for the average weight change using the confidence quantile function:
@@ -239,10 +239,10 @@ Again, the confidence density and confidence curve are plotted by default. We re
 conf.diff$qconf(c(0.025, 0.975))
 ```
 
-The two-sided \(P\)-value for the hypothesis that \(\mu_{\text{LF}} - \mu_{\text{LC}} = \delta\) is generated using `plot.pcurve()`:
+The two-sided \(P\)-value for the hypothesis that \(\mu_{\text{LF}} - \mu_{\text{LC}} = \delta\) is generated using `display.pcurve()`:
 
 ```{r}
-plot.pcurve(conf.diff, 
+display.pcurve(conf.diff, 
             xlab = expression(mu[LF] - mu[LC] * ' (lb)'))
 abline(v = 0, lty = 3)
 ```
@@ -256,7 +256,7 @@ conf.diff$pcurve(0)
 Finally, we can show the \(S\)-curve for various values of \(\delta\)
 
 ```{r}
-plot.scurve(conf.diff,
+display.scurve(conf.diff,
             xlab = expression(mu[LF] - mu[LC] * ' (lb)'))
 abline(v = 0, lty = 3)
 ```
@@ -317,10 +317,10 @@ We can also perform inferences for the difference between of rates of SARS-CoV-2
 conf.diff.props <- prop.conf(x = x, n = n, plot = FALSE)
 ```
 
-We plot the confidence curve with a 99.9% confidence curve manually using `plot.cconf()`:
+We plot the confidence curve with a 99.9% confidence curve manually using `display.cconf()`:
 
 ```{r}
-plot.cconf(conf.diff.props, xlab = 'p[C] - p[R]', conf.level = 0.999)
+display.cconf(conf.diff.props, xlab = 'p[C] - p[R]', conf.level = 0.999)
 ```
 
 We can recover the 99.9% confidence interval for \(\delta\) by taking the appropriate quantiles of the confidence distribution:
@@ -343,7 +343,7 @@ conf.rel.risk <- riskratio.conf(x, n)
 Since we are interested in showing that the treatment is more effective than the control, and effectiveness corresponds to a \(\rho < 1\), it is natural to plot the complementary confidence curve for \(\rho\), which gives the \(P\)-value for the null hypothesis \(\rho \geq \rho_{0}\):
 
 ```{r}
-plot.pconf(conf.rel.risk, compl = TRUE,
+display.pconf(conf.rel.risk, compl = TRUE,
            xlab = 'p[T]/p[C]')
 ```
 

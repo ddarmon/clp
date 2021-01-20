@@ -46,8 +46,8 @@ bc <- percboot(data = scor, statistic = statistic, B = 8000, sim = "parametric",
 
 lam.conf <- conffuns.from.percboot(bc)
 
-plot.cconf(lam.conf, xlab = 'Largest Eigenvalue')
-plot.dconf(lam.conf, xlab = 'Largest Eigenvalue')
+display.cconf(lam.conf, xlab = 'Largest Eigenvalue')
+display.dconf(lam.conf, xlab = 'Largest Eigenvalue')
 
 lam.conf$qconf(c(0.025, 0.975))
 

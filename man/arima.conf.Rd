@@ -26,7 +26,7 @@ mod <- arima(lh, order = c(3,0,0))
 
 beta.conf <- arima.conf(mod)
 
-plot.cconf(beta.conf$ar1)
+display.cconf(beta.conf$ar1)
 
 }
 \references{

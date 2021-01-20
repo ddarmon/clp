@@ -26,7 +26,7 @@ mod <- lm(body.fat ~ age + weight + height, data = fat)
 
 beta.conf <- lm.beta.conf(mod)
 
-plot.cconf(beta.conf$weight)
+display.cconf(beta.conf$weight)
 
 }
 \references{

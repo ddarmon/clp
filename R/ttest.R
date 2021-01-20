@@ -74,8 +74,8 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
     out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
     if (plot){
-      plot.dconf(out, xlab = 'mean')
-      plot.cconf(out, conf.level = conf.level, xlab = 'mean')
+      display.dconf(out, xlab = 'mean')
+      display.cconf(out, conf.level = conf.level, xlab = 'mean')
     }
 
     return(out)
@@ -115,8 +115,8 @@ t.conf <- function(x, y = NULL, paired = FALSE, plot = TRUE, conf.level = 0.95) 
     out <- list(pconf = pconf, dconf = dconf, cconf =  cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
     if (plot){
-      plot.dconf(out, xlab = 'mean[1] - mean[2]')
-      plot.cconf(out, conf.level = conf.level, xlab = 'mean[1] - mean[2]')
+      display.dconf(out, xlab = 'mean[1] - mean[2]')
+      display.cconf(out, conf.level = conf.level, xlab = 'mean[1] - mean[2]')
     }
 
     return(out)
@@ -182,8 +182,8 @@ t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
     out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
     if (plot){
-      plot.dconf(out, xlab = 'mean')
-      plot.cconf(out, conf.level = conf.level, xlab = 'mean')
+      display.dconf(out, xlab = 'mean')
+      display.cconf(out, conf.level = conf.level, xlab = 'mean')
     }
 
     return(out)
@@ -226,8 +226,8 @@ t.conf.summary <- function(mean, sd, n, plot = TRUE, conf.level = 0.95){
     out <- list(pconf = pconf, dconf = dconf, cconf =  cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
 
     if (plot){
-      plot.dconf(out, xlab = 'mean[1] - mean[2]')
-      plot.cconf(out, conf.level = conf.level, xlab = 'mean[1] - mean[2]')
+      display.dconf(out, xlab = 'mean[1] - mean[2]')
+      display.cconf(out, conf.level = conf.level, xlab = 'mean[1] - mean[2]')
     }
 
     return(out)

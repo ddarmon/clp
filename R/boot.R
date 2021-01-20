@@ -527,8 +527,8 @@ t.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
   out <- conffuns.from.bcaboot(bc)
 
   if (plot){
-    plot.dconf(out, xlab = xlab)
-    plot.cconf(out, conf.level = conf.level, xlab = xlab)
+    display.dconf(out, xlab = xlab)
+    display.cconf(out, conf.level = conf.level, xlab = xlab)
   }
 
   return(out)
@@ -565,7 +565,7 @@ lm.beta.for.boot <- function(data, id = 1:nrow(data), formula){
 #'
 #' beta.boot.conf <- lm.beta.boot.conf(body.fat ~ age + weight + height, data = fat, B = 2000)
 #'
-#' plot.cconf(beta.boot.conf$weight)
+#' display.cconf(beta.boot.conf$weight)
 #'
 #' @export lm.beta.boot.conf
 lm.beta.boot.conf <- function(formula, data, B = 2000){
@@ -594,8 +594,8 @@ lm.sigma.boot.conf <- function(formula, data, B = 2000, plot = TRUE, conf.level 
   out <- conffuns.from.bcaboot(bc)
 
   if (plot){
-    plot.dconf(out, xlab = 'Noise Standard Deviation')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Noise Standard Deviation')
+    display.dconf(out, xlab = 'Noise Standard Deviation')
+    display.cconf(out, conf.level = conf.level, xlab = 'Noise Standard Deviation')
   }
 
   return(out)
@@ -683,8 +683,8 @@ conffuns.from.percboot.single <- function(bc, ind){
 #'
 #' lam.conf <- conffuns.from.bcaboot(bc)
 #'
-#' plot.cconf(lam.conf, xlab = 'Largest Eigenvalue')
-#' plot.dconf(lam.conf, xlab = 'Largest Eigenvalue')
+#' display.cconf(lam.conf, xlab = 'Largest Eigenvalue')
+#' display.dconf(lam.conf, xlab = 'Largest Eigenvalue')
 #'
 #' lam.conf$qconf(c(0.025, 0.975))
 #'
@@ -756,8 +756,8 @@ conffuns.from.bcaboot <- function(bc){
 #'
 #' lam.conf <- conffuns.from.percboot(bc)
 #'
-#' plot.cconf(lam.conf, xlab = 'Largest Eigenvalue')
-#' plot.dconf(lam.conf, xlab = 'Largest Eigenvalue')
+#' display.cconf(lam.conf, xlab = 'Largest Eigenvalue')
+#' display.dconf(lam.conf, xlab = 'Largest Eigenvalue')
 #'
 #' lam.conf$qconf(c(0.025, 0.975))
 #'
@@ -910,7 +910,7 @@ make.beran.multicomp.obj <- function(theta.boot, K, bca.params = NULL){
 #' beta.conf.simul <- bootstrap.beran.conf(bc, which = 2:4)
 #'
 #' for (nam in names(beta.conf.simul)){
-#'  plot.cconf(beta.conf.simul[[nam]], xlab = nam)
+#'  display.cconf(beta.conf.simul[[nam]], xlab = nam)
 #' }
 #'
 #' @export bootstrap.beran.conf

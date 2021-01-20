@@ -28,7 +28,7 @@ data(fat)
 
 beta.boot.conf <- lm.beta.boot.conf(body.fat ~ age + weight + height, data = fat, B = 2000)
 
-plot.cconf(beta.boot.conf$weight)
+display.cconf(beta.boot.conf$weight)
 
 }
 \references{

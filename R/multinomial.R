@@ -126,7 +126,7 @@ multinomial.conf <- function(N, plot = TRUE, conf.level = 0.95, B = 2000, col = 
     for (j in 1:length(N)){
       xlab <- sprintf('Proportion, Category %s', nam[j])
 
-      plot.cconf(multicomp[[j]], xlab = xlab, col = col[j])
+      display.cconf(multicomp[[j]], xlab = xlab, col = col[j])
       curve(singlecomp[[j]]$cconf(x), lty = 2, add = TRUE, n = n.plot, col = col[j])
     }
 
@@ -364,8 +364,8 @@ chisq.conf <- function(N, plot = TRUE, conf.level = 0.95){
   if (plot){
     xlab <- "Chi-square Parameter of Association"
 
-    plot.dconf(out, xlab = xlab, n.points = 201)
-    plot.cconf(out, xlab = xlab, n.points = 201, conf.level = conf.level)
+    display.dconf(out, xlab = xlab, n.points = 201)
+    display.cconf(out, xlab = xlab, n.points = 201, conf.level = conf.level)
   }
 
   return(out)

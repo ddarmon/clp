@@ -198,8 +198,8 @@ glm.lincom.conf <- function(mod, x, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve, profile.lik = profile.lik.fun, deviance = dev.fun)
 
   if (plot){
-    plot.dconf(out, xlab = 'Expected Response')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
+    display.dconf(out, xlab = 'Expected Response')
+    display.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
   }
 
   return(out)
@@ -429,8 +429,8 @@ glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
   out <- list(pconf = pconf, dconf = dconf, cconf = cconf, qconf = qconf, pcurve = pcurve)
 
   if (plot){
-    plot.dconf(out, xlab = 'Expected Response')
-    plot.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
+    display.dconf(out, xlab = 'Expected Response')
+    display.cconf(out, conf.level = conf.level, xlab = 'Expected Response')
   }
 
   return(out)
@@ -457,7 +457,7 @@ glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
 #'
 #' mod.conf <- glm.beta.conf(mod)
 #'
-#' plot.cconf(mod.conf$weight)
+#' display.cconf(mod.conf$weight)
 #'
 #' @import MASS
 #' @export

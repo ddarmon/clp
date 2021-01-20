@@ -25,7 +25,7 @@ mod <- glm(low ~ weight + age + black + other + smoker, data = lbw, family = bin
 
 mod.conf <- glm.beta.conf(mod)
 
-plot.cconf(mod.conf$weight)
+display.cconf(mod.conf$weight)
 
 }
 \references{

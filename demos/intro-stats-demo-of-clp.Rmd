@@ -99,8 +99,8 @@ mod <- lm(eruptions ~ waiting, data = faithful)
 
 conf.lm <- lm.beta.conf(mod)
 
-plot.cconf(conf.lm$`(Intercept)`, xlab = '(Intercept)')
-plot.cconf(conf.lm$waiting, xlab = 'waiting')
+display.cconf(conf.lm$`(Intercept)`, xlab = '(Intercept)')
+display.cconf(conf.lm$waiting, xlab = 'waiting')
 ```
 # Correlation
 

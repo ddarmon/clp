@@ -53,11 +53,11 @@ for (var.name in names(coef(mod.lm))){
 }
 ```
 ```{r}
-plot.dconf(conf.out$age)
-plot.cconf(conf.out$age)
+display.dconf(conf.out$age)
+display.cconf(conf.out$age)
 
-plot.dconf(conf.out$height)
-plot.cconf(conf.out$height)
+display.dconf(conf.out$height)
+display.cconf(conf.out$height)
 ```
 
 

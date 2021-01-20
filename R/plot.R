@@ -25,11 +25,11 @@
 #'
 #' out <- t.conf(x, plot = FALSE)
 #'
-#' plot.cconf(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
+#' display.cconf(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'
 #' @import graphics
-#' @export plot.cconf
-plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
+#' @export display.cconf
+display.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
   alpha <- 1-conf.level
 
   if (is.null(xlim)) {
@@ -91,9 +91,9 @@ plot.cconf <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '
 #'
 #' out <- t.conf(x, plot = FALSE)
 #'
-#' plot.pcurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
-#' @export plot.pcurve
-plot.pcurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
+#' display.pcurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
+#' @export display.pcurve
+display.pcurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
   alpha <- 1-conf.level
 
   if (is.null(xlim)) {
@@ -155,10 +155,10 @@ plot.pcurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = 
 #'
 #' out <- t.conf(x, plot = FALSE)
 #'
-#' plot.scurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
+#' display.scurve(out, conf.level = 0.999, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'
-#' @export plot.scurve
-plot.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
+#' @export display.scurve
+display.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = '', col = 'black', n.points = 2001){
   alpha <- 1-conf.level
 
   if (is.null(xlim)) {
@@ -217,9 +217,9 @@ plot.scurve <- function(obj, conf.level = 0.95, xlim = NULL, xlab = NULL, log = 
 #'
 #' out <- t.conf(x, plot = FALSE)
 #'
-#' plot.dconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
-#' @export plot.dconf
-plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
+#' display.dconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
+#' @export display.dconf
+display.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
@@ -253,10 +253,10 @@ plot.dconf <- function(obj, xlim = NULL, xlab = NULL, col = 'black', n.points = 
 #'
 #' out <- t.conf(x, plot = FALSE)
 #'
-#' plot.pconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
+#' display.pconf(out, xlab = 'Average Weight Loss in Low Carb Group (lbs)')
 #'
-#' @export plot.pconf
-plot.pconf <- function(obj, compl = FALSE, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
+#' @export display.pconf
+display.pconf <- function(obj, compl = FALSE, xlim = NULL, xlab = NULL, col = 'black', n.points = 2001){
   if (is.null(xlim)) xlim <- obj$qconf(c(0.001, 0.999))
   if (is.null(xlab)) xlab <- 'Parameter'
 
