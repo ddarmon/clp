@@ -12,8 +12,8 @@ y <- dietstudy$weightchange[dietstudy$diet == 'Low Fat']
 lc.wsr.conf <- wilcox.conf(x)
 lf.wsr.conf <- wilcox.conf(y)
 
-lc.sign.conf <- sign.conf(x)
-lf.sign.conf <- sign.conf(y)
+lc.signtest.conf <- signtest.conf(x)
+lf.signtest.conf <- signtest.conf(y)
 
 comp.wrs.conf <- wilcox.conf(x, y)
 ```

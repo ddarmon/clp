@@ -180,7 +180,7 @@ prop.conf.2s <- function(x, n, plot = TRUE, conf.level = 0.95){
     if (Delta < -1){
       return(0)
     }else if (Delta == -1){
-      Delta = -1+1e-5 # To handle potential atom at Delta = -1.
+      Delta <- -1+1e-5 # To handle potential atom at Delta = -1.
     }else if (Delta >= 1){
       return(1)
     }
@@ -377,7 +377,7 @@ riskratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
     dd <- (pconf.score(rho + dx) - pconf.score(rho - dx))/(2*dx)
 
     if ((x1 == 0) || (x0 == n0)){
-      dd[rho == 0] = 0
+      dd[rho == 0] <- 0
     }
 
     return(dd)
@@ -428,9 +428,9 @@ riskratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
     }
 
     if (log == 'x'){
-      xlab.cconf = 'Relative Risk (p[2]/p[1]), Log-scaling'
+      xlab.cconf <- 'Relative Risk (p[2]/p[1]), Log-scaling'
     }else{
-      xlab.cconf = 'Relative Risk (p[2]/p[1])'
+      xlab.cconf <- 'Relative Risk (p[2]/p[1])'
     }
 
     plot.dconf(out, xlab = 'Relative Risk (p[2]/p[1])', xlim = xlim)
@@ -594,9 +594,9 @@ oddsratio.conf <- function(x, n, plot = TRUE, conf.level = 0.95, log = ''){
     xlim <- qconf(c(0.001, 0.999))
 
     if (log == 'x'){
-      xlab.cconf = 'Odds Ratio (odds[2]/odds[1]), Log-scaling'
+      xlab.cconf <- 'Odds Ratio (odds[2]/odds[1]), Log-scaling'
     }else{
-      xlab.cconf = 'Odds Ratio (odds[2]/odds[1])'
+      xlab.cconf <- 'Odds Ratio (odds[2]/odds[1])'
     }
 
     plot.dconf(out, xlab = 'Odds Ratio (odds[2]/odds[1])', xlim = xlim)

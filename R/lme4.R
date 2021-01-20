@@ -11,7 +11,7 @@
 #'
 #' @export
 glmer.beta.conf <- function(mod){
-  alpha = 1e-8
+  alpha <- 1e-8
   # Producs a more finely-explored profile confidence distribution
   # prof <- profile(mod, alphamax = alpha, maxpts = 100, delta = qnorm(1-alpha)/80)
   prof <- profile(mod)

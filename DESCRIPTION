@@ -2,6 +2,7 @@ Package: clp
 Type: Package
 Title: R Package for Computing Confidence Functions to Accompany *Confidence, Likelihood, and Probability*
 Version: 0.0.0.9000
+URL: http://github.com/ddarmon/clp
 Author: David Darmon (for now)
 Maintainer: David Darmon <david.m.darmon@gmail.com>
 Description: Currently in  alpha.

@@ -140,7 +140,7 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
   Gn <- list()
 
   for (i in 1:p){
-    Gn[[i]] = stats::ecdf(boot.out$t[, i])
+    Gn[[i]] <- stats::ecdf(boot.out$t[, i])
   }
 
   return(list(t0 = boot.out$t0, t = boot.out$t, Gn = Gn, z0 = z0, a = a))
@@ -220,7 +220,7 @@ percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = F
   Gn <- list()
 
   for (i in 1:p){
-    Gn[[i]] = stats::ecdf(boot.out$t[, i])
+    Gn[[i]] <- stats::ecdf(boot.out$t[, i])
   }
 
   return(list(t0 = boot.out$t0, t = boot.out$t, Gn = Gn))
@@ -241,12 +241,12 @@ percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = F
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confdist = function(bc, theta, param){
-  Gn = bc$Gn[[param]]
-  Phi.invs = qnorm(Gn(theta))
+confdist <- function(bc, theta, param){
+  Gn <- bc$Gn[[param]]
+  Phi.invs <- qnorm(Gn(theta))
 
   # The BCa confidence distribution
-  Hn = pnorm((Phi.invs - bc$z0[param])/(1 + bc$a[param]*(Phi.invs - bc$z0[param])) - bc$z0[param])
+  Hn <- pnorm((Phi.invs - bc$z0[param])/(1 + bc$a[param]*(Phi.invs - bc$z0[param])) - bc$z0[param])
 
   # Handle when Gn(theta) is 0 or 1.
 
@@ -281,7 +281,7 @@ confdist = function(bc, theta, param){
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confdens = function(bc, param){
+confdens <- function(bc, param){
   # See page 202 of *Computer Age Statistical Inference* by
   # Efron and Hastie for the appropriate weights for the
   # BCa confidence density.
@@ -290,10 +290,10 @@ confdens = function(bc, param){
 
   Gn <- bc$Gn[[param]]
 
-  w = function(theta, Gn, z0, a){
-    ztheta = qnorm(Gn(theta)) - z0
+  w <- function(theta, Gn, z0, a){
+    ztheta <- qnorm(Gn(theta)) - z0
 
-    bca.fac = dnorm(ztheta/(1+a*ztheta) - z0)/((1 + a*ztheta)^2*dnorm(ztheta + z0))
+    bca.fac <- dnorm(ztheta/(1+a*ztheta) - z0)/((1 + a*ztheta)^2*dnorm(ztheta + z0))
 
     return(bca.fac)
   }
@@ -368,8 +368,8 @@ confquant <- function(bc, p, param){
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confdist.perc = function(bc, theta, param){
-  Gn = bc$Gn[[param]]
+confdist.perc <- function(bc, theta, param){
+  Gn <- bc$Gn[[param]]
 
   return(Gn(theta))
 }
@@ -388,7 +388,7 @@ confdist.perc = function(bc, theta, param){
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confdens.perc = function(bc, param){
+confdens.perc <- function(bc, param){
   density.out <- density(bc$t[, param], bw = "SJ", n = 1024) # Seems to undersmooth
 
   gn.perc <- density.out$y
@@ -767,7 +767,7 @@ conffuns.from.percboot <- function(bc){
     Gn <- list()
 
     for (i in 1:length(bc$t0)){
-      Gn[[i]] = stats::ecdf(bc$t[, i])
+      Gn[[i]] <- stats::ecdf(bc$t[, i])
     }
 
     bc$Gn <- Gn
@@ -812,10 +812,10 @@ make.beran.multicomp.obj <- function(theta.boot, K, bca.params = NULL){
     theta.med <- median(theta.boot)
   }else{
     cconf <- function(theta) {
-      Phi.invs = qnorm(Gn(theta))
+      Phi.invs <- qnorm(Gn(theta))
 
       # The BCa confidence distribution
-      Hn = pnorm((Phi.invs - bca.params$z0)/(1 + bca.params$a*(Phi.invs - bca.params$z0)) - bca.params$z0)
+      Hn <- pnorm((Phi.invs - bca.params$z0)/(1 + bca.params$a*(Phi.invs - bca.params$z0)) - bca.params$z0)
 
       # Handle when Gn(theta) is 0 or 1.
 

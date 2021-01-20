@@ -462,7 +462,7 @@ glm.lincom.conf.disp <- function(mod, x, plot = TRUE, conf.level = 0.95){
 #' @import MASS
 #' @export
 glm.beta.conf <- function(mod){
-  alpha = 1e-8
+  alpha <- 1e-8
   prof <- profile(mod, alpha = alpha, maxsteps = 100, del = qnorm(1-alpha)/80)
 
   fam <- family(mod)

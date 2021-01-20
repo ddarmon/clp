@@ -4,35 +4,19 @@
 \alias{plot.cconf}
 \title{A Wrapper Function for Plotting Confidence Curves}
 \usage{
-\method{plot}{cconf}(
-  obj,
-  conf.level = 0.95,
-  xlim = NULL,
-  xlab = NULL,
-  log = "",
-  col = "black",
-  n.points = 2001
-)
+\method{plot}{cconf}(x, conf.level = 0.95, n.points = 2001, ...)
 }
 \arguments{
-\item{obj}{a list of confidence functions returned by a *.conf() function}
+\item{x}{a list of confidence functions returned by a *.conf() function}
 
 \item{conf.level}{the confidence level for the confidence interval indicated on the confidence curve}
 
-\item{xlim}{the horizontal limits for the plot. If NULL, taken as the larger of
-a conf.level confidence interval or a 1 - (1 - conf.level)/2 confidence interval.}
-
-\item{xlab}{the label for the horizontal axis}
-
-\item{log}{switch for plotting the horizontal ('x') or vertical ('x') or both ('xy') axes with a
-log-scaling}
-
-\item{col}{the color to plot the confidence curve}
-
 \item{n.points}{the number of points to plot for the confidence curve}
+
+\item{...}{additional plotting parameters.}
 }
 \value{
-a plot of the confidence curve from obj
+a plot of the confidence curve from x
 }
 \description{
 A wrapper for plotting confidence curves using confidence objects

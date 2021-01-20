@@ -20,11 +20,11 @@
 #' x <- dietstudy$weightchange[dietstudy$diet == 'Low Carb']
 #' y <- dietstudy$weightchange[dietstudy$diet == 'Low Fat']
 #'
-#' lc.sign.conf <- sign.conf(x)
-#' lf.sign.conf <- sign.conf(y)
+#' lc.signtest.conf <- signtest.conf(x)
+#' lf.signtest.conf <- signtest.conf(y)
 #'
-#' @export sign.conf
-sign.conf <- function(x, plot = TRUE, conf.level = 0.95){
+#' @export signtest.conf
+signtest.conf <- function(x, plot = TRUE, conf.level = 0.95){
   # DMD: NOTE: Not currently set up for handling tied values.
   #
   # NOTE: This is taking a success as a negative score,
