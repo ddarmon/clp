@@ -1,6 +1,6 @@
 ---
 title: Draft Vignette for `clp`
-date: 10 December 2020
+date: 20 January 2021
 author: David Darmon
 output: rmarkdown::html_vignette
 vignette: >
