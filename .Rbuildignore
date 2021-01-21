@@ -5,3 +5,4 @@
 ^LICENSE\.md$
 demos
 .travis.yml
+travis.yml
