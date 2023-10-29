@@ -65,85 +65,144 @@
 #'                          Sigma = cov(scor)*((nrow(scor)-1)/nrow(scor))))
 #'
 #' @export
-bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
-  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+bcaboot <-
+function(data,
+       statistic,
+       B = 2000,
+       sim = "ordinary",
+       stratified = FALSE,
+       ran.gen = function(d, p)
+         d,
+       mle = NULL,
+       formula = NULL) {
+chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
 
-  if (nzchar(chk) && chk == "TRUE") {
-    # use 2 cores for CRAN
-    num_workers <- 2L
-  } else {
-    # use all cores in devtools::test()
-    num_workers <- parallel::detectCores()
+if (nzchar(chk) && chk == "TRUE") {
+  # use 2 cores for CRAN
+  num_workers <- 2L
+} else {
+  # use all cores in devtools::test()
+  num_workers <- parallel::detectCores()
+}
+
+# num_workers <- parallel::detectCores()
+
+if (stratified) {
+  strata <- data[, ncol(data)]
+
+  if (is.null(formula)) {
+    boot.out <-
+      boot::boot(
+        data = data,
+        statistic = statistic,
+        strata = strata,
+        R = B,
+        sim = sim,
+        ran.gen = ran.gen,
+        mle = mle,
+        parallel = 'multicore',
+        ncpus = num_workers
+      )
+  } else{
+    boot.out <-
+      boot::boot(
+        data = data,
+        statistic = statistic,
+        strata = strata,
+        R = B,
+        sim = sim,
+        ran.gen = ran.gen,
+        mle = mle,
+        formula = formula,
+        parallel = 'multicore',
+        ncpus = num_workers
+      )
   }
 
-  # num_workers <- parallel::detectCores()
-
-  if (stratified){
-    strata <- data[, ncol(data)]
-
-    if (is.null(formula)){
-      boot.out <- boot::boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = num_workers)
-    }else{
-      boot.out <- boot::boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = num_workers)
-    }
-
-  }else{
-    if (is.null(formula)){
-      boot.out <- boot::boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = num_workers)
-    }else{
-      boot.out <- boot::boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = num_workers)
-    }
+} else{
+  if (is.null(formula)) {
+    boot.out <-
+      boot::boot(
+        data = data,
+        statistic = statistic,
+        R = B,
+        sim = sim,
+        ran.gen = ran.gen,
+        mle = mle,
+        parallel = 'multicore',
+        ncpus = num_workers
+      )
+  } else{
+    boot.out <-
+      boot::boot(
+        data = data,
+        statistic = statistic,
+        R = B,
+        sim = sim,
+        ran.gen = ran.gen,
+        mle = mle,
+        formula = formula,
+        parallel = 'multicore',
+        ncpus = num_workers
+      )
   }
+}
 
 
-  p <- length(boot.out$t0) # Dimension of the parameter vector
+p <- length(boot.out$t0) # Dimension of the parameter vector
 
-  # Compute bias adjustment:
-  z0 <- rep(0, p)
+# Compute bias adjustment:
+z0 <- rep(0, p)
 
-  for (i in 1:p){
-    # Handle possible NAs:
+for (i in 1:p) {
+  # Handle possible NAs:
 
-    comp <- boot.out$t[, i] <= boot.out$t0[i]
-    B.wo.na <- sum(!is.na(comp))
+  comp <- boot.out$t[, i] <= boot.out$t0[i]
+  B.wo.na <- sum(!is.na(comp))
 
-    z0[i] <- qnorm(sum(comp, na.rm = TRUE)/(B.wo.na))
+  z0[i] <- qnorm(sum(comp, na.rm = TRUE) / (B.wo.na))
+}
+
+n <- nrow(data)
+
+if (is.null(n)) {
+  n <- length(data)
+  # Reshape data into a matrix
+
+  data <- matrix(data, nrow = n)
+}
+
+# Compute acceleration adjustment:
+u <- matrix(rep(0, n * p), nrow = n)
+
+n1 <- sqrt(n * (n - 1))
+
+if (is.null(formula)) {
+  for (i in seq_len(n)) {
+    u[i, ] <- statistic(data[-i, ], seq_len(n - 1))
   }
-
-  n <- nrow(data)
-
-  if (is.null(n)){
-    n <- length(data)
-    # Reshape data into a matrix
-
-    data <- matrix(data, nrow = n)
+} else{
+  for (i in seq_len(n)) {
+    u[i, ] <- statistic(data[-i, ], seq_len(n - 1), formula = formula)
   }
+}
 
-  # Compute acceleration adjustment:
-  u <- matrix(rep(0, n*p), nrow = n)
+t. <- sweep(-u, 2, colMeans(u), "+") * (n - 1)
+a <- (1 / 6) * colSums(t. ^ 3) / (colSums(t. ^ 2)) ^ 1.5
 
-  n1 <- sqrt(n * (n - 1))
+Gn <- list()
 
-  if (is.null(formula)){
-    for (i in seq_len(n)) {
-      u[i, ] <- statistic(data[-i, ], seq_len(n-1))
-    }
-  }else{
-    for (i in seq_len(n)) {
-      u[i, ] <- statistic(data[-i, ], seq_len(n-1), formula = formula)
-    }
-  }
+for (i in 1:p) {
+  Gn[[i]] <- stats::ecdf(boot.out$t[, i])
+}
 
-  t. <- sweep(-u, 2, colMeans(u), "+") * (n - 1)
-  a <- (1 / 6) * colSums(t.^3) / (colSums(t.^2))^1.5
-
-  Gn <- list()
-
-  for (i in 1:p){
-    Gn[[i]] <- stats::ecdf(boot.out$t[, i])
-  }
-
-  return(list(t0 = boot.out$t0, t = boot.out$t, Gn = Gn, z0 = z0, a = a))
+return(list(
+  t0 = boot.out$t0,
+  t = boot.out$t,
+  Gn = Gn,
+  z0 = z0,
+  a = a
+))
 }
 
 #' Perform Percentile Bootstrap for a Given Statistic
@@ -185,45 +244,98 @@ bcaboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FA
 #'
 #'
 #' @export percboot
-percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = FALSE, ran.gen = function(d, p) d, mle = NULL, formula = NULL){
-  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+percboot <-
+function(data,
+       statistic,
+       B = 2000,
+       sim = "ordinary",
+       stratified = FALSE,
+       ran.gen = function(d, p)
+         d,
+       mle = NULL,
+       formula = NULL) {
+chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
 
-  if (nzchar(chk) && chk == "TRUE") {
-    # use 2 cores for CRAN
-    num_workers <- 2L
-  } else {
-    # use all cores in devtools::test()
-    num_workers <- parallel::detectCores()
+if (nzchar(chk) && chk == "TRUE") {
+  # use 2 cores for CRAN
+  num_workers <- 2L
+} else {
+  # use all cores in devtools::test()
+  num_workers <- parallel::detectCores()
+}
+
+# num_workers <- parallel::detectCores()
+
+if (stratified) {
+  strata <- data[, ncol(data)]
+
+  if (is.null(formula)) {
+    boot.out <-
+      boot::boot(
+        data = data,
+        statistic = statistic,
+        strata = strata,
+        R = B,
+        sim = sim,
+        ran.gen = ran.gen,
+        mle = mle,
+        parallel = 'multicore',
+        ncpus = num_workers
+      )
+  } else{
+    boot.out <-
+      boot::boot(
+        data = data,
+        statistic = statistic,
+        strata = strata,
+        R = B,
+        sim = sim,
+        ran.gen = ran.gen,
+        mle = mle,
+        formula = formula,
+        parallel = 'multicore',
+        ncpus = num_workers
+      )
   }
 
-  # num_workers <- parallel::detectCores()
-
-  if (stratified){
-    strata <- data[, ncol(data)]
-
-    if (is.null(formula)){
-      boot.out <- boot::boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = num_workers)
-    }else{
-      boot.out <- boot::boot(data = data, statistic = statistic, strata = strata, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = num_workers)
-    }
-
-  }else{
-    if (is.null(formula)){
-      boot.out <- boot::boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, parallel = 'multicore', ncpus = num_workers)
-    }else{
-      boot.out <- boot::boot(data = data, statistic = statistic, R = B, sim = sim, ran.gen = ran.gen, mle = mle, formula = formula, parallel = 'multicore', ncpus = num_workers)
-    }
+} else{
+  if (is.null(formula)) {
+    boot.out <-
+      boot::boot(
+        data = data,
+        statistic = statistic,
+        R = B,
+        sim = sim,
+        ran.gen = ran.gen,
+        mle = mle,
+        parallel = 'multicore',
+        ncpus = num_workers
+      )
+  } else{
+    boot.out <-
+      boot::boot(
+        data = data,
+        statistic = statistic,
+        R = B,
+        sim = sim,
+        ran.gen = ran.gen,
+        mle = mle,
+        formula = formula,
+        parallel = 'multicore',
+        ncpus = num_workers
+      )
   }
+}
 
-  p <- length(boot.out$t0) # Dimension of the parameter vector
+p <- length(boot.out$t0) # Dimension of the parameter vector
 
-  Gn <- list()
+Gn <- list()
 
-  for (i in 1:p){
-    Gn[[i]] <- stats::ecdf(boot.out$t[, i])
-  }
+for (i in 1:p) {
+  Gn[[i]] <- stats::ecdf(boot.out$t[, i])
+}
 
-  return(list(t0 = boot.out$t0, t = boot.out$t, Gn = Gn))
+return(list(t0 = boot.out$t0, t = boot.out$t, Gn = Gn))
 }
 
 #' Construct the Confidence Distribution from a BCa Bootstrap for a Given Statistic
@@ -241,30 +353,35 @@ percboot <- function(data, statistic, B = 2000, sim = "ordinary", stratified = F
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confdist <- function(bc, theta, param){
-  Gn <- bc$Gn[[param]]
-  Phi.invs <- qnorm(Gn(theta))
+confdist <- function(bc, theta, param) {
+Gn <- bc$Gn[[param]]
+Phi.invs <- qnorm(Gn(theta))
 
-  # The BCa confidence distribution
-  Hn <- pnorm((Phi.invs - bc$z0[param])/(1 + bc$a[param]*(Phi.invs - bc$z0[param])) - bc$z0[param])
+# The BCa confidence distribution
+Hn <-
+pnorm((Phi.invs - bc$z0[param]) / (1 + bc$a[param] * (Phi.invs - bc$z0[param])) - bc$z0[param])
 
-  # Handle when Gn(theta) is 0 or 1.
+# Handle when Gn(theta) is 0 or 1.
 
-  which.pinf <- which(Phi.invs == Inf)
+which.pinf <- which(Phi.invs == Inf)
 
-  if (length(which.pinf) > 0){
-    Hn[which.pinf] <- 1
-    warning("Warning: Evaluating BCa confidence distribution at a parameter value greater than the largest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
-  }
+if (length(which.pinf) > 0) {
+Hn[which.pinf] <- 1
+warning(
+  "Warning: Evaluating BCa confidence distribution at a parameter value greater than the largest bootstrapped estimate.\nInferential statistics may be unreliable.\n"
+)
+}
 
-  which.ninf <- which(Phi.invs == -Inf)
+which.ninf <- which(Phi.invs == -Inf)
 
-  if (length(which.ninf) > 0){
-    Hn[which.ninf] <- 0
-    warning("Warning: Evaluating BCa confidence distribution at a parameter value less than the smallest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
-  }
+if (length(which.ninf) > 0) {
+Hn[which.ninf] <- 0
+warning(
+  "Warning: Evaluating BCa confidence distribution at a parameter value less than the smallest bootstrapped estimate.\nInferential statistics may be unreliable.\n"
+)
+}
 
-  return(Hn)
+return(Hn)
 }
 
 #' Construct the Confidence Density from a BCa Bootstrap for a Given Statistic
@@ -281,46 +398,52 @@ confdist <- function(bc, theta, param){
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confdens <- function(bc, param){
-  # See page 202 of *Computer Age Statistical Inference* by
-  # Efron and Hastie for the appropriate weights for the
-  # BCa confidence density.
+confdens <- function(bc, param) {
+# See page 202 of *Computer Age Statistical Inference* by
+# Efron and Hastie for the appropriate weights for the
+# BCa confidence density.
 
-  z0 <- bc$z0[param]; a <- bc$a[param]
+z0 <- bc$z0[param]
+a <- bc$a[param]
 
-  Gn <- bc$Gn[[param]]
+Gn <- bc$Gn[[param]]
 
-  w <- function(theta, Gn, z0, a){
-    ztheta <- qnorm(Gn(theta)) - z0
+w <- function(theta, Gn, z0, a) {
+ztheta <- qnorm(Gn(theta)) - z0
 
-    bca.fac <- dnorm(ztheta/(1+a*ztheta) - z0)/((1 + a*ztheta)^2*dnorm(ztheta + z0))
+bca.fac <-
+  dnorm(ztheta / (1 + a * ztheta) - z0) / ((1 + a * ztheta) ^ 2 * dnorm(ztheta + z0))
 
-    return(bca.fac)
-  }
+return(bca.fac)
+}
 
-  Ws <- w(bc$t[, param], Gn, z0, a)
+Ws <- w(bc$t[, param], Gn, z0, a)
 
-  Ws[is.na(Ws)] <- 0
+Ws[is.na(Ws)] <- 0
 
-  Ws <- Ws/sum(Ws)
+Ws <- Ws / sum(Ws)
 
-  density.out <- density(bc$t[, param], bw = "SJ", weights = Ws, n = 1024) # Seems to undersmooth
-  # density.out = density(bc$t[, param], bw = "bcv", weights = Ws, n = 1024) # Seems to oversmooth
+density.out <-
+density(bc$t[, param],
+        bw = "SJ",
+        weights = Ws,
+        n = 1024) # Seems to undersmooth
+# density.out = density(bc$t[, param], bw = "bcv", weights = Ws, n = 1024) # Seems to oversmooth
 
-  gn.bca <- density.out$y
-  thetas <- density.out$x
+gn.bca <- density.out$y
+thetas <- density.out$x
 
-  gn.approx <- approxfun(thetas, gn.bca)
+gn.approx <- approxfun(thetas, gn.bca)
 
-  dconf <- function(thetas){
-    g <- gn.approx(thetas)
+dconf <- function(thetas) {
+g <- gn.approx(thetas)
 
-    g[is.na(g)] <- 0
+g[is.na(g)] <- 0
 
-    return(g)
-  }
+return(g)
+}
 
-  return(dconf)
+return(dconf)
 }
 
 #' Construct the Confidence Quantile Function from a BCa Bootstrap for a Given Statistic
@@ -338,19 +461,19 @@ confdens <- function(bc, param){
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confquant <- function(bc, p, param){
-  Gn <- bc$Gn[[param]]
-  z0 <- bc$z0[param]
+confquant <- function(bc, p, param) {
+Gn <- bc$Gn[[param]]
+z0 <- bc$z0[param]
 
-  a <- bc$a[param]
+a <- bc$a[param]
 
-  z <- qnorm(p)
+z <- qnorm(p)
 
-  zp <- z0 + (z0 + z)/(1 - a*(z0 + z))
+zp <- z0 + (z0 + z) / (1 - a * (z0 + z))
 
-  Qn <- quantile(bc$t[, param], pnorm(zp))
+Qn <- quantile(bc$t[, param], pnorm(zp))
 
-  return(Qn)
+return(Qn)
 }
 
 #' Construct the Confidence Distribution from a Percentile Bootstrap for a Given Statistic
@@ -368,10 +491,10 @@ confquant <- function(bc, p, param){
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confdist.perc <- function(bc, theta, param){
-  Gn <- bc$Gn[[param]]
+confdist.perc <- function(bc, theta, param) {
+Gn <- bc$Gn[[param]]
 
-  return(Gn(theta))
+return(Gn(theta))
 }
 
 #' Construct the Confidence Density from a Percentile Bootstrap for a Given Statistic
@@ -388,23 +511,24 @@ confdist.perc <- function(bc, theta, param){
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confdens.perc <- function(bc, param){
-  density.out <- density(bc$t[, param], bw = "SJ", n = 1024) # Seems to undersmooth
+confdens.perc <- function(bc, param) {
+density.out <-
+density(bc$t[, param], bw = "SJ", n = 1024) # Seems to undersmooth
 
-  gn.perc <- density.out$y
-  thetas <- density.out$x
+gn.perc <- density.out$y
+thetas <- density.out$x
 
-  gn.approx <- approxfun(thetas, gn.perc)
+gn.approx <- approxfun(thetas, gn.perc)
 
-  dconf <- function(thetas){
-    g <- gn.approx(thetas)
+dconf <- function(thetas) {
+g <- gn.approx(thetas)
 
-    g[is.na(g)] <- 0
+g[is.na(g)] <- 0
 
-    return(g)
-  }
+return(g)
+}
 
-  return(dconf)
+return(dconf)
 }
 
 #' Construct the Confidence Quantile Function from a Percentile Bootstrap for a Given Statistic
@@ -422,18 +546,24 @@ confdens.perc <- function(bc, param){
 #'
 #'              Bradley Efron and Trevor Hastie. Computer Age Statistical Inference. Vol. 5. Cambridge University Press, 2016.
 #'
-confquant.perc <- function(bc, p, param){
-  num.na <- sum(is.na(bc$t[, param]))
+confquant.perc <- function(bc, p, param) {
+num.na <- sum(is.na(bc$t[, param]))
 
-  if (num.na > 0) {
-    warning(sprintf('%g of %g bootstrap estimates are NA. Removing them when approximating estimating the bootstrap distribution.', num.na, nrow(bc$t)))
-    Qn <- quantile(bc$t[, param], p, na.rm = TRUE)
-  }else{
-    Qn <- quantile(bc$t[, param], p)
-  }
+if (num.na > 0) {
+warning(
+  sprintf(
+    '%g of %g bootstrap estimates are NA. Removing them when approximating estimating the bootstrap distribution.',
+    num.na,
+    nrow(bc$t)
+  )
+)
+Qn <- quantile(bc$t[, param], p, na.rm = TRUE)
+} else{
+Qn <- quantile(bc$t[, param], p)
+}
 
 
-  return(Qn)
+return(Qn)
 }
 
 #' Statistic for Bootstrapped Two-sample t-test.
@@ -449,12 +579,12 @@ confquant.perc <- function(bc, p, param){
 #'
 #' @return A single value of the difference of the two bootstrapped sample means.
 #'
-t.two.sample <- function(data, id = 1:nrow(data)){
-  dat <- data[id, ]
+t.two.sample <- function(data, id = 1:nrow(data)) {
+dat <- data[id, ]
 
-  d <- mean(dat[dat[, 2] == 1, 1]) - mean(dat[dat[, 2] == 2, 1])
+d <- mean(dat[dat[, 2] == 1, 1]) - mean(dat[dat[, 2] == 2, 1])
 
-  return(d)
+return(d)
 }
 
 #' Statistic for Bootstrapped One-sample t-test.
@@ -467,12 +597,12 @@ t.two.sample <- function(data, id = 1:nrow(data)){
 #'
 #' @return A single value of the bootstrapped sample mean.
 #'
-t.one.sample <- function(data, id = 1:length(data)){
-  dat <- data[id]
+t.one.sample <- function(data, id = 1:length(data)) {
+dat <- data[id]
 
-  d <- mean(dat)
+d <- mean(dat)
 
-  return(d)
+return(d)
 }
 
 #' Bootstrapped Confidence Functions for One or Two Means
@@ -510,36 +640,40 @@ t.one.sample <- function(data, id = 1:length(data)){
 #'             B = 2000)
 #'
 #' @export t_test.boot.conf
-t_test.boot.conf <- function(x, y = NULL, B = 2000, plot = TRUE, conf.level = 0.95){
+t_test.boot.conf <-
+function(x,
+       y = NULL,
+       B = 2000,
+       plot = TRUE,
+       conf.level = 0.95) {
+if (is.null(y)) {
+  dat <- x
+  bc <- bcaboot(dat, t.one.sample, B = B)
 
-  if (is.null(y)){
-    dat <- x
-    bc <- bcaboot(dat, t.one.sample, B = B)
+  xlab <- 'mean'
+} else{
+  dat <- cbind(c(x, y), c(rep(1, length(x)), rep(2, length(y))))
+  bc <- bcaboot(dat, t.two.sample, B = B, stratified = TRUE)
 
-    xlab <- 'mean'
-  }else{
-    dat <- cbind(c(x, y), c(rep(1, length(x)), rep(2, length(y))))
-    bc <- bcaboot(dat, t.two.sample, B = B, stratified = TRUE)
-
-    xlab <- 'mean[1] - mean[2]'
-  }
-
-  out <- conffuns.from.bcaboot(bc)
-
-  if (plot){
-    display.dconf(out, xlab = xlab)
-    display.cconf(out, conf.level = conf.level, xlab = xlab)
-  }
-
-  return(out)
+  xlab <- 'mean[1] - mean[2]'
 }
 
-lm.beta.for.boot <- function(data, id = 1:nrow(data), formula){
-  dat <- data[id, ]
+out <- conffuns.from.bcaboot(bc)
 
-  mod <- lm(formula, data = dat)
+if (plot) {
+  display.dconf(out, xlab = xlab)
+  display.cconf(out, conf.level = conf.level, xlab = xlab)
+}
 
-  return(mod$coefficients)
+return(out)
+}
+
+lm.beta.for.boot <- function(data, id = 1:nrow(data), formula) {
+dat <- data[id, ]
+
+mod <- lm(formula, data = dat)
+
+return(mod$coefficients)
 }
 
 #' Bootstrapped Confidence Functions for Coefficients of a Linear Model
@@ -568,75 +702,120 @@ lm.beta.for.boot <- function(data, id = 1:nrow(data), formula){
 #' display.cconf(beta.boot.conf$weight)
 #'
 #' @export lm.beta.boot.conf
-lm.beta.boot.conf <- function(formula, data, B = 2000){
-  bc <- bcaboot(data = data, statistic = lm.beta.for.boot, B = B, formula = formula)
+lm.beta.boot.conf <- function(formula, data, B = 2000) {
+bc <-
+bcaboot(
+  data = data,
+  statistic = lm.beta.for.boot,
+  B = B,
+  formula = formula
+)
 
-  out <- conffuns.from.bcaboot(bc)
+out <- conffuns.from.bcaboot(bc)
 
-  return(out)
+return(out)
 }
 
-lm.sigma.for.boot <- function(data, id = 1:nrow(data), formula){
-  dat <- data[id, ]
+lm.sigma.for.boot <- function(data, id = 1:nrow(data), formula) {
+dat <- data[id, ]
 
-  mod <- lm(formula, data = dat)
+mod <- lm(formula, data = dat)
 
-  df <- mod$df.residual
+df <- mod$df.residual
 
-  sig <- sqrt(df*(summary(mod)$sigma)^2/nrow(mod$model))
+sig <- sqrt(df * (summary(mod)$sigma) ^ 2 / nrow(mod$model))
 
-  return(sig)
+return(sig)
 }
 
-lm.sigma.boot.conf <- function(formula, data, B = 2000, plot = TRUE, conf.level = 0.95){
-  bc <- bcaboot(data = data, statistic = lm.sigma.for.boot, B = B, formula = formula)
+lm.sigma.boot.conf <-
+function(formula,
+       data,
+       B = 2000,
+       plot = TRUE,
+       conf.level = 0.95) {
+bc <-
+  bcaboot(
+    data = data,
+    statistic = lm.sigma.for.boot,
+    B = B,
+    formula = formula
+  )
 
-  out <- conffuns.from.bcaboot(bc)
+out <- conffuns.from.bcaboot(bc)
 
-  if (plot){
-    display.dconf(out, xlab = 'Noise Standard Deviation')
-    display.cconf(out, conf.level = conf.level, xlab = 'Noise Standard Deviation')
-  }
-
-  return(out)
+if (plot) {
+  display.dconf(out, xlab = 'Noise Standard Deviation')
+  display.cconf(out, conf.level = conf.level, xlab = 'Noise Standard Deviation')
 }
 
-conffuns.from.bcaboot.single <- function(bc, ind){
-  ind
-
-  pconf <- function(x) confdist(bc, x, ind)
-  cconf <- function(x) abs(2*pconf(x) - 1)
-
-  # Only valid within the approximate range of the data!
-  dconf <- function(x) confdens(bc, ind)(x)
-
-  qconf <- function(p) confquant(bc, p, ind)
-
-  pcurve <- function(x) 1 - cconf(x)
-  scurve <- function(x) -log2(pcurve(x))
-
-  out <- list(pconf = pconf, cconf = cconf, dconf = dconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
-
-  return(out)
+return(out)
 }
 
-conffuns.from.percboot.single <- function(bc, ind){
-  ind
+conffuns.from.bcaboot.single <- function(bc, ind) {
+ind
 
-  pconf <- function(x) confdist.perc(bc, x, ind)
-  cconf <- function(x) abs(2*pconf(x) - 1)
+pconf <- function(x)
+confdist(bc, x, ind)
+cconf <- function(x)
+abs(2 * pconf(x) - 1)
 
-  # Only valid within the approximate range of the data!
-  dconf <- function(x) confdens.perc(bc, ind)(x)
+# Only valid within the approximate range of the data!
+dconf <- function(x)
+confdens(bc, ind)(x)
 
-  qconf <- function(p) confquant.perc(bc, p, ind)
+qconf <- function(p)
+confquant(bc, p, ind)
 
-  pcurve <- function(x) 1 - cconf(x)
-  scurve <- function(x) -log2(pcurve(x))
+pcurve <- function(x)
+1 - cconf(x)
+scurve <- function(x)
+- log2(pcurve(x))
 
-  out <- list(pconf = pconf, cconf = cconf, dconf = dconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+out <-
+list(
+  pconf = pconf,
+  cconf = cconf,
+  dconf = dconf,
+  qconf = qconf,
+  pcurve = pcurve,
+  scurve = scurve
+)
 
-  return(out)
+return(out)
+}
+
+conffuns.from.percboot.single <- function(bc, ind) {
+ind
+
+pconf <- function(x)
+confdist.perc(bc, x, ind)
+cconf <- function(x)
+abs(2 * pconf(x) - 1)
+
+# Only valid within the approximate range of the data!
+dconf <- function(x)
+confdens.perc(bc, ind)(x)
+
+qconf <- function(p)
+confquant.perc(bc, p, ind)
+
+pcurve <- function(x)
+1 - cconf(x)
+scurve <- function(x)
+- log2(pcurve(x))
+
+out <-
+list(
+  pconf = pconf,
+  cconf = cconf,
+  dconf = dconf,
+  qconf = qconf,
+  pcurve = pcurve,
+  scurve = scurve
+)
+
+return(out)
 }
 
 #' Construct Confidence Functions from an Output of bcaboot
@@ -689,28 +868,30 @@ conffuns.from.percboot.single <- function(bc, ind){
 #' lam.conf$qconf(c(0.025, 0.975))
 #'
 #' @export conffuns.from.bcaboot
-conffuns.from.bcaboot <- function(bc){
-  if (length(bc$t0) > 1){ # Parameter vector
+conffuns.from.bcaboot <- function(bc) {
+if (length(bc$t0) > 1) {
+# Parameter vector
 
-    out <- list()
+out <- list()
 
-    if (is.null(names(bc$t0))){
-      theta.names <- paste0('theta', 1:length(bc$t0))
-    }else{
-      theta.names <- names(bc$t0)
-    }
+if (is.null(names(bc$t0))) {
+  theta.names <- paste0('theta', 1:length(bc$t0))
+} else{
+  theta.names <- names(bc$t0)
+}
 
-    for (ind in 1:length(theta.names)){
-      out[[theta.names[ind]]] <- conffuns.from.bcaboot.single(bc, ind)
-    }
+for (ind in 1:length(theta.names)) {
+  out[[theta.names[ind]]] <- conffuns.from.bcaboot.single(bc, ind)
+}
 
-    return(out)
-  }else{ # Single parameter
+return(out)
+} else{
+# Single parameter
 
-    out <- conffuns.from.bcaboot.single(bc, 1)
+out <- conffuns.from.bcaboot.single(bc, 1)
 
-    return(out)
-  }
+return(out)
+}
 }
 
 #' Construct Confidence Functions from an Output of percboot
@@ -762,117 +943,138 @@ conffuns.from.bcaboot <- function(bc){
 #' lam.conf$qconf(c(0.025, 0.975))
 #'
 #' @export conffuns.from.percboot
-conffuns.from.percboot <- function(bc){
-  if (is.null(bc$Gn)){ # A boot object made directly by the boot package
-    Gn <- list()
+conffuns.from.percboot <- function(bc) {
+if (is.null(bc$Gn)) {
+# A boot object made directly by the boot package
+Gn <- list()
 
-    for (i in 1:length(bc$t0)){
-      Gn[[i]] <- stats::ecdf(bc$t[, i])
-    }
+for (i in 1:length(bc$t0)) {
+  Gn[[i]] <- stats::ecdf(bc$t[, i])
+}
 
-    bc$Gn <- Gn
-  }
+bc$Gn <- Gn
+}
 
-  if (length(bc$t0) > 1){ # Parameter vector
+if (length(bc$t0) > 1) {
+# Parameter vector
 
-    out <- list()
+out <- list()
 
-    if (is.null(names(bc$t0))){
-      theta.names <- paste0('theta', 1:length(bc$t0))
-    }else{
-      theta.names <- names(bc$t0)
-    }
+if (is.null(names(bc$t0))) {
+  theta.names <- paste0('theta', 1:length(bc$t0))
+} else{
+  theta.names <- names(bc$t0)
+}
 
-    for (ind in 1:length(theta.names)){
-      out[[theta.names[ind]]] <- conffuns.from.percboot.single(bc, ind)
-    }
+for (ind in 1:length(theta.names)) {
+  out[[theta.names[ind]]] <- conffuns.from.percboot.single(bc, ind)
+}
 
-    return(out)
-  }else{ # Single parameter
+return(out)
+} else{
+# Single parameter
 
-    out <- conffuns.from.percboot.single(bc, 1)
+out <- conffuns.from.percboot.single(bc, 1)
 
-    return(out)
-  }
+return(out)
+}
 }
 
 # Function to generate confidence functions via bootstrapping
 # adjusted for multiple comparisons using the method of Rudolf Beran (1988):
 #
 # Rudolf Beran. "Balanced simultaneous confidence sets." Journal of the American Statistical Association 83.403 (1988): 679-686.
-make.beran.multicomp.obj <- function(theta.boot, K, bca.params = NULL){
-  Gn <- ecdf(theta.boot)
+make.beran.multicomp.obj <-
+function(theta.boot, K, bca.params = NULL) {
+Gn <- ecdf(theta.boot)
 
-  if (is.null(bca.params)){
-    cconf <- function(theta) K(abs(2*Gn(theta) - 1))
+if (is.null(bca.params)) {
+  cconf <- function(theta)
+    K(abs(2 * Gn(theta) - 1))
 
-    # Median of the confidence distribution is the median of the
-    # bootstrap estimates.
+  # Median of the confidence distribution is the median of the
+  # bootstrap estimates.
 
-    theta.med <- median(theta.boot)
-  }else{
-    cconf <- function(theta) {
-      Phi.invs <- qnorm(Gn(theta))
+  theta.med <- median(theta.boot)
+} else{
+  cconf <- function(theta) {
+    Phi.invs <- qnorm(Gn(theta))
 
-      # The BCa confidence distribution
-      Hn <- pnorm((Phi.invs - bca.params$z0)/(1 + bca.params$a*(Phi.invs - bca.params$z0)) - bca.params$z0)
+    # The BCa confidence distribution
+    Hn <-
+      pnorm((Phi.invs - bca.params$z0) / (1 + bca.params$a * (Phi.invs - bca.params$z0)) - bca.params$z0)
 
-      # Handle when Gn(theta) is 0 or 1.
+    # Handle when Gn(theta) is 0 or 1.
 
-      which.pinf <- which(Phi.invs == Inf)
+    which.pinf <- which(Phi.invs == Inf)
 
-      if (length(which.pinf) > 0){
-        Hn[which.pinf] <- 1
-        #warning("Warning: Evaluating BCa confidence distribution at a parameter value greater than the largest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
-      }
-
-      which.ninf <- which(Phi.invs == -Inf)
-
-      if (length(which.ninf) > 0){
-        Hn[which.ninf] <- 0
-        #warning("Warning: Evaluating BCa confidence distribution at a parameter value less than the smallest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
-      }
-      return(K(abs(2*Hn - 1)))
+    if (length(which.pinf) > 0) {
+      Hn[which.pinf] <- 1
+      #warning("Warning: Evaluating BCa confidence distribution at a parameter value greater than the largest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
     }
 
-    # Median of the BCa confidence distribution is
-    #   \psi_{1/2} =  \hat{G}^{-1}\left( \Phi\left( \frac{z_{0}(2 - az_{0})}{1 - a z_{0}} \right) \right)
+    which.ninf <- which(Phi.invs == -Inf)
 
-    inner <- pnorm(bca.params$z0*(2-bca.params$a*bca.params$z0)/(1 - bca.params$a*bca.params$z0))
-
-    theta.med <- as.numeric(quantile(theta.boot, probs = inner))
-  }
-
-  # Might want to adjust this too, for when z0 is large.
-
-  theta.min <- min(theta.boot) - 1 # Need - 1 since Fhat(theta.min) = 1/n, and not 0.
-  theta.max <- max(theta.boot)
-
-  pconf <- function(theta){
-    if (theta <= theta.med){
-      return(0.5 - 0.5*cconf(theta))
-    }else{
-      return(0.5 + 0.5*cconf(theta))
+    if (length(which.ninf) > 0) {
+      Hn[which.ninf] <- 0
+      #warning("Warning: Evaluating BCa confidence distribution at a parameter value less than the smallest bootstrapped estimate.\nInferential statistics may be unreliable.\n")
     }
+    return(K(abs(2 * Hn - 1)))
   }
 
-  pconf <- Vectorize(pconf)
+  # Median of the BCa confidence distribution is
+  #   \psi_{1/2} =  \hat{G}^{-1}\left( \Phi\left( \frac{z_{0}(2 - az_{0})}{1 - a z_{0}} \right) \right)
 
-  qconf <- function(p){
-    fun.root <- function(x) pconf(x) - p
+  inner <-
+    pnorm(
+      bca.params$z0 * (2 - bca.params$a * bca.params$z0) / (1 - bca.params$a *
+                                                              bca.params$z0)
+    )
 
-    uniroot(fun.root, interval = c(theta.min, theta.max))$root
+  theta.med <- as.numeric(quantile(theta.boot, probs = inner))
+}
+
+# Might want to adjust this too, for when z0 is large.
+
+theta.min <-
+  min(theta.boot) - 1 # Need - 1 since Fhat(theta.min) = 1/n, and not 0.
+theta.max <- max(theta.boot)
+
+pconf <- function(theta) {
+  if (theta <= theta.med) {
+    return(0.5 - 0.5 * cconf(theta))
+  } else{
+    return(0.5 + 0.5 * cconf(theta))
   }
+}
 
-  qconf <- Vectorize(qconf)
+pconf <- Vectorize(pconf)
 
-  pcurve <- function(theta) 1 - cconf(theta)
+qconf <- function(p) {
+  fun.root <- function(x)
+    pconf(x) - p
 
-  scurve <- function(theta) -log2(pcurve(theta))
+  uniroot(fun.root, interval = c(theta.min, theta.max))$root
+}
 
-  out <- list(pconf = pconf, cconf = cconf, qconf = qconf, pcurve = pcurve, scurve = scurve)
+qconf <- Vectorize(qconf)
 
-  return(out)
+pcurve <- function(theta)
+  1 - cconf(theta)
+
+scurve <- function(theta)
+  - log2(pcurve(theta))
+
+out <-
+  list(
+    pconf = pconf,
+    cconf = cconf,
+    qconf = qconf,
+    pcurve = pcurve,
+    scurve = scurve
+  )
+
+return(out)
 }
 
 #' Simultaneous Confidence Functions via Bootstrapping.
@@ -914,52 +1116,58 @@ make.beran.multicomp.obj <- function(theta.boot, K, bca.params = NULL){
 #' }
 #'
 #' @export bootstrap.beran.conf
-bootstrap.beran.conf <- function(bc, which = NULL, interval.type = 'bca'){
-  if (is.null(which)){
-    which <- 1:ncol(bc$t)
+bootstrap.beran.conf <-
+function(bc,
+       which = NULL,
+       interval.type = 'bca') {
+if (is.null(which)) {
+  which <- 1:ncol(bc$t)
+}
+
+theta.hat  <- bc$t0[which]
+theta.boot <- bc$t[, which]
+
+if (interval.type == 'bca') {
+  if (is.null(bc$z0) || is.null(bc$a)) {
+    warning(
+      'The boot object does not have the necessary BCa parameters. Using the percentile interval confidence distribution instead.'
+    )
+    interval.type <- 'percentile'
+  } else{
+    z0.sub <- bc$z0[which]
+    a.sub <- bc$a[which]
   }
+}
 
-  theta.hat  <- bc$t0[which]
-  theta.boot <- bc$t[, which]
+nam <- names(theta.hat)
 
-  if (interval.type == 'bca'){
-    if (is.null(bc$z0) || is.null(bc$a)){
-      warning('The boot object does not have the necessary BCa parameters. Using the percentile interval confidence distribution instead.')
-      interval.type <- 'percentile'
-    }else{
-      z0.sub <- bc$z0[which]
-      a.sub <- bc$a[which]
-    }
+if (is.null(nam)) {
+  nam <- as.character(which)
+}
+
+V <- matrix(nrow = nrow(theta.boot), ncol = ncol(theta.boot))
+
+for (j in 1:ncol(theta.boot)) {
+  Hn <- ecdf(theta.boot[, j])
+
+  V[, j] <- abs(2 * Hn(theta.boot[, j]) - 1)
+}
+
+Vmax <- apply(V, 1, max)
+K <- ecdf(Vmax)
+
+out <- list()
+
+if (interval.type == 'bca') {
+  for (j in 1:ncol(theta.boot)) {
+    out[[nam[j]]] <-
+      make.beran.multicomp.obj(theta.boot[, j], K, list(z0 = z0.sub[j], a = a.sub[j]))
   }
-
-  nam <- names(theta.hat)
-
-  if (is.null(nam)){
-    nam <- as.character(which)
+} else{
+  for (j in 1:ncol(theta.boot)) {
+    out[[nam[j]]] <- make.beran.multicomp.obj(theta.boot[, j], K)
   }
+}
 
-  V <- matrix(nrow = nrow(theta.boot), ncol = ncol(theta.boot))
-
-  for (j in 1:ncol(theta.boot)){
-    Hn <- ecdf(theta.boot[, j])
-
-    V[, j] <- abs(2*Hn(theta.boot[, j]) - 1)
-  }
-
-  Vmax <- apply(V, 1, max)
-  K <- ecdf(Vmax)
-
-  out <- list()
-
-  if (interval.type == 'bca'){
-    for (j in 1:ncol(theta.boot)){
-      out[[nam[j]]] <- make.beran.multicomp.obj(theta.boot[, j], K, list(z0 = z0.sub[j], a = a.sub[j]))
-    }
-  }else{
-    for (j in 1:ncol(theta.boot)){
-      out[[nam[j]]] <- make.beran.multicomp.obj(theta.boot[, j], K)
-    }
-  }
-
-  return(out)
+return(out)
 }
